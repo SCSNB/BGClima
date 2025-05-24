@@ -1,0 +1,69 @@
+########################################
+# .NET (API)
+########################################
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.dbmdl
+*.log
+*.vs/
+.vscode/
+*.pdb
+*.cache/
+*.ide/
+*.csproj.user
+Generated_Code/
+
+# ASP.NET Core specific
+appsettings.*.json
+appsettings.Local.json
+secrets.json
+*.publishsettings
+Properties/launchSettings.json
+
+########################################
+# Angular (Frontend)
+########################################
+# compiled output
+dist/
+out-tsc/
+
+# dependencies
+node_modules/
+
+# environment settings
+src/environments/*.ts
+!src/environments/environment.prod.ts
+
+# Angular tooling
+.angular/
+.angular-cache/
+npm-debug.log
+yarn-error.log
+package-lock.json
+*.tgz
+
+# IDE/editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+*.code-workspace
+
+########################################
+# OS files
+########################################
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# Logs
+*.log
+
+########################################
+# Git
+########################################
+.git/
+
