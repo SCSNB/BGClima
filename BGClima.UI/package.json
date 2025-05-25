@@ -4,8 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build && copy dist\\bgclima.ui public /Y",
-    "postbuild": "echo Build complete",
+    "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
