@@ -1,12 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from './services/auth.service';
+import { Router, NavigationEnd, Event } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'BGClima';
+  isAuthenticated = false;
+  isAdmin = false;
+  currentUrl: string = '';
   
   // Mock products data
   products = [
@@ -59,4 +65,33 @@ export class AppComponent {
       freeInstallation: false
     }
   ];
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {
+    // Subscribe to router events to keep track of the current URL
+    this.router.events.pipe(
+      filter((event: Event): event is NavigationEnd => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      this.currentUrl = event.url;
+      console.log('Current URL:', this.currentUrl);
+    });
+  }
+
+  ngOnInit(): void {
+    this.authService.currentUser.subscribe(user => {
+      this.isAuthenticated = !!user;
+      this.isAdmin = this.authService.isAdmin();
+    });
+  }
+
+  logout(): void {
+    this.authService.logout();
+  }
+  
+  // Check if the current route is admin or login
+  isAdminOrLoginRoute(): boolean {
+    return this.currentUrl.includes('/admin') || this.currentUrl.includes('/login');
+  }
 }

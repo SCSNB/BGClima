@@ -1,27 +1,34 @@
-# BGClimaUI
+# BGClima UI
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.0.2.
+This is the UI project for BGClima website.
 
-## Development server
+## Setup Instructions
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+1. Install dependencies:
+```
+npm install
+```
 
-## Code scaffolding
+2. Download the logo:
+   - Download the BGClima logo from https://www.bgclima.com/images/logo.png
+   - Save it to `src/assets/logo.png`
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+3. Run the development server:
+```
+ng serve
+```
 
-## Build
+4. Navigate to `http://localhost:4200/` to see the application.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Project Structure
 
-## Running unit tests
+- `src/app/app.component.*` - Main application component
+- `src/assets/` - Static assets including images
+- `src/styles.scss` - Global styles
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Features
 
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- Responsive design
+- Product catalog with filtering
+- Contact information
+- Service categories

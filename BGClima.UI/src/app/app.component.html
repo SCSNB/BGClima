@@ -1,9 +1,10 @@
-<div class="bg-clima-container">
+<!-- Only show the main layout if not on admin or login pages -->
+<div class="bg-clima-container" *ngIf="!isAdminOrLoginRoute()">
   <!-- Header -->
   <mat-toolbar color="primary" class="header">
     <div class="logo-container">
       <a routerLink="/">
-        <span class="logo">БГ Клима</span>
+        <img src="assets/logo.png" alt="БГ Клима" class="logo-image">
       </a>
     </div>
     <span class="spacer"></span>
@@ -26,7 +27,28 @@
         <mat-icon>contact_phone</mat-icon>
         <span>Контакти</span>
       </button>
+      <button mat-menu-item routerLink="/admin" *ngIf="isAdmin">
+        <mat-icon>admin_panel_settings</mat-icon>
+        <span>Админ панел</span>
+      </button>
+      <button mat-menu-item routerLink="/login" *ngIf="!isAuthenticated">
+        <mat-icon>login</mat-icon>
+        <span>Вход</span>
+      </button>
+      <button mat-menu-item (click)="logout()" *ngIf="isAuthenticated">
+        <mat-icon>logout</mat-icon>
+        <span>Изход</span>
+      </button>
     </mat-menu>
+    <a mat-icon-button routerLink="/admin" *ngIf="isAdmin" class="admin-button" matTooltip="Админ панел">
+      <mat-icon>admin_panel_settings</mat-icon>
+    </a>
+    <a mat-icon-button routerLink="/login" *ngIf="!isAuthenticated" class="login-button" matTooltip="Вход">
+      <mat-icon>login</mat-icon>
+    </a>
+    <button mat-icon-button *ngIf="isAuthenticated" (click)="logout()" class="logout-button" matTooltip="Изход">
+      <mat-icon>logout</mat-icon>
+    </button>
   </mat-toolbar>
 
   <!-- Main Navigation -->
@@ -103,7 +125,9 @@
           <h4>Цена</h4>
           <div class="price-range">
             <span>0 лв.</span>
-            <mat-slider min="0" max="15000" step="100" value="14850"></mat-slider>
+            <mat-slider min="0" max="15000" step="100">
+              <input matSliderThumb value="14850">
+            </mat-slider>
             <span>14850 лв.</span>
           </div>
         </mat-card-content>
@@ -125,7 +149,6 @@
           </mat-card-content>
           <mat-card-actions>
             <button mat-button color="primary">Детайли</button>
-            <button mat-raised-button color="accent">Поръчай</button>
           </mat-card-actions>
           <div class="free-installation" *ngIf="product.freeInstallation">
             <span>Безплатен монтаж</span>
@@ -190,4 +213,5 @@
   </footer>
 </div>
 
+<!-- Always show the router outlet -->
 <router-outlet></router-outlet>

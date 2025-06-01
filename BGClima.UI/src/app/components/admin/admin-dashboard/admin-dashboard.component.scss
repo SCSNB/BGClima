@@ -1,0 +1,62 @@
+.admin-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.admin-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.username {
+  margin-right: 16px;
+}
+
+.admin-sidenav-container {
+  flex: 1;
+}
+
+.admin-sidenav {
+  width: 250px;
+}
+
+.admin-content {
+  padding: 20px;
+}
+
+.dashboard-content {
+  h1 {
+    margin-bottom: 24px;
+  }
+}
+
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  
+  mat-card {
+    h2 {
+      font-size: 2.5rem;
+      font-weight: 500;
+      margin: 0;
+      text-align: center;
+      padding: 16px 0;
+    }
+  }
+}
+
+// Active route styling
+.mat-list-item.active {
+  background-color: rgba(0, 0, 0, 0.04);
+  
+  .mat-icon {
+    color: #3f51b5;
+  }
+} 

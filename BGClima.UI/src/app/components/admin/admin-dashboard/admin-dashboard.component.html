@@ -1,0 +1,101 @@
+<div class="admin-container">
+  <mat-toolbar color="primary" class="admin-toolbar">
+    <button mat-icon-button (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span>BGClima Admin</span>
+    <span class="toolbar-spacer"></span>
+    <span class="username">Welcome, {{username}}</span>
+    <button mat-icon-button (click)="logout()">
+      <mat-icon>exit_to_app</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <mat-sidenav-container class="admin-sidenav-container">
+    <mat-sidenav #sidenav mode="over" class="admin-sidenav" [opened]="true">
+      <mat-nav-list>
+        <a mat-list-item routerLink="/admin" routerLinkActive="active">
+          <mat-icon>dashboard</mat-icon>
+          <span>Dashboard</span>
+        </a>
+        <a mat-list-item routerLink="/admin/products" routerLinkActive="active">
+          <mat-icon>inventory_2</mat-icon>
+          <span>Products</span>
+        </a>
+        <a mat-list-item routerLink="/admin/categories" routerLinkActive="active">
+          <mat-icon>category</mat-icon>
+          <span>Categories</span>
+        </a>
+        <a mat-list-item routerLink="/admin/orders" routerLinkActive="active">
+          <mat-icon>shopping_cart</mat-icon>
+          <span>Orders</span>
+        </a>
+        <a mat-list-item routerLink="/admin/users" routerLinkActive="active">
+          <mat-icon>people</mat-icon>
+          <span>Users</span>
+        </a>
+        <mat-divider></mat-divider>
+        <a mat-list-item routerLink="/" target="_blank">
+          <mat-icon>public</mat-icon>
+          <span>View Website</span>
+        </a>
+        <a mat-list-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Logout</span>
+        </a>
+      </mat-nav-list>
+    </mat-sidenav>
+
+    <mat-sidenav-content class="admin-content">
+      <div class="dashboard-content">
+        <h1>Admin Dashboard</h1>
+        
+        <div class="stats-cards">
+          <mat-card>
+            <mat-card-header>
+              <mat-icon mat-card-avatar>inventory_2</mat-icon>
+              <mat-card-title>Products</mat-card-title>
+              <mat-card-subtitle>Total Products</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <h2>156</h2>
+            </mat-card-content>
+          </mat-card>
+          
+          <mat-card>
+            <mat-card-header>
+              <mat-icon mat-card-avatar>category</mat-icon>
+              <mat-card-title>Categories</mat-card-title>
+              <mat-card-subtitle>Active Categories</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <h2>12</h2>
+            </mat-card-content>
+          </mat-card>
+          
+          <mat-card>
+            <mat-card-header>
+              <mat-icon mat-card-avatar>shopping_cart</mat-icon>
+              <mat-card-title>Orders</mat-card-title>
+              <mat-card-subtitle>This Month</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <h2>28</h2>
+            </mat-card-content>
+          </mat-card>
+          
+          <mat-card>
+            <mat-card-header>
+              <mat-icon mat-card-avatar>people</mat-icon>
+              <mat-card-title>Users</mat-card-title>
+              <mat-card-subtitle>Registered Users</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <h2>245</h2>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div> 
