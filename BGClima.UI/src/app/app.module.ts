@@ -8,6 +8,11 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { AdminDashboardComponent } from './components/admin/admin-dashboard/admin-dashboard.component';
+import { OffersComponent } from './components/offers/offers.component';
+import { NewsComponent } from './components/news/news.component';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { FooterComponent } from './components/footer/footer.component';
+import { HomeComponent } from './components/home/home.component';
 
 // Material Imports
 import { MatButtonModule } from '@angular/material/button';
@@ -35,7 +40,12 @@ import { JwtInterceptor, ErrorInterceptor } from './interceptors';
   declarations: [
     AppComponent,
     LoginComponent,
-    AdminDashboardComponent
+    AdminDashboardComponent,
+    OffersComponent,
+    NewsComponent,
+    NavbarComponent,
+    FooterComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,

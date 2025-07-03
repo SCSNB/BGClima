@@ -1,0 +1,220 @@
+{
+  "elementStyling": {
+    "layout": {
+      "background": "#FFFFFF",
+      "sectionBackgrounds": {
+        "about": "#FFFFFF",
+        "footer": "#27255F",
+        "news": "#F6F8FC"
+      }
+    },
+    "cards": {
+      "background": "#FFFFFF",
+      "border": "#E6E6E6",
+      "borderRadius": "12px",
+      "shadow": "0 2px 6px rgba(0, 0, 0, 0.08)",
+      "hover": {
+        "shadow": "0 4px 12px rgba(0, 0, 0, 0.15)",
+        "transform": "translateY(-2px)"
+      },
+      "icons": {
+        "fill": "#5A9DDF",
+        "background": "#F3F5FB"
+      },
+      "titleText": "#1C1B4F",
+      "secondaryText": "#939393",
+      "priceText": "#FF385C",
+      "content": {
+        "titleColor": "#1A1A2E",
+        "subtitleColor": "#5A5A89",
+        "dateColor": "#A0A3BD"
+      }
+    },
+    "buttons": {
+      "primary": {
+        "background": "#3A66FF",
+        "text": "#FFFFFF",
+        "borderRadius": "8px",
+        "hover": {
+          "background": "#0056CC"
+        },
+        "focus": {
+          "outline": "2px solid #3366CC"
+        },
+        "active": {
+          "background": "#CCE0FF"
+        }
+      },
+      "secondary": {
+        "background": "#FFFFFF",
+        "text": "#3A66FF",
+        "border": "#3A66FF",
+        "hover": {
+          "background": "#F0F1F9"
+        }
+      },
+      "accent": {
+        "background": "#E8393A",
+        "text": "#FFFFFF",
+        "hover": {
+          "background": "#C1212C"
+        }
+      }
+    },
+    "icons": {
+      "navigation": "#C9CFE2",
+      "action": "#1E1F57",
+      "feature": {
+        "fill": "#63C0FF",
+        "secondary": "#FFC155"
+      },
+      "social": {
+        "container": "#3E3B92",
+        "fill": "#FFFFFF",
+        "hoverFill": "#A1A7FF",
+        "borderRadius": "50%",
+        "border": "2px solid #5D5AEF"
+      }
+    },
+    "text": {
+      "headings": "#1E1F57",
+      "subheadings": "#7B93C6",
+      "body": "#000000",
+      "muted": "#939393",
+      "priceHighlight": "#FF385C",
+      "link": "#3366CC",
+      "linkHover": "#003399",
+      "footerText": "#FFFFFF",
+      "linkText": "#8A99FF"
+    },
+    "gradients": {
+      "heroBanner": {
+        "type": "linear",
+        "direction": "to right",
+        "start": "#61C5E4",
+        "end": "#9BC6F1"
+      },
+      "promoCard": {
+        "type": "linear",
+        "direction": "135deg",
+        "start": "#EF4343",
+        "end": "#4E99EC"
+      },
+      "footerGradient": {
+        "type": "linear-gradient",
+        "direction": "to right",
+        "colors": [
+          "#F5497F",
+          "#F9A13B",
+          "#F6E400",
+          "#00B7E1",
+          "#8E65E5"
+        ],
+        "placement": "top border edge"
+      }
+    },
+    "footer": {
+      "background": "#27255F",
+      "text": "#FFFFFF",
+      "link": "#BFC6FF",
+      "logoArea": {
+        "iconFill": "#FFFFFF",
+        "text": "#FFFFFF"
+      },
+      "shadow": "none",
+      "borderTop": "none"
+    },
+    "shadows": {
+      "card": "0 2px 6px rgba(0, 0, 0, 0.08)",
+      "cardHover": "0 4px 12px rgba(0, 0, 0, 0.15)",
+      "lightCard": "0px 4px 12px rgba(0, 0, 0, 0.05)",
+      "buttonHover": "0px 2px 8px rgba(0, 0, 0, 0.1)",
+      "navigation": "0 2px 10px rgba(0, 0, 0, 0.2)"
+    },
+    "borders": {
+      "default": "#E6E6E6",
+      "hover": "#B1B7CC",
+      "inputFocus": "#3A66FF",
+      "card": "#E0E0E0",
+      "button": "#0044FF",
+      "input": "#CCCCCC"
+    },
+    "radii": {
+      "card": "12px",
+      "button": "20px",
+      "icon": "50%",
+      "navigation": "4px"
+    },
+    "states": {
+      "button": {
+        "default": {
+          "opacity": "1"
+        },
+        "hover": {
+          "opacity": "0.9"
+        },
+        "active": {
+          "scale": "0.97"
+        },
+        "disabled": {
+          "background": "#C9CFE2",
+          "text": "#FFFFFF",
+          "cursor": "not-allowed"
+        }
+      },
+      "card": {
+        "hover": {
+          "shadow": "cardHover",
+          "transform": "translateY(-2px)"
+        }
+      },
+      "input": {
+        "focus": {
+          "border": "#3A66FF",
+          "outline": "none"
+        },
+        "disabled": {
+          "background": "#F4F6FC",
+          "text": "#B1B7CC"
+        }
+      },
+      "focus": {
+        "outline": "2px solid #0056CC",
+        "outlineOffset": "2px"
+      },
+      "disabled": {
+        "opacity": 0.5,
+        "cursor": "not-allowed"
+      }
+    },
+    "hoverStates": {
+      "link": {
+        "color": "#FFFFFF",
+        "textDecoration": "underline"
+      },
+      "button": {
+        "background": "#E6F0FF"
+      },
+      "card": {
+        "shadow": "0 6px 16px rgba(0, 0, 0, 0.1)"
+      },
+      "icon": {
+        "fill": "#A1A7FF"
+      }
+    }
+  },
+  "rules": {
+    "doNot": [
+      "Do NOT apply heroBanner gradient to card backgrounds — use only solid white (#ffffff) or light neutral.",
+      "Do NOT use accent red (#e8393a) for text unless indicating critical action or alert.",
+      "Do NOT use button background colors (#3a66ff, #e8393a) for headings or titles.",
+      "Do NOT apply shadow effects to icon-only elements — use shadows only on containers or cards.",
+      "Do NOT round borders on navigation items — use rectangular or subtle radius (max 4px).",
+      "Do not apply footer accent gradient to card backgrounds.",
+      "Do not use solid #27255F text on white backgrounds (insufficient contrast).",
+      "Do not apply button gradient colors to text links.",
+      "Do not apply icon container styling to inline action icons.",
+      "Do not use card shadow styles on footer or social icons."
+    ]
+  }
+}

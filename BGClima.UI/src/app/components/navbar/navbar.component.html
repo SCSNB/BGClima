@@ -1,0 +1,46 @@
+<nav class="main-navbar">
+  <ul class="navbar-list">
+    <li>
+      <button mat-button [matMenuTriggerFor]="productsMenu" class="navbar-link products-link">
+        <mat-icon>category</mat-icon> Продукти <mat-icon>expand_more</mat-icon>
+      </button>
+    </li>
+    <li><a mat-button class="navbar-link promo-link">ПРОМО</a></li>
+    <li>
+      <button mat-button [matMenuTriggerFor]="servicesMenu" class="navbar-link">
+        Услуги <mat-icon>expand_more</mat-icon>
+      </button>
+    </li>
+    <li><a mat-button class="navbar-link">За клиенти</a></li>
+    <li><a mat-button class="navbar-link">Каталози и цени</a></li>
+    <li>
+      <button mat-button [matMenuTriggerFor]="aboutMenu" class="navbar-link">
+        За нас <mat-icon>expand_more</mat-icon>
+      </button>
+    </li>
+    <li><a mat-button class="navbar-link">Контакти</a></li>
+  </ul>
+</nav>
+
+<!-- DROPDOWN MENUS -->
+<mat-menu #productsMenu="matMenu" class="products-dropdown">
+  <button mat-menu-item><img src="assets/icons/ac.svg" class="menu-icon"> Климатици</button>
+  <button mat-menu-item><img src="assets/icons/heatpump.svg" class="menu-icon"> Термопомпи</button>
+  <button mat-menu-item><img src="assets/icons/fancoil.svg" class="menu-icon"> Вентилаторни конвектори</button>
+  <button mat-menu-item><img src="assets/icons/central.svg" class="menu-icon"> Централна климатизация</button>
+  <button mat-menu-item><img src="assets/icons/aircare.svg" class="menu-icon"> Грижа за въздуха</button>
+  <button mat-menu-item><img src="assets/icons/boiler.svg" class="menu-icon"> Бойлери</button>
+  <button mat-menu-item><img src="assets/icons/curtain.svg" class="menu-icon"> Въздушни завеси</button>
+  <button mat-menu-item><img src="assets/icons/recuperator.svg" class="menu-icon"> Рекуператори</button>
+</mat-menu>
+<mat-menu #servicesMenu="matMenu">
+  <button mat-menu-item>Монтаж</button>
+  <button mat-menu-item>Профилактика</button>
+  <button mat-menu-item>Сервиз</button>
+  <button mat-menu-item>Проекти</button>
+</mat-menu>
+<mat-menu #aboutMenu="matMenu">
+  <button mat-menu-item>За фирмата</button>
+  <button mat-menu-item>Екип</button>
+  <button mat-menu-item>Кариери</button>
+</mat-menu>

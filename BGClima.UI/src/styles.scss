@@ -20,3 +20,77 @@ html, body {
 * {
   box-sizing: border-box;
 }
+
+/* Override search field in header (Material v15+) */
+.header-top .search-white-bg .mat-mdc-form-field-flex {
+  border-radius: 20px !important;
+  background: #47448a !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 16px !important;
+  min-height: 48px;
+}
+.header-top .search-white-bg input.mat-mdc-input-element {
+  color: #fff !important;
+  background: #47448a !important;
+  border-radius: 20px !important;
+}
+.header-top .search-white-bg input.mat-mdc-input-element::placeholder {
+  color: #fff !important;
+  opacity: 0.7;
+}
+.header-top .search-white-bg .mat-mdc-form-field-label {
+  color: #fff !important;
+  opacity: 0.8;
+}
+.header-top .search-white-bg .mat-mdc-form-field-outline,
+.header-top .search-white-bg .mat-mdc-form-field-outline-thick {
+  border-radius: 20px !important;
+  stroke: #fff !important;
+  border-color: #fff !important;
+}
+.header-top .search-white-bg .mat-mdc-form-field-icon-suffix .mat-icon {
+  color: #3A66FF !important;
+}
+
+/* Override search field in header */
+.header-top .search-white-bg .mat-form-field-outline,
+.header-top .search-white-bg .mat-form-field-outline-thick {
+  border-radius: 20px !important;
+  stroke: #fff !important;
+  border-color: #fff !important;
+}
+.header-top .search-white-bg .mat-form-field-flex {
+  border-radius: 20px !important;
+  background: transparent !important;
+}
+.header-top .search-white-bg input.mat-input-element {
+  border-radius: 20px !important;
+  color: #fff !important;
+  background: transparent !important;
+}
+.header-top .search-white-bg input.mat-input-element::placeholder {
+  color: #fff !important;
+  opacity: 0.7;
+}
+.header-top .search-white-bg .mat-form-field-label {
+  color: #fff !important;
+  opacity: 0.8;
+}
+.header-top .search-white-bg .mat-form-field-outline-start,
+.header-top .search-white-bg .mat-form-field-outline-end {
+  border-radius: 20px !important;
+}
+
+.header-top .search-white-bg .mat-mdc-floating-label,
+.header-top .search-white-bg .mat-mdc-form-field-label {
+  color: #fff !important;
+  opacity: 1 !important;
+}
+
+.header-top .search-white-bg .mdc-notched-outline,
+.header-top .search-white-bg .mdc-notched-outline__leading,
+.header-top .search-white-bg .mdc-notched-outline__notch,
+.header-top .search-white-bg .mdc-notched-outline__trailing {
+  display: none !important;
+}

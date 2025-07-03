@@ -303,3 +303,280 @@ a, a:visited, a:hover {
 .admin-button, .login-button, .logout-button {
   margin-left: 8px;
 }
+
+.main-header {
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  .header-top {
+    background: #27255F;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.7rem 1.5rem;
+    .logo-search {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      .logo-link {
+        display: flex;
+        align-items: center;
+        .logo-image {
+          height: 48px;
+        }
+      }
+      .search-bar {
+        min-width: 260px;
+        max-width: 340px;
+        width: 100%;
+        .search-white-bg {
+          width: 100%;
+        }
+      }
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-right: 40px;
+      .phone-block {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        .phone-number {
+          color: #fff;
+          font-weight: 700;
+          font-size: 1.1rem;
+        }
+        .phone-desc {
+          color: #fff;
+          font-size: 0.75rem;
+        }
+      }
+      button {
+        color: #fff;
+        background: rgba(255,255,255,0.08);
+        border-radius: 50%;
+        &:hover {
+          background: #3A66FF;
+          color: #fff;
+        }
+      }
+      mat-icon {
+        color: #fff;
+      }
+    }
+  }
+}
+
+/**** Angular Material deep selectors for search field ****/
+.header-top .search-white-bg .mat-form-field-outline,
+.header-top .search-white-bg .mat-form-field-outline-thick,
+.header-top .search-white-bg .mat-form-field-flex,
+.header-top .search-white-bg input.mat-input-element,
+.header-top .search-white-bg .mat-form-field-outline-start,
+.header-top .search-white-bg .mat-form-field-outline-end {
+  border-radius: 50px !important;
+}
+.header-top .search-white-bg .mat-form-field-outline,
+.header-top .search-white-bg .mat-form-field-outline-thick {
+  border-radius: 20px !important;
+  stroke: #fff !important;
+  border-color: #fff !important;
+}
+.header-top .search-white-bg .mat-form-field-flex {
+  border-radius: 20px !important;
+  background: #39377a !important;
+}
+.header-top .search-white-bg input.mat-input-element {
+  border-radius: 20px !important;
+  color: #fff !important;
+  background: #39377a !important;
+}
+.header-top .search-white-bg input.mat-input-element::placeholder {
+  color: #fff !important;
+  opacity: 0.7;
+}
+.header-top .search-white-bg .mat-form-field-label {
+  color: #fff !important;
+  opacity: 0.8;
+}
+.header-top .search-white-bg .mat-form-field-outline-start,
+.header-top .search-white-bg .mat-form-field-outline-end {
+  border-radius: 20px !important;
+}
+
+::ng-deep .main-header .header-top .search-white-bg .mat-mdc-form-field-flex,
+::ng-deep .main-header .header-top .search-white-bg .mat-form-field-flex,
+::ng-deep .main-header .header-top .search-white-bg .mat-form-field-outline,
+::ng-deep .main-header .header-top .search-white-bg .mat-form-field-outline-thick,
+::ng-deep .main-header .header-top .search-white-bg input.mat-input-element,
+::ng-deep .main-header .header-top .search-white-bg .mat-form-field-outline-start,
+::ng-deep .main-header .header-top .search-white-bg .mat-form-field-outline-end {
+  border-radius: 50px !important;
+}
+
+body {
+  background: #FFFFFF;
+}
+
+@media (max-width: 900px) {
+  .main-header .header-top {
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 1rem 0.5rem;
+    .logo-search {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .header-actions {
+      flex-direction: row;
+      gap: 0.7rem;
+    }
+  }
+}
+
+.main-navbar {
+  background: #fff;
+  border-bottom: 1.5px solid #e0e0e0;
+  .navbar-list {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0 32px;
+    list-style: none;
+    height: 48px;
+    .navbar-link {
+      color: var(--primary-color);
+      font-weight: 500;
+      font-size: 16px;
+      text-transform: none;
+      margin-right: 16px;
+      display: flex;
+      align-items: center;
+      &.promo-link {
+        color: var(--accent-color);
+        font-weight: bold;
+      }
+      &.products-link {
+        color: #1976d2;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+.products-dropdown .menu-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+}
+
+.hero-banner {
+  background: linear-gradient(90deg, #1976d2 60%, #fff 100%);
+  color: #fff;
+  padding: 48px 32px 32px 32px;
+  display: flex;
+  align-items: center;
+  .banner-content {
+    max-width: 600px;
+    h1 {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+    .banner-features {
+      list-style: none;
+      padding: 0;
+      li {
+        display: flex;
+        align-items: center;
+        font-size: 20px;
+        margin-bottom: 12px;
+        mat-icon {
+          margin-right: 12px;
+        }
+      }
+    }
+  }
+}
+
+.main-header .header-top .header-actions button[mat-icon-button] {
+  padding: 2px !important;
+  min-width: 40px !important;
+  width: 40px !important;
+  height: 40px !important;
+  border: 2px solid #5A5A89 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: border-color 0.2s, background 0.2s;
+}
+.main-header .header-top .header-actions button[mat-icon-button]:hover,
+.main-header .header-top .header-actions button[mat-icon-button]:focus {
+  border-color: #3A66FF !important;
+  background: rgba(58,102,255,0.08) !important;
+}
+.main-header .header-top .header-actions button[mat-icon-button] mat-icon {
+  font-size: 22px !important;
+  width: 22px !important;
+  height: 22px !important;
+  line-height: 22px !important;
+  color: #fff !important;
+}
+
+.main-header .header-top .header-actions {
+  gap: 0.3rem;
+}
+.main-header .header-top .header-actions > button[mat-icon-button]:first-of-type {
+  margin-left: 8px;
+}
+
+.main-header .header-top .logo-search {
+  flex: 1 1 0;
+  justify-content: center;
+  align-items: center;
+  gap: 1.2rem;
+}
+.main-header .header-top .logo-search .search-bar {
+  min-width: 320px;
+  max-width: 540px;
+  width: 100%;
+  height: 48px;
+  display: flex;
+  align-items: center;
+}
+.main-header .header-top .logo-search .search-bar .search-white-bg {
+  width: 100%;
+  height: 48px;
+}
+.main-header .header-top .logo-search .search-bar input.mat-input-element {
+  height: 48px !important;
+  line-height: 48px !important;
+  font-size: 1.35rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+::ng-deep .main-header .header-top .search-white-bg .mat-mdc-form-field-flex,
+::ng-deep .main-header .header-top .search-white-bg .mat-form-field-flex,
+::ng-deep .main-header .header-top .search-white-bg .mat-form-field-outline,
+::ng-deep .main-header .header-top .search-white-bg .mat-form-field-outline-thick,
+::ng-deep .main-header .header-top .search-white-bg input.mat-input-element,
+::ng-deep .main-header .header-top .search-white-bg .mat-form-field-outline-start,
+::ng-deep .main-header .header-top .search-white-bg .mat-form-field-outline-end {
+  border-radius: 48px !important;
+}
+::ng-deep .main-header .header-top .search-white-bg .mat-icon {
+  font-size: 1.3rem !important;
+}
+
+.main-header .header-top .header-actions .phone-block {
+  margin-left: 24px;
+}
+
+.main-header .header-top .logo-search .logo-link .logo-image {
+  height: 36px;
+}
+
