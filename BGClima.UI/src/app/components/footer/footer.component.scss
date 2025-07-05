@@ -263,3 +263,11 @@
 .main-footer .footer-section.footer-contacts a[href^="mailto"]:hover {
   color: #fff !important;
 }
+.main-footer .footer-bottom a[href^="http"] {
+  color: #4A7AFF !important;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+.main-footer .footer-bottom a[href^="http"]:hover {
+  color: #fff !important;
+}
