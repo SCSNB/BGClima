@@ -1,6 +1,7 @@
 .main-header {
   background: #fff;
   box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  min-height: 120px;
   .header-top {
     background: #27255F;
     display: flex;
@@ -8,11 +9,13 @@
     align-items: center;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0.7rem 1.5rem;
+    min-height: 120px;
+    padding: 1.5rem 1.5rem;
     .logo-search {
       display: flex;
+      flex-direction: row;
       align-items: center;
-      gap: 2rem;
+      gap: 2.5rem;
       .logo-link {
         display: flex;
         align-items: center;
@@ -47,15 +50,16 @@
         display: flex;
         flex-direction: column;
         align-items: flex-end;
-        .phone-number {
-          color: #3A66FF;
-          font-weight: 700;
-          font-size: 1.1rem;
-        }
-        .phone-desc {
-          color: #939393;
-          font-size: 0.95rem;
-        }
+      }
+      .phone-block .phone-number {
+        color: #3A66FF;
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+      .phone-block .phone-desc {
+        color: #939393;
+        font-size: 0.95rem;
+        margin-top: 1.2rem;
       }
       button {
         color: #1E1F57;
@@ -89,4 +93,39 @@ body {
       gap: 0.7rem;
     }
   }
+}
+.logo-search {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2.5rem;
+}
+.logo-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 320px;
+}
+.logo-block .logo-subtitle {
+  color: #fff !important;
+  text-transform: uppercase;
+  font-size: 2.8rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  margin-top: 2.2rem;
+  margin-bottom: 0.7rem;
+  text-align: center;
+  white-space: normal;
+  line-height: 1.1;
+}
+.header-top .phone-block .phone-desc {
+  margin-top: 2rem !important;
+}
+.phone-block .phone-number {
+  display: block;
+  margin-bottom: 0.7rem;
+}
+.phone-block .phone-desc {
+  display: block;
+  margin-top: 0;
 }

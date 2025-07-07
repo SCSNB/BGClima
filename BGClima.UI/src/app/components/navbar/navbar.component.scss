@@ -48,9 +48,12 @@
 .main-navbar .navbar-list .navbar-link.promo-link {
   color: #FF385C !important;
 }
-.products-dropdown .mat-menu-item {
-  display: flex;
-  align-items: center;
+.products-dropdown .mat-menu-item,
+.mat-menu-panel .mat-menu-item {
+  font-size: 0.75rem !important;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 .menu-icon {
   width: 24px;
@@ -59,6 +62,11 @@
   display: inline-block;
   vertical-align: middle;
   position: static;
+}
+.navbar-link mat-icon {
+  margin-left: 0.7rem;
+  margin-right: 0;
+  vertical-align: middle;
 }
 @media (max-width: 900px) {
   .main-navbar .navbar-list {
