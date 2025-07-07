@@ -35,6 +35,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from './services/auth.service';
 import { AuthGuard } from './guards/auth.guard';
 import { JwtInterceptor, ErrorInterceptor } from './interceptors';
+import { ContactsComponent } from './components/contacts/contacts.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { JwtInterceptor, ErrorInterceptor } from './interceptors';
     NewsComponent,
     NavbarComponent,
     FooterComponent,
-    HomeComponent
+    HomeComponent,
+    ContactsComponent
   ],
   imports: [
     BrowserModule,

@@ -1,16 +1,14 @@
-<p>home works!</p>
-
-<section class="about-section">
-  <h2>За Булклима</h2>
-  <div class="about-content">
-    <p>
-      Булклима е българска компания с традиции в ОВК индустрията, успешно налагаща на българския пазар комплексни иновативни и енергоспестяващи системи за отопление, охлаждане и производство на битова гореща вода от водещи производители, предназначени за битови и индустриални сгради.
-    </p>
-    <ul class="about-features">
-      <li><mat-icon>verified</mat-icon> Високо качество и дългогодишен опит</li>
-      <li><mat-icon>bolt</mat-icon> Иновативни и енергоспестяващи решения</li>
-      <li><mat-icon>groups</mat-icon> Компетентен екип и професионално обслужване</li>
-      <li><mat-icon>support_agent</mat-icon> Пълна грижа за клиента – от консултация до сервиз</li>
-    </ul>
+<section class="hero-banner">
+  <div class="banner-content">
+    <div class="hero-slider">
+      <div class="slide" *ngFor="let slide of slides; let i = index" [class.active]="i === currentSlide" [style.display]="i === currentSlide ? 'block' : 'none'">
+        <img [src]="slide.image" alt="hero image" class="hero-image" *ngIf="slide.image">
+      </div>
+      <div class="slider-dots">
+        <span *ngFor="let slide of slides; let i = index" class="dot" [class.active]="i === currentSlide" (click)="selectSlide(i)"></span>
+      </div>
+    </div>
   </div>
 </section>
+
+<app-offers></app-offers>
