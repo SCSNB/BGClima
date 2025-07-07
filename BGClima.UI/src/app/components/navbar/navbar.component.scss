@@ -48,6 +48,18 @@
 .main-navbar .navbar-list .navbar-link.promo-link {
   color: #FF385C !important;
 }
+.products-dropdown .mat-menu-item {
+  display: flex;
+  align-items: center;
+}
+.menu-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 0.7rem;
+  display: inline-block;
+  vertical-align: middle;
+  position: static;
+}
 @media (max-width: 900px) {
   .main-navbar .navbar-list {
     flex-wrap: wrap;

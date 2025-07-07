@@ -1,31 +1,28 @@
 <section class="offers-section">
-  <h2>Актуални оферти</h2>
-  <div class="offers-list">
-    <div class="offer-card">
-      <img src="assets/products/ashh09kmcg.jpg" alt="General Fujitsu ASHH09KMCG/AOHH09KMCG">
-      <div class="offer-info">
-        <h3>Инверторен климатик стенен General Fujitsu ASHH09KMCG/AOHH09KMCG</h3>
-        <p class="offer-price">1499.00 лв. <span class="old-price">1629.00 лв.</span></p>
-        <p class="offer-details">Мощност: 9 | Клас: A++ | Охлаждане: 2.50 | Отопление: 2.80</p>
-        <button mat-raised-button color="primary">Виж повече</button>
+  <h2 class="offers-title">Актуални оферти</h2>
+  <div class="offers-cards-wrapper">
+    <div class="offer-card" *ngFor="let offer of offers">
+      <div class="offer-card-image-badges">
+        <img [src]="offer.image" alt="Климатик" class="offer-card-image" />
+        <div class="offer-badges">
+          <span *ngFor="let badge of offer.badges" class="badge" [ngStyle]="{'background': badge.bg, 'color': badge.color}">{{ badge.text }}</span>
+        </div>
       </div>
-    </div>
-    <div class="offer-card">
-      <img src="assets/products/ashh07kmcg.jpg" alt="General Fujitsu ASHH07KMCG/AOHH07KMCG">
-      <div class="offer-info">
-        <h3>Инверторен климатик стенен General Fujitsu ASHH07KMCG/AOHH07KMCG</h3>
-        <p class="offer-price">1419.00 лв. <span class="old-price">1479.00 лв.</span></p>
-        <p class="offer-details">Мощност: 7 | Клас: A++ | Охлаждане: 2.00 | Отопление: 2.50</p>
-        <button mat-raised-button color="primary">Виж повече</button>
+      <div class="offer-card-title">{{ offer.title }}</div>
+      <div class="offer-card-prices">
+        <span class="current-price">{{ offer.price.current }}</span>
+        <span class="old-price">{{ offer.price.old }}</span>
       </div>
-    </div>
-    <div class="offer-card">
-      <img src="assets/products/ashh12kmcg.jpg" alt="General Fujitsu ASHH12KMCG/AOHH12KMCG">
-      <div class="offer-info">
-        <h3>Инверторен климатик стенен General Fujitsu ASHH12KMCG/AOHH12KMCG</h3>
-        <p class="offer-price">1729.00 лв. <span class="old-price">1749.00 лв.</span></p>
-        <p class="offer-details">Мощност: 12 | Клас: A++ | Охлаждане: 3.40 | Отопление: 4.00</p>
-        <button mat-raised-button color="primary">Виж повече</button>
+      <div class="offer-card-brand-row">
+        <img [src]="offer.brand.logo" alt="General" class="brand-logo" />
+        <span class="brand-text">{{ offer.brand.text }}</span>
+        <button class="compare-btn">Сравни</button>
+      </div>
+      <div class="offer-card-specs">
+        <div class="spec" *ngFor="let spec of offer.specs; let i = index" [ngStyle]="{'color': spec.color}">
+          <img [src]="spec.icon" [alt]="spec.label" />
+          <span>{{ spec.value }}</span>
+        </div>
       </div>
     </div>
   </div>
