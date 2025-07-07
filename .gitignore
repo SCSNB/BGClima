@@ -67,3 +67,6 @@ Desktop.ini
 ########################################
 .git/
 
+# Ignore Angular build output in ASP.NET Core wwwroot
+BGClima.API/wwwroot/
+
