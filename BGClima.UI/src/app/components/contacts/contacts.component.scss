@@ -59,6 +59,30 @@ iframe {
   background: #fff;
 }
 
+.contacts-header {
+  width: 100%;
+  background: #f3f4fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.2rem 0 1.2rem 0;
+  position: relative;
+  margin-bottom: 1.2rem;
+}
+.contacts-logo {
+  height: 54px;
+  margin-bottom: 0.7rem;
+}
+.contacts-title {
+  color: #27255F;
+  font-size: 2.1rem;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
 @media (max-width: 900px) {
   .contacts-page-centered {
     padding: 0.7rem 0.2rem 0.7rem 0.2rem;
@@ -100,5 +124,16 @@ iframe {
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(30,41,87,0.08);
     height: 150px !important;
+  }
+  .contacts-header {
+    padding: 1.2rem 0 0.7rem 0;
+    margin-bottom: 0.7rem;
+  }
+  .contacts-logo {
+    height: 38px;
+    margin-bottom: 0.4rem;
+  }
+  .contacts-title {
+    font-size: 1.25rem;
   }
 }
