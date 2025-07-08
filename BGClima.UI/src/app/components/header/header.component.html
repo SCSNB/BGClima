@@ -1,1 +1,36 @@
-<p>header works!</p>
+<header class="main-header">
+  <div class="header-top custom-mobile-header">
+    <div class="logo-block">
+      <a class="logo-link" routerLink="/">
+        <img src="assets/logo.png" alt="BG Клима" class="logo-image">
+      </a>
+      <span class="logo-subtitle">КЛИМАТИЗАЦИЯ И ВЕНТИЛАЦИЯ</span>
+    </div>
+    <div class="header-icons">
+      <button class="icon-btn" aria-label="Меню" (click)="toggleMenu()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <button class="icon-btn" aria-label="Търсене" (click)="onSearch()">
+        <mat-icon>search</mat-icon>
+      </button>
+      <button class="icon-btn" aria-label="Локация" (click)="onLocation()">
+        <mat-icon>location_on</mat-icon>
+      </button>
+      <button class="icon-btn" aria-label="Телефон" (click)="onPhone()">
+        <mat-icon>phone</mat-icon>
+      </button>
+    </div>
+  </div>
+  <!-- Навигация -->
+  <nav>
+    <ul class="navbar-list" [ngClass]="{ 'open': menuOpen }">
+      <li><button mat-button class="navbar-link products-link">ПРОДУКТИ</button></li>
+      <li><a mat-button class="navbar-link promo-link">ПРОМО</a></li>
+      <li><button mat-button class="navbar-link">Услуги</button></li>
+      <li><a mat-button class="navbar-link">За клиенти</a></li>
+      <li><a mat-button class="navbar-link">Каталози и цени</a></li>
+      <li><button mat-button class="navbar-link">За нас</button></li>
+      <li><a mat-button class="navbar-link" routerLink="/contacts">Контакти</a></li>
+    </ul>
+  </nav>
+</header>
