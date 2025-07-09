@@ -95,5 +95,14 @@ namespace BGClima.API.Controllers
             await _productService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
+
+        // API: GET /api/products
+        [HttpGet("/api/products")]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetAllProductsApi()
+        {
+            var products = await _productService.GetAllAsync();
+            return Ok(products);
+        }
     }
 } 

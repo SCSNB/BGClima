@@ -1,3 +1,4 @@
+
 using Microsoft.EntityFrameworkCore;
 using BGClima.Domain.Entities;
 
@@ -17,7 +18,6 @@ namespace BGClima.Infrastructure
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            // Configure relationships and constraints if needed
         }
     }
 } 

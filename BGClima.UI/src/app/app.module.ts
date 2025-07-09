@@ -8,6 +8,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { AdminDashboardComponent } from './components/admin/admin-dashboard/admin-dashboard.component';
+import { ProductListComponent } from './components/admin/product-list.component';
 
 // Material Imports
 import { MatButtonModule } from '@angular/material/button';
@@ -35,7 +36,8 @@ import { JwtInterceptor, ErrorInterceptor } from './interceptors';
   declarations: [
     AppComponent,
     LoginComponent,
-    AdminDashboardComponent
+    AdminDashboardComponent,
+    ProductListComponent
   ],
   imports: [
     BrowserModule,

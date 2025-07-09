@@ -3,14 +3,18 @@ import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './components/login/login.component';
 import { AdminDashboardComponent } from './components/admin/admin-dashboard/admin-dashboard.component';
 import { AuthGuard } from './guards/auth.guard';
+import { ProductListComponent } from './components/admin/product-list.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { 
     path: 'admin', 
-    component: AdminDashboardComponent,
-    canActivate: [AuthGuard],
-    data: { roles: ['ADMIN'] }
+    component: ProductListComponent,
+    // canActivate: [AuthGuard],
+    // data: { roles: ['ADMIN'] },
+    children: [
+      { path: 'product', component: ProductListComponent }
+    ]
   },
   // Redirect empty path to home
   { path: '', redirectTo: '/home', pathMatch: 'full' },
