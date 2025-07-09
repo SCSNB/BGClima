@@ -36,6 +36,11 @@ import { AuthService } from './services/auth.service';
 import { AuthGuard } from './guards/auth.guard';
 import { JwtInterceptor, ErrorInterceptor } from './interceptors';
 import { ContactsComponent } from './components/contacts/contacts.component';
+import { AboutCompanyComponent } from './components/about-company/about-company.component';
+import { MainActivityComponent } from './components/main-activity/main-activity.component';
+import { ResourceComponent } from './components/resource/resource.component';
+import { CertificatesComponent } from './components/certificates/certificates.component';
+import { ProjectsComponent } from './components/projects/projects.component';
 
 @NgModule({
   declarations: [
@@ -47,7 +52,12 @@ import { ContactsComponent } from './components/contacts/contacts.component';
     NavbarComponent,
     FooterComponent,
     HomeComponent,
-    ContactsComponent
+    ContactsComponent,
+    AboutCompanyComponent,
+    MainActivityComponent,
+    ResourceComponent,
+    CertificatesComponent,
+    ProjectsComponent
   ],
   imports: [
     BrowserModule,
