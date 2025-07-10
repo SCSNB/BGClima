@@ -41,6 +41,8 @@ import { MainActivityComponent } from './components/main-activity/main-activity.
 import { ResourceComponent } from './components/resource/resource.component';
 import { CertificatesComponent } from './components/certificates/certificates.component';
 import { ProjectsComponent } from './components/projects/projects.component';
+import { ConsultingComponent } from './components/consulting/consulting.component';
+import { InstallationComponent } from './components/installation/installation.component';
 
 @NgModule({
   declarations: [
@@ -57,7 +59,9 @@ import { ProjectsComponent } from './components/projects/projects.component';
     MainActivityComponent,
     ResourceComponent,
     CertificatesComponent,
-    ProjectsComponent
+    ProjectsComponent,
+    ConsultingComponent,
+    InstallationComponent
   ],
   imports: [
     BrowserModule,

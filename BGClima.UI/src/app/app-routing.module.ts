@@ -10,6 +10,8 @@ import { MainActivityComponent } from './components/main-activity/main-activity.
 import { ResourceComponent } from './components/resource/resource.component';
 import { CertificatesComponent } from './components/certificates/certificates.component';
 import { ProjectsComponent } from './components/projects/projects.component';
+import { ConsultingComponent } from './components/consulting/consulting.component';
+import { InstallationComponent } from './components/installation/installation.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -26,6 +28,8 @@ const routes: Routes = [
   { path: 'resource', component: ResourceComponent },
   { path: 'certificates', component: CertificatesComponent },
   { path: 'projects', component: ProjectsComponent },
+  { path: 'consulting', component: ConsultingComponent },
+  { path: 'installation', component: InstallationComponent },
   // Redirect empty path to home
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   // Catch-all route for any undefined routes
