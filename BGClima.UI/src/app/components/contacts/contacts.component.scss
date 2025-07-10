@@ -1,0 +1,139 @@
+.contacts-page-centered {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem 1rem 2rem 1rem;
+}
+
+h1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  color: #1e2957;
+  text-align: left;
+}
+
+.contact-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 2.5rem;
+  margin-bottom: 2.2rem;
+}
+
+.contact-info {
+  flex: 1 1 320px;
+  max-width: 400px;
+  text-align: left;
+}
+
+.contact-map {
+  flex: 2 1 600px;
+  min-width: 260px;
+}
+
+h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.2rem 0;
+  color: #1e2957;
+  text-align: left;
+}
+
+p, a {
+  font-size: 0.95rem;
+  color: #1e2957;
+  margin-bottom: 0.1rem;
+  text-align: left;
+}
+
+a {
+  color: #1e90ff;
+  text-decoration: underline;
+}
+
+iframe {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(30,41,87,0.08);
+  background: #fff;
+}
+
+.contacts-header {
+  width: 100%;
+  background: #f3f4fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.2rem 0 1.2rem 0;
+  position: relative;
+  margin-bottom: 1.2rem;
+}
+.contacts-logo {
+  height: 54px;
+  margin-bottom: 0.7rem;
+}
+.contacts-title {
+  color: #27255F;
+  font-size: 2.1rem;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+@media (max-width: 900px) {
+  .contacts-page-centered {
+    padding: 0.7rem 0.2rem 0.7rem 0.2rem;
+  }
+  .contact-row {
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 0.7rem !important;
+    align-items: flex-start;
+    padding-bottom: 0.2rem;
+    border: none;
+  }
+  .contact-info {
+    margin-bottom: 0.15rem !important;
+    padding-bottom: 0 !important;
+    text-align: left;
+  }
+  .contact-info h2 {
+    font-size: 1.01rem;
+    font-weight: 700;
+    margin-bottom: 0.08rem !important;
+    color: #1e2957;
+    text-align: left;
+  }
+  .contact-info p, .contact-info a {
+    font-size: 0.93rem;
+    margin-bottom: 0.05rem !important;
+    color: #1e2957;
+    text-align: left;
+  }
+  .contact-map {
+    margin-bottom: 0.15rem;
+  }
+  .contact-map iframe {
+    width: 100% !important;
+    min-width: 0;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(30,41,87,0.08);
+    height: 150px !important;
+  }
+  .contacts-header {
+    padding: 1.2rem 0 0.7rem 0;
+    margin-bottom: 0.7rem;
+  }
+  .contacts-logo {
+    height: 38px;
+    margin-bottom: 0.4rem;
+  }
+  .contacts-title {
+    font-size: 1.25rem;
+  }
+}

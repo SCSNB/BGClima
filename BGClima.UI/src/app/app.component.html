@@ -1,217 +1,36 @@
-<!-- Only show the main layout if not on admin or login pages -->
-<div class="bg-clima-container" *ngIf="!isAdminOrLoginRoute()">
-  <!-- Header -->
-  <mat-toolbar color="primary" class="header">
-    <div class="logo-container">
-      <a routerLink="/">
-        <img src="assets/logo.png" alt="БГ Клима" class="logo-image">
-      </a>
-    </div>
-    <span class="spacer"></span>
-    <div class="contact-info">
-      <mat-icon>phone</mat-icon> 042 / 638 248
-    </div>
-    <button mat-icon-button [matMenuTriggerFor]="menu" class="mobile-menu-button">
-      <mat-icon>menu</mat-icon>
-    </button>
-    <mat-menu #menu="matMenu">
-      <button mat-menu-item routerLink="/">
-        <mat-icon>home</mat-icon>
-        <span>Начало</span>
-      </button>
-      <button mat-menu-item routerLink="/about">
-        <mat-icon>info</mat-icon>
-        <span>За нас</span>
-      </button>
-      <button mat-menu-item routerLink="/contacts">
-        <mat-icon>contact_phone</mat-icon>
-        <span>Контакти</span>
-      </button>
-      <button mat-menu-item routerLink="/admin" *ngIf="isAdmin">
-        <mat-icon>admin_panel_settings</mat-icon>
-        <span>Админ панел</span>
-      </button>
-      <button mat-menu-item routerLink="/login" *ngIf="!isAuthenticated">
-        <mat-icon>login</mat-icon>
-        <span>Вход</span>
-      </button>
-      <button mat-menu-item (click)="logout()" *ngIf="isAuthenticated">
-        <mat-icon>logout</mat-icon>
-        <span>Изход</span>
-      </button>
-    </mat-menu>
-    <a mat-icon-button routerLink="/admin" *ngIf="isAdmin" class="admin-button" matTooltip="Админ панел">
-      <mat-icon>admin_panel_settings</mat-icon>
-    </a>
-    <a mat-icon-button routerLink="/login" *ngIf="!isAuthenticated" class="login-button" matTooltip="Вход">
-      <mat-icon>login</mat-icon>
-    </a>
-    <button mat-icon-button *ngIf="isAuthenticated" (click)="logout()" class="logout-button" matTooltip="Изход">
-      <mat-icon>logout</mat-icon>
-    </button>
-  </mat-toolbar>
-
-  <!-- Main Navigation -->
-  <nav class="main-nav">
-    <div class="nav-container">
-      <a mat-button routerLink="/">Начало</a>
-      <a mat-button routerLink="/about">За нас</a>
-      <a mat-button routerLink="/contacts">Контакти</a>
-    </div>
-  </nav>
-
-  <!-- Main Content -->
-  <div class="main-content">
-    <div class="sidebar">
-      <mat-accordion>
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              Соларни системи
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <mat-nav-list>
-            <a mat-list-item routerLink="/solar/thermosiphon">Термосифонни</a>
-            <a mat-list-item routerLink="/solar/pressure">Под налягане</a>
-            <a mat-list-item routerLink="/solar/panels">Соларни панели</a>
-          </mat-nav-list>
-        </mat-expansion-panel>
-
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              Вентилация
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <mat-nav-list>
-            <a mat-list-item routerLink="/ventilation/design">Проектиране на вентилационни системи</a>
-            <a mat-list-item routerLink="/ventilation/installation">Монтаж на вентилационни системи</a>
-            <a mat-list-item routerLink="/ventilation/maintenance">Профилактика и сервиз</a>
-          </mat-nav-list>
-        </mat-expansion-panel>
-
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              Климатици и термопомпи
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <mat-nav-list>
-            <a mat-list-item routerLink="/climate/wall">Климатици стенен тип</a>
-            <a mat-list-item routerLink="/climate/column">Климатици колонен тип</a>
-            <a mat-list-item routerLink="/climate/duct">Климатици канален тип</a>
-            <a mat-list-item routerLink="/climate/cassette">Климатици касетъчен тип</a>
-            <a mat-list-item routerLink="/climate/floor">Климатици подов тип</a>
-            <a mat-list-item routerLink="/climate/ceiling">Климатици подово - таванен тип</a>
-            <a mat-list-item routerLink="/climate/vrf">VRF / VRV</a>
-            <a mat-list-item routerLink="/climate/heat-pumps">Термопомпени системи</a>
-            <a mat-list-item routerLink="/climate/multisplit">Мултисплит системи</a>
-            <a mat-list-item routerLink="/climate/exchangers">Бгклима Тръбни Топлообменници</a>
-            <a mat-list-item routerLink="/climate/portable">Мобилни / Преносими климатици</a>
-          </mat-nav-list>
-        </mat-expansion-panel>
-      </mat-accordion>
-
-      <mat-card class="filter-card">
-        <mat-card-header>
-          <mat-card-title>Филтър</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <h4>Производители</h4>
-          <mat-selection-list>
-            <mat-list-option>NIPPON</mat-list-option>
-          </mat-selection-list>
-
-          <h4>Цена</h4>
-          <div class="price-range">
-            <span>0 лв.</span>
-            <mat-slider min="0" max="15000" step="100">
-              <input matSliderThumb value="14850">
-            </mat-slider>
-            <span>14850 лв.</span>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-
-    <div class="content">
-      <div class="page-header">
-        <h1>Соларни панели</h1>
+<!-- HEADER -->
+<header class="main-header">
+  <div class="header-top">
+    <div class="logo-search">
+      <div class="logo-block">
+        <a routerLink="/" class="logo-link" style="cursor:pointer">
+          <img src="assets/logo.png" alt="БГ Клима" class="logo-image">
+        </a>
+        <div class="logo-subtitle" style="color:#fff;font-size:0.8rem;margin-top:0.7rem;text-align:center;text-transform:uppercase;line-height:1.1;font-weight:400;">КЛИМАТИЗАЦИЯ И ВЕНТИЛАЦИЯ</div>
       </div>
-
-      <div class="products-container">
-        <mat-card class="product-card" *ngFor="let product of products">
-          <img mat-card-image [src]="product.image" [alt]="product.name">
-          <mat-card-content>
-            <h3>{{ product.name }}</h3>
-            <p class="price">{{ product.price }} лв.</p>
-            <p>{{ product.description }}</p>
-          </mat-card-content>
-          <mat-card-actions>
-            <button mat-button color="primary">Детайли</button>
-          </mat-card-actions>
-          <div class="free-installation" *ngIf="product.freeInstallation">
-            <span>Безплатен монтаж</span>
-          </div>
-        </mat-card>
+      <div class="search-bar">
+        <mat-form-field appearance="outline" class="search-white-bg">
+          <input matInput type="text" placeholder="Търси продукт...">
+          <button mat-icon-button matSuffix><mat-icon>search</mat-icon></button>
+        </mat-form-field>
       </div>
+    </div>
+    <div class="header-actions">
+      <div class="phone-block">
+        <span class="phone-number"><mat-icon>call</mat-icon> 042 / 638 248</span>
+        <span class="phone-desc">Безплатна консултация</span>
+      </div>
+      <button mat-icon-button><mat-icon>calculate</mat-icon></button>
+      <button mat-icon-button><mat-icon>swap_vert</mat-icon></button>
+      <button mat-icon-button><mat-icon>shopping_cart</mat-icon></button>
     </div>
   </div>
+</header>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-container">
-      <div class="footer-section">
-        <h3>За БГ клима</h3>
-        <mat-nav-list>
-          <a mat-list-item routerLink="/about/company">За фирмата</a>
-          <a mat-list-item routerLink="/about/activity">Основна дейност</a>
-          <a mat-list-item routerLink="/about/resources">Ресурс</a>
-          <a mat-list-item routerLink="/news">Новини</a>
-          <a mat-list-item routerLink="/certificates">Сертификати</a>
-          <a mat-list-item routerLink="/projects">Обекти</a>
-          <a mat-list-item routerLink="/contacts">Контакти</a>
-        </mat-nav-list>
-      </div>
+<!-- NAVBAR -->
+<app-navbar></app-navbar>
 
-      <div class="footer-section">
-        <h3>Услуги и сервиз</h3>
-        <mat-nav-list>
-          <a mat-list-item routerLink="/services/design">Проектиране и консултации</a>
-          <a mat-list-item routerLink="/services/installation">Монтаж на климатици</a>
-          <a mat-list-item routerLink="/services/maintenance">Профилактика на климатици</a>
-          <a mat-list-item routerLink="/services/warranty">Сервиз и гаранция</a>
-        </mat-nav-list>
-      </div>
-
-      <div class="footer-section">
-        <h3>Контакти</h3>
-        <div class="contact-info">
-          <p><strong>Централен офис:</strong><br>
-            бул. "М.М.Кусев" №34 А ет. II ап. 3<br>
-            тел. 042 / 638 248 ; 042 / 655 048<br>
-            office@bgclima.com</p>
-
-          <p><strong>Магазини Стара Загора:</strong><br>
-            ул. "Хр. Ботев" 106,<br>
-            моб. 0888 410 237</p>
-
-          <p>ул. "Хаджи Димитър" № 94<br>
-            моб. 0888 409 853</p>
-
-          <p><strong>Магазин Казанлък:</strong><br>
-            ул. "Ал. Батемберг" № 41,<br>
-            тел./факс: 0431 / 62 205<br>
-            моб. 0897 958 267 ; 0894 317 643</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="copyright">
-      <p>Copyright © 2023 България Клима ООД. Всички права запазени.</p>
-    </div>
-  </footer>
-</div>
-
-<!-- Always show the router outlet -->
+<!-- ROUTER OUTLET -->
 <router-outlet></router-outlet>
+
+<app-footer></app-footer>
