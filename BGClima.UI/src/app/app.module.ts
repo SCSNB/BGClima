@@ -13,6 +13,7 @@ import { NewsComponent } from './components/news/news.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { HomeComponent } from './components/home/home.component';
+import { ProductListComponent } from './components/admin/product-list.component';
 
 // Material Imports
 import { MatButtonModule } from '@angular/material/button';
@@ -62,6 +63,7 @@ import { InstallationComponent } from './components/installation/installation.co
     ProjectsComponent,
     ConsultingComponent,
     InstallationComponent
+    ProductListComponent
   ],
   imports: [
     BrowserModule,

@@ -12,14 +12,18 @@ import { CertificatesComponent } from './components/certificates/certificates.co
 import { ProjectsComponent } from './components/projects/projects.component';
 import { ConsultingComponent } from './components/consulting/consulting.component';
 import { InstallationComponent } from './components/installation/installation.component';
+import { ProductListComponent } from './components/admin/product-list.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { 
     path: 'admin', 
-    component: AdminDashboardComponent,
-    canActivate: [AuthGuard],
-    data: { roles: ['ADMIN'] }
+    component: ProductListComponent,
+    // canActivate: [AuthGuard],
+    // data: { roles: ['ADMIN'] },
+    children: [
+      { path: 'product', component: ProductListComponent }
+    ]
   },
   { path: 'contacts', component: ContactsComponent },
   { path: 'home', component: HomeComponent },
