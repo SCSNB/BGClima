@@ -44,6 +44,8 @@ import { CertificatesComponent } from './components/certificates/certificates.co
 import { ProjectsComponent } from './components/projects/projects.component';
 import { ConsultingComponent } from './components/consulting/consulting.component';
 import { InstallationComponent } from './components/installation/installation.component';
+import { ProfilaktikaComponent } from './components/profilaktika/profilaktika.component';
+import { ServizComponent } from './components/serviz/serviz.component';
 
 @NgModule({
   declarations: [
@@ -62,8 +64,10 @@ import { InstallationComponent } from './components/installation/installation.co
     CertificatesComponent,
     ProjectsComponent,
     ConsultingComponent,
-    InstallationComponent
-    ProductListComponent
+    InstallationComponent,
+    ProductListComponent,
+    ProfilaktikaComponent,
+    ServizComponent,
   ],
   imports: [
     BrowserModule,

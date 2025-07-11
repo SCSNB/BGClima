@@ -12,6 +12,8 @@ import { CertificatesComponent } from './components/certificates/certificates.co
 import { ProjectsComponent } from './components/projects/projects.component';
 import { ConsultingComponent } from './components/consulting/consulting.component';
 import { InstallationComponent } from './components/installation/installation.component';
+import { ProfilaktikaComponent } from './components/profilaktika/profilaktika.component';
+import { ServizComponent } from './components/serviz/serviz.component';
 import { ProductListComponent } from './components/admin/product-list.component';
 
 const routes: Routes = [
@@ -34,6 +36,8 @@ const routes: Routes = [
   { path: 'projects', component: ProjectsComponent },
   { path: 'consulting', component: ConsultingComponent },
   { path: 'installation', component: InstallationComponent },
+  { path: 'profilaktika', component: ProfilaktikaComponent },
+  { path: 'serviz', component: ServizComponent },
   // Redirect empty path to home
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   // Catch-all route for any undefined routes

@@ -1,0 +1,16 @@
+@import '../installation/installation.component.scss';
+
+:host {
+  .styled-price-table {
+    // Center the first column (Number)
+    tr td:first-child {
+      text-align: center;
+    }
+
+    // Left-align the second column (Service Name)
+    tr td:nth-child(2) {
+      text-align: left;
+    }
+  }
+}
+

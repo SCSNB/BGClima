@@ -64,7 +64,7 @@
   background: #dbe7f7;
   font-weight: bold;
   text-align: left;
-  font-size: 1.08em;
+  font-size: 1.0em;
   border: 1px solid #111;
 }
 .styled-price-table tr:nth-child(even):not(.section-header):not(.table-header):not(.empty-row) td {
@@ -79,13 +79,17 @@
 .styled-price-table td[colspan] {
   text-align: left;
 }
+
+.styled-price-table tr td:not(:first-child) {
+  text-align: center;
+}
 :host ::ng-deep .styled-price-table,
 :host ::ng-deep .styled-price-table td {
-  font-size: 0.87rem !important;
+  font-size: 0.78rem !important;
 }
 @media (max-width: 700px) {
   :host ::ng-deep .styled-price-table td {
-    font-size: 0.8em !important;
+    font-size: 0.75em !important;
   }
 }
 :host ::ng-deep .styled-price-table th {
