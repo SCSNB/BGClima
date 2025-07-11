@@ -1,0 +1,147 @@
+.about-logo-section {
+  width: 100%;
+  background: #f3f4fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.2rem 0 1.2rem 0;
+  position: relative;
+  margin-bottom: 1.2rem;
+}
+.about-logo-large {
+  height: 54px;
+  margin: 0 auto;
+  display: block;
+  opacity: 1;
+}
+@media (max-width: 900px) {
+  .about-logo-section {
+    padding: 1.2rem 0 0.7rem 0;
+    margin-bottom: 0.7rem;
+  }
+  .about-logo-large {
+    height: 38px;
+  }
+}
+.about-content {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin: 0 auto;
+  max-width: 900px;
+  padding: 2.2rem 2.2rem 2.2rem 2.2rem;
+}
+.padded-content {
+  padding: 0 1.2rem 1.2rem 1.2rem;
+}
+@media (max-width: 900px) {
+  .about-content {
+    padding: 1.2rem 0.7rem 1.2rem 0.7rem;
+    max-width: 100%;
+  }
+  .padded-content {
+    padding: 0 0.5rem 0.7rem 0.5rem;
+  }
+}
+.styled-price-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0 1.5rem 0;
+}
+.styled-price-table td {
+  border: 1px solid #111;
+  padding: 0.7rem 0.5rem;
+  text-align: left;
+  vertical-align: middle;
+}
+.styled-price-table.profilaktika-table {
+  margin-top: 2.2rem;
+  margin-bottom: 2.2rem;
+  width: 100%;
+}
+.styled-price-table.profilaktika-table td {
+  border: 1px solid #b0b9d6;
+  padding: 1.1rem 0.7rem;
+  font-size: 0.89rem;
+  text-align: center;
+  vertical-align: middle;
+}
+.styled-price-table.profilaktika-table .table-header td {
+  font-size: 0.89rem;
+}
+.styled-price-table.profilaktika-table .profilaktika-extra {
+  font-size: 0.85rem;
+}
+.styled-price-table.profilaktika-table .price-value {
+  font-size: 0.8rem !important;
+  font-weight: 600;
+}
+.styled-price-table.profilaktika-table .main-title {
+  font-size: 0.87rem;
+  font-weight: 700;
+  display: block;
+  color: #0a3a5a;
+}
+.styled-price-table.profilaktika-table .extra-note {
+  font-size: 0.78rem;
+  color: #4d5c7a;
+  margin-top: 0.45em;
+  font-weight: 400;
+}
+@media (max-width: 900px) {
+  .styled-price-table.profilaktika-table .main-title {
+    font-size: 0.81rem;
+  }
+  .styled-price-table.profilaktika-table .extra-note {
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .styled-price-table.profilaktika-table td,
+  .styled-price-table.profilaktika-table .table-header td,
+  .styled-price-table.profilaktika-table .profilaktika-extra,
+  .styled-price-table.profilaktika-table .price-value {
+    font-size: 0.82rem;
+  }
+}
+
+.styled-price-table.profilaktika-table .table-header td {
+  background: #e7effa;
+  color: #0a3a5a;
+  font-weight: 700;
+  font-size: 1.2rem;
+  border-bottom: 2px solid #b0b9d6;
+  padding-top: 0.9rem;
+  padding-bottom: 0.7rem;
+}
+.styled-price-table.profilaktika-table .table-header td:last-child {
+  font-size: 0.8rem !important;
+  font-weight: 500;
+}
+
+.styled-price-table.profilaktika-table .profilaktika-extra {
+  display: block;
+  color: #1a237e;
+  font-size: 0.98rem;
+  font-weight: 400;
+  margin-top: 0.2em;
+}
+@media (max-width: 900px) {
+  .styled-price-table.profilaktika-table td {
+    font-size: 0.98rem;
+    padding: 0.5rem 0.3rem;
+  }
+  .styled-price-table.profilaktika-table .table-header td {
+    font-size: 0.98rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.4rem;
+  }
+}
+
+.profilaktika-extra {
+  color: #f57c00;
+  font-weight: 500;
+  margin-left: 8px;
+}
