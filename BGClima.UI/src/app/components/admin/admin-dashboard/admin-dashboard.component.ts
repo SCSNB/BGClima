@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { MatSidenav } from '@angular/material/sidenav';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -8,6 +9,7 @@ import { AuthService } from '../../../services/auth.service';
   styleUrls: ['./admin-dashboard.component.scss']
 })
 export class AdminDashboardComponent implements OnInit {
+  @ViewChild('sidenav') sidenav!: MatSidenav;
   username: string = '';
 
   constructor(

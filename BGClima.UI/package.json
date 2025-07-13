@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "postbuild": "npx cpy ./dist/bgclima.ui/* ../BGClima.API/wwwroot/ --recursive && npx cpy ./dist/bgclima.ui/assets/* ../BGClima.API/wwwroot/assets/ --recursive"
+    "postbuild": "npx cpy ./dist/bgclima.ui/* ../BGClima.API/wwwroot/ --recursive && npx cpy ./dist/bgclima.ui/assets/** ../BGClima.API/wwwroot/assets/ --recursive"
   },
   "private": true,
   "dependencies": {

@@ -14,6 +14,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { HomeComponent } from './components/home/home.component';
 import { ProductListComponent } from './components/admin/product-list.component';
+import { DashboardHomeComponent } from './components/admin/dashboard-home.component';
 
 // Material Imports
 import { MatButtonModule } from '@angular/material/button';
@@ -64,10 +65,10 @@ import { ServizComponent } from './components/serviz/serviz.component';
     CertificatesComponent,
     ProjectsComponent,
     ConsultingComponent,
-    InstallationComponent,
     ProductListComponent,
-    ProfilaktikaComponent,
-    ServizComponent,
+	DashboardHomeComponent,
+	ProfilaktikaComponent,
+	ServizComponent
   ],
   imports: [
     BrowserModule,

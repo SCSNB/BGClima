@@ -14,11 +14,11 @@
   <mat-sidenav-container class="admin-sidenav-container">
     <mat-sidenav #sidenav mode="over" class="admin-sidenav" [opened]="true">
       <mat-nav-list>
-        <a mat-list-item routerLink="/admin" routerLinkActive="active">
+        <a mat-list-item routerLink="/admin" routerLinkActive="active" (click)="sidenav.close()">
           <mat-icon>dashboard</mat-icon>
           <span>Dashboard</span>
         </a>
-        <a mat-list-item routerLink="/admin/products" routerLinkActive="active">
+        <a mat-list-item routerLink="/admin/product" routerLinkActive="active" (click)="sidenav.close()">
           <mat-icon>inventory_2</mat-icon>
           <span>Products</span>
         </a>
@@ -47,55 +47,7 @@
     </mat-sidenav>
 
     <mat-sidenav-content class="admin-content">
-      <div class="dashboard-content">
-        <h1>Admin Dashboard</h1>
-        
-        <div class="stats-cards">
-          <mat-card>
-            <mat-card-header>
-              <mat-icon mat-card-avatar>inventory_2</mat-icon>
-              <mat-card-title>Products</mat-card-title>
-              <mat-card-subtitle>Total Products</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
-              <h2>156</h2>
-            </mat-card-content>
-          </mat-card>
-          
-          <mat-card>
-            <mat-card-header>
-              <mat-icon mat-card-avatar>category</mat-icon>
-              <mat-card-title>Categories</mat-card-title>
-              <mat-card-subtitle>Active Categories</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
-              <h2>12</h2>
-            </mat-card-content>
-          </mat-card>
-          
-          <mat-card>
-            <mat-card-header>
-              <mat-icon mat-card-avatar>shopping_cart</mat-icon>
-              <mat-card-title>Orders</mat-card-title>
-              <mat-card-subtitle>This Month</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
-              <h2>28</h2>
-            </mat-card-content>
-          </mat-card>
-          
-          <mat-card>
-            <mat-card-header>
-              <mat-icon mat-card-avatar>people</mat-icon>
-              <mat-card-title>Users</mat-card-title>
-              <mat-card-subtitle>Registered Users</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
-              <h2>245</h2>
-            </mat-card-content>
-          </mat-card>
-        </div>
-      </div>
+      <router-outlet></router-outlet>
     </mat-sidenav-content>
   </mat-sidenav-container>
 </div> 

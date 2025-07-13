@@ -15,15 +15,17 @@ import { InstallationComponent } from './components/installation/installation.co
 import { ProfilaktikaComponent } from './components/profilaktika/profilaktika.component';
 import { ServizComponent } from './components/serviz/serviz.component';
 import { ProductListComponent } from './components/admin/product-list.component';
+import { DashboardHomeComponent } from './components/admin/dashboard-home.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { 
     path: 'admin', 
-    component: ProductListComponent,
+    component: AdminDashboardComponent,
     // canActivate: [AuthGuard],
     // data: { roles: ['ADMIN'] },
     children: [
+      { path: '', component: DashboardHomeComponent },
       { path: 'product', component: ProductListComponent }
     ]
   },
