@@ -42,16 +42,46 @@ h1 {
 
   h2 {
     font-size: 1.1rem;
-    font-weight: 700;
-    margin: 0 0 0.2rem 0;
+    margin: 0 0 1rem 0;
     color: #1e2957;
+    display: flex;
+    align-items: center;
+    
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 1.2rem;
+      background-color: #1e90ff;
+      margin-right: 0.6rem;
+      border-radius: 2px;
+    }
   }
 
-  p, a {
-    font-size: 0.9rem;
+  .info-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 0.8rem;
+    font-size: 1.1rem;
     color: #1e2957;
-    line-height: 1.5;
-    margin: 0.2rem 0;
+    line-height: 1.6;
+
+    .icon {
+      margin-right: 0.8rem;
+      color: #1e90ff;
+      min-width: 20px;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    a {
+      color: #1e90ff;
+      text-decoration: none;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 
   a {
