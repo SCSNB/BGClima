@@ -3,10 +3,10 @@
   <div class="header-top">
     <div class="logo-search">
       <div class="logo-block">
-        <a routerLink="/" class="logo-link" style="cursor:pointer">
+        <a routerLink="/" class="logo-link">
           <img src="assets/logo.png" alt="БГ Клима" class="logo-image">
+          <div class="logo-subtitle">КЛИМАТИЗАЦИЯ И ВЕНТИЛАЦИЯ</div>
         </a>
-        <div class="logo-subtitle" style="color:#fff;font-size:0.8rem;margin-top:0.7rem;text-align:center;text-transform:uppercase;line-height:1.1;font-weight:400;">КЛИМАТИЗАЦИЯ И ВЕНТИЛАЦИЯ</div>
       </div>
       <div class="search-bar">
         <mat-form-field appearance="outline" class="search-white-bg">
@@ -20,10 +20,12 @@
         <span class="phone-number"><mat-icon>call</mat-icon> 042 / 638 248</span>
         <span class="phone-desc">Безплатна консултация</span>
       </div>
-      <button mat-icon-button><mat-icon>calculate</mat-icon></button>
-      <button mat-icon-button><mat-icon>swap_vert</mat-icon></button>
-      
-      <!-- Премахнат бутонът с количката -->
+      <button mat-icon-button aria-label="Калкулатор">
+        <mat-icon>calculate</mat-icon>
+      </button>
+      <button mat-icon-button aria-label="Сравняване">
+        <mat-icon>swap_vert</mat-icon>
+      </button>
     </div>
   </div>
 </header>
