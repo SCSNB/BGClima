@@ -426,6 +426,10 @@ body {
     flex-direction: column;
     gap: 1.2rem;
     padding: 1rem 0.5rem;
+    
+    .header-actions {
+      display: none; // Скрива иконите до логото в мобилен изглед
+    }
     position: relative;
     
     .logo-search {
@@ -679,40 +683,125 @@ body {
   }
 }
 
-// Mobile Action Bar Styles
+// Hide focus indicators in the navigation bar
+.mobile-action-bar {
+  .mat-mdc-focus-indicator {
+    display: none;
+  }
+}
+
+//* Utility Classes */
+.desktop-only {
+  display: none;
+  @media (min-width: 768px) {
+    display: block;
+  }
+}
+
+.mobile-only {
+  display: block;
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+/* Mobile Action Bar Styles */
 .mobile-action-bar {
   display: none; // Hidden by default on desktop
 }
 
+.flex-spacer {
+  flex: 1 1 auto;
+}
+
 .mobile-sidenav {
-  width: 280px;
-  padding: 16px;
+  width: 320px; // Make it a bit wider
+  padding: 0;
 
-  .sidenav-title {
-    font-size: 1.2rem;
-    font-weight: 500;
-    margin-bottom: 16px;
+  .sidenav-header {
+    display: flex;
+    align-items: center;
+    background-color: #3A66FF;
+    color: white;
+    padding: 0 16px;
+    height: 60px;
+
+    .sidenav-title {
+      margin: 0;
+      margin-left: 16px;
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
   }
 
-  .menu-icon {
-    width: 24px;
-    height: 24px;
-    margin-right: 16px;
-  }
+  .sidenav-accordion {
+    .mat-expansion-panel,
+    .mat-list-item {
+      border-bottom: 1px solid #f0f0f0;
+    }
 
-  .mat-expansion-panel {
-    box-shadow: none !important;
-    border-bottom: 1px solid #eee;
-  }
+    .mat-expansion-panel-header,
+    .mat-list-item {
+      height: 56px;
+      padding: 0 16px;
+      font-size: 1rem;
+    }
 
-  .mat-expansion-panel-header {
-    padding: 0 8px;
-  }
+    .menu-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 24px;
+      filter: grayscale(1) opacity(0.8);
+    }
 
-  .mat-nav-list .mat-list-item {
-    font-size: 0.9rem;
-    height: 40px;
-    padding-left: 32px;
+    .mat-expansion-panel {
+      box-shadow: none !important;
+
+      .mat-expansion-panel-header {
+        padding-right: 10px; // Space for the custom toggle icon
+      }
+    }
+
+    .promo-item {
+      .mat-expansion-panel-header-title {
+        color: #d9534f; // Red text color
+        align-items: center;
+        
+        .menu-icon {
+          filter: brightness(0) saturate(100%) invert(36%) sepia(93%) saturate(1106%) hue-rotate(327deg) brightness(91%) contrast(92%); // Red color for the icon
+          margin-right: 12px; // Reduce the right margin to bring text closer to the icon
+        }
+        
+        .promo-text {
+          margin-left: 12px; // Reduce the left margin to bring text closer to the icon
+        }
+      }
+      
+      // Hide the expansion indicator (arrow) since we don't need it
+      .mat-expansion-indicator {
+        display: none;
+      }
+    }
+
+    .submenu-items {
+      padding-left: 0;
+      background-color: #f8f9fa;
+      
+      a {
+        display: block;
+        padding: 12px 16px 12px 60px;
+        color: #333;
+        text-decoration: none;
+        transition: all 0.2s;
+        font-size: 0.95rem; // По-малък размер на шрифта
+        font-weight: 400; // Нормално тегло на шрифта
+        
+        &:hover {
+          background-color: #e9ecef;
+          color: #000; // По-тъмен цвят при посочване
+        }
+      }
+    }
   }
 }
 
