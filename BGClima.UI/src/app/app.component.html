@@ -28,12 +28,104 @@
       </button>
     </div>
   </div>
+
+  <!-- MOBILE ACTION BAR -->
+  <nav class="mobile-action-bar">
+    <button mat-icon-button class="nav-item menu-button" (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <button mat-icon-button class="nav-item" (click)="toggleMobileSearch()">
+      <mat-icon>search</mat-icon>
+    </button>
+    <button mat-icon-button class="nav-item" routerLink="/contacts">
+      <mat-icon>call</mat-icon>
+    </button>
+    <button mat-icon-button class="nav-item">
+      <mat-icon matBadge="0" matBadgeColor="warn">shopping_cart</mat-icon>
+    </button>
+  </nav>
+
+  <!-- MOBILE SEARCH BAR -->
+  <div class="mobile-search-container" *ngIf="isMobileSearchVisible">
+    <mat-form-field appearance="outline" class="search-mobile">
+      <input matInput type="text" placeholder="Търси продукт...">
+      <button mat-icon-button matSuffix><mat-icon>search</mat-icon></button>
+    </mat-form-field>
+  </div>
 </header>
 
 <!-- NAVBAR -->
-<app-navbar></app-navbar>
+<mat-sidenav-container class="main-container">
+  <mat-sidenav #sidenav mode="over" class="mobile-sidenav">
+    <h2 class="sidenav-title">Продукти</h2>
+    <mat-accordion displayMode="flat">
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <img src="assets/product-icons/air-conditioner.svg" class="menu-icon" alt="Климатици"> Климатици
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-nav-list>
+          <a mat-list-item>КЛИМАТИЦИ СТЕНЕН ТИП</a>
+          <a mat-list-item>КЛИМАТИЦИ КОЛОНЕН ТИП</a>
+          <a mat-list-item>КЛИМАТИЦИ КАНАЛЕН ТИП</a>
+          <a mat-list-item>КЛИМАТИЦИ КАСЕТЪЧЕН ТИП</a>
+          <a mat-list-item>КЛИМАТИЦИ ПОДОВ ТИП</a>
+          <a mat-list-item>КЛИМАТИЦИ ПОДОВО - ТАВАНЕН ТИП</a>
+          <a mat-list-item>VRF / VRV</a>
+          <a mat-list-item>МОБИЛНИ / ПРЕНОСИМИ КЛИМАТИЦИ</a>
+        </mat-nav-list>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <img src="assets/product-icons/tp.svg" class="menu-icon" alt="Термопомпи"> Термопомпи
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-nav-list>
+          <a mat-list-item>ТЕРМОПОМПЕНИ СИСТЕМИ</a>
+          <a mat-list-item>МУЛТИСПЛИТ СИСТЕМИ</a>
+          <a mat-list-item>БГКЛИМА ТРЪБНИ ТОПЛООБМЕННИЦИ</a>
+        </mat-nav-list>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <img src="assets/product-icons/vc.svg" class="menu-icon" alt="Вентилация"> Вентилация
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-nav-list>
+          <a mat-list-item>ПРОЕКТИРАНЕ НА ВЕНТИЛАЦИОННИ СИСТЕМИ</a>
+          <a mat-list-item>МОНТАЖ НА ВЕНТИЛАЦИОННИ СИСТЕМИ</a>
+          <a mat-list-item>ПРОФИЛАКТИКА И СЕРВИЗ</a>
+        </mat-nav-list>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <img src="assets/product-icons/solar.svg" class="menu-icon" alt="Соларни системи"> Соларни системи
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-nav-list>
+          <a mat-list-item>ТЕРМОСИФОННИ</a>
+          <a mat-list-item>ПОД НАЛЯГАНЕ</a>
+          <a mat-list-item>СОЛАРНИ ПАНЕЛИ</a>
+        </mat-nav-list>
+      </mat-expansion-panel>
+
+    </mat-accordion>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <app-navbar></app-navbar>
 
 <!-- ROUTER OUTLET -->
 <router-outlet></router-outlet>
 
-<app-footer></app-footer>
+    <app-footer></app-footer>
+  </mat-sidenav-content>
+</mat-sidenav-container>
