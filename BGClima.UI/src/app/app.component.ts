@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatSidenav } from '@angular/material/sidenav';
 import { AuthService } from './services/auth.service';
 import { Router, NavigationEnd, Event } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -9,6 +10,9 @@ import { filter } from 'rxjs/operators';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+  @ViewChild('sidenav') sidenav!: MatSidenav;
+  isMobileSearchVisible = false;
+
   title = 'BGClima';
   isAuthenticated = false;
   isAdmin = false;
@@ -77,6 +81,10 @@ export class AppComponent implements OnInit {
       this.currentUrl = event.url;
       console.log('Current URL:', this.currentUrl);
     });
+  }
+
+  toggleMobileSearch(): void {
+    this.isMobileSearchVisible = !this.isMobileSearchVisible;
   }
 
   ngOnInit(): void {
