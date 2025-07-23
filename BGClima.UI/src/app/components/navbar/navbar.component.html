@@ -31,9 +31,7 @@
   <button mat-menu-item [matMenuTriggerFor]="ventilationMenu">
     <img src="assets/product-icons/vc.svg" class="menu-icon" alt="Вентилация"> Вентилация
   </button>
-  <button mat-menu-item [matMenuTriggerFor]="solarMenu">
-    <img src="assets/product-icons/solar.svg" class="menu-icon" alt="Соларни системи"> Соларни системи
-  </button>
+
 </mat-menu>
 
 <mat-menu #acTypesMenu="matMenu">
@@ -59,13 +57,8 @@
   <button mat-menu-item>Профилактика и сервиз</button>
 </mat-menu>
 
-<mat-menu #solarMenu="matMenu">
-  <button mat-menu-item>Термосифонни</button>
-  <button mat-menu-item>Под налягане</button>
-  <button mat-menu-item>Соларни панели</button>
-</mat-menu>
+
 <mat-menu #servicesMenu="matMenu">
-  <button mat-menu-item routerLink="/consulting">Консултиране</button>
   <button mat-menu-item routerLink="/installation">Монтаж</button>
   <button mat-menu-item routerLink="/profilaktika">Профилактика</button>
   <button mat-menu-item routerLink="/serviz">Сервиз</button>

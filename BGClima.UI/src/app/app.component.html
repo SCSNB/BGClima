@@ -57,12 +57,7 @@
 <!-- NAVBAR -->
 <mat-sidenav-container class="main-container">
   <mat-sidenav #sidenav mode="over" class="mobile-sidenav">
-    <div class="sidenav-header">
-      <button mat-icon-button (click)="sidenav.close()">
-        <mat-icon>close</mat-icon>
-      </button>
-      <h2 class="sidenav-title">Меню</h2>
-    </div>
+
 
     <mat-accordion class="sidenav-accordion" displayMode="flat" multi>
 
@@ -119,20 +114,16 @@
         </div>
       </mat-expansion-panel>
 
-      <mat-expansion-panel #panel4 hideToggle="true">
+
+
+      <mat-expansion-panel class="promo-item" hideToggle="true">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <img src="assets/product-icons/solar.svg" class="menu-icon" alt="Соларни системи"> Соларни системи
-            <span class="flex-spacer"></span>
-            <mat-icon *ngIf="!panel4.expanded">chevron_right</mat-icon>
-            <mat-icon *ngIf="panel4.expanded">expand_more</mat-icon>
+            <img src="assets/product-icons/promo.png" class="menu-icon" alt="Промо">
+            <span class="promo-text">ПРОМО</span>
           </mat-panel-title>
         </mat-expansion-panel-header>
-        <div class="submenu-items">
-          <a mat-list-item>Термосифонни</a>
-          <a mat-list-item>Под налягане</a>
-          <a mat-list-item>Соларни панели</a>
-        </div>
+        <!-- Empty panel content, since it's just a link -->
       </mat-expansion-panel>
 
       <mat-expansion-panel class="calculator-item" hideToggle="true" routerLink="/calculator">
@@ -144,14 +135,31 @@
         </mat-expansion-panel-header>
       </mat-expansion-panel>
 
-      <mat-expansion-panel class="promo-item" hideToggle="true">
+      <mat-expansion-panel class="menu-item" hideToggle="true" routerLink="/installation">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <img src="assets/product-icons/promo.png" class="menu-icon" alt="Промо">
-            <span class="promo-text">ПРОМО</span>
+            <mat-icon class="menu-icon">handyman</mat-icon>
+            <span>Монтаж</span>
           </mat-panel-title>
         </mat-expansion-panel-header>
-        <!-- Empty panel content, since it's just a link -->
+      </mat-expansion-panel>
+
+      <mat-expansion-panel class="menu-item" hideToggle="true" routerLink="/profilaktika">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-icon class="menu-icon">shield_plus</mat-icon>
+            <span>Профилактика</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel class="menu-item" hideToggle="true" routerLink="/serviz">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-icon class="menu-icon">settings</mat-icon>
+            <span>Сервиз</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
       </mat-expansion-panel>
 
       <mat-expansion-panel #panel5 hideToggle="true">
