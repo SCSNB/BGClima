@@ -235,24 +235,58 @@
 
 .promo-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  grid-template-rows: repeat(3, auto);
+  grid-template-columns: 1.5fr 1fr; /* Намаляваме ширината на голямата колона */
+  grid-template-rows: repeat(3, 1fr); /* Равни височини за всички редове */
   gap: 20px;
   grid-template-areas:
     "large top-right"
     "large middle-right"
     "large bottom-right";
+  height: 700px; /* Фиксирана височина за цялата мрежа */
 }
 
 .promo-item {
   position: relative;
   overflow: hidden;
-  border-radius: 8px;
-  background-color: #f0f0f0; // Placeholder background
-  min-height: 150px;
+  border-radius: 12px; /* Повече заобляне на ъглите */
+  background-color: #f0f0f0;
   background-size: cover;
   background-position: center;
-  transition: transform 0.3s ease;
+  background-repeat: no-repeat;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Добавяне на сянка */
+  
+  /* Стилове за малките секции */
+  &.top-right-banner,
+  &.middle-right-banner,
+  &.bottom-right-banner {
+    min-height: 220px; /* Увеличена височина за малките секции */
+  }
+  
+  /* Стил за голямата секция */
+  &.large-banner {
+    min-height: 100%; /* Заема цялата височина на мрежата */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    
+    .promo-link {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .promo-content {
+      width: 100%;
+      height: 100%;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+  }
 
   &:hover {
     transform: scale(1.03);
