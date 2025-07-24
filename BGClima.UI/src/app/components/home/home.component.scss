@@ -58,15 +58,22 @@
   color: #fff;
   padding: 0;
   min-height: 360px;
-  height: 550px;
+  height: auto;
   width: 100%;
   overflow: hidden;
+  margin: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 16/9;
 }
 
 .banner-content {
   width: 100%;
   height: 100%;
-  max-width: 100vw;
+  max-width: 100%;
   margin: 0;
   padding: 0;
   display: flex;
@@ -83,9 +90,10 @@
 
 .slide {
   background-image: url('/assets/hero/hero-bg.jpg');
-  background-size: cover;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
+  background-color: #fbfbfb; /* Light gray background */
   width: 100%;
   height: 100%;
   position: absolute;
@@ -97,7 +105,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
 }
 .slide.active {
   opacity: 1;
@@ -106,37 +114,46 @@
 }
 
 .hero-image {
-  width: 100%;
+  width: auto;
   height: 100%;
+  max-width: 100%;
   object-fit: contain;
-  border-radius: 0;
-  max-width: none;
-  margin: 0;
-  position: absolute;
-  left: 0;
-  top: 0;
+  display: block;
+  margin: 0 auto;
   z-index: 1;
 }
 
 .slider-dots {
   position: absolute;
+  bottom: 20px;
   left: 0;
   right: 0;
-  bottom: 1.1rem;
-  z-index: 3;
   display: flex;
   justify-content: center;
-  gap: 0.6rem;
-}
-.dot {
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  background: #fff;
-  opacity: 0.5;
-  cursor: pointer;
-  transition: opacity 0.2s, background 0.2s;
-  border: 2px solid #63c0ff;
+  z-index: 3;
+  gap: 8px;
+  padding: 10px;
+
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+    &.active {
+      background-color: #fff;
+      transform: scale(1.2);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    &:hover {
+      transform: scale(1.1);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    }
+  }
 }
 .dot.active {
   opacity: 1;
@@ -174,13 +191,38 @@
 @media (max-width: 600px) {
   .hero-banner {
     min-height: 220px;
-    height: 220px;
+    height: auto;
+    aspect-ratio: 16/9;
+    width: 100%;
+    margin: 0;
+    left: 0;
+    right: 0;
+  }
+  .hero-slider {
+    width: 100%;
+    height: 100%;
+  }
+  .slide {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .hero-image {
-    max-width: 98vw;
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    object-fit: contain;
   }
   .banner-content {
-    padding: 1.2rem 0.2rem 1.2rem 0.2rem;
+    padding: 0;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
+  }
+  .slider-dots {
+    bottom: 0.5rem;
   }
 }
 
@@ -220,6 +262,52 @@
     display: block;
     width: 100%;
     height: 100%;
+  }
+}
+
+.text-overlay {
+  color: #fff;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  box-sizing: border-box;
+  background: linear-gradient(45deg, rgba(25, 42, 86, 0.8), rgba(42, 86, 157, 0.6));
+  transition: background 0.3s ease;
+
+  .promo-item:hover & {
+    background: linear-gradient(45deg, rgba(25, 42, 86, 0.9), rgba(42, 86, 157, 0.7));
+  }
+
+  .promo-question {
+    font-size: 1.1rem;
+    font-weight: 300;
+    margin: 0;
+  }
+
+  .promo-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0.5rem 0 1.5rem 0;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .promo-cta {
+    font-size: 1.2rem;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+
+    mat-icon {
+      margin-left: 8px;
+      transition: transform 0.3s ease;
+    }
+  }
+
+  .promo-item:hover & .promo-cta mat-icon {
+    transform: translateX(5px);
   }
 }
 
