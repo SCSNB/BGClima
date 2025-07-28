@@ -64,7 +64,7 @@
       <mat-expansion-panel #panel1 hideToggle="true">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <img src="assets/product-icons/air-conditioner.svg" class="menu-icon" alt="Климатици"> Климатици
+            <img src="assets/product-icons/ico1.png" class="menu-icon" alt="Климатици"> Климатици
             <span class="flex-spacer"></span>
             <mat-icon *ngIf="!panel1.expanded">chevron_right</mat-icon>
             <mat-icon *ngIf="panel1.expanded">expand_more</mat-icon>
@@ -85,7 +85,7 @@
       <mat-expansion-panel #panel2 hideToggle="true">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <img src="assets/product-icons/tp.svg" class="menu-icon" alt="Термопомпи"> Термопомпи
+            <img src="assets/product-icons/ico2.png" class="menu-icon" alt="Термопомпи"> Термопомпи
             <span class="flex-spacer"></span>
             <mat-icon *ngIf="!panel2.expanded">chevron_right</mat-icon>
             <mat-icon *ngIf="panel2.expanded">expand_more</mat-icon>
@@ -101,7 +101,7 @@
       <mat-expansion-panel #panel3 hideToggle="true">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <img src="assets/product-icons/vc.svg" class="menu-icon" alt="Вентилация"> Вентилация
+            <img src="assets/product-icons/ico3.png" class="menu-icon" alt="Вентилация"> Вентилация
             <span class="flex-spacer"></span>
             <mat-icon *ngIf="!panel3.expanded">chevron_right</mat-icon>
             <mat-icon *ngIf="panel3.expanded">expand_more</mat-icon>
@@ -116,20 +116,19 @@
 
 
 
-      <mat-expansion-panel class="promo-item" hideToggle="true">
+      <mat-expansion-panel class="promo-item" hideToggle="true" routerLink="/promo">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <img src="assets/product-icons/promo.png" class="menu-icon" alt="Промо">
+            <img src="assets/product-icons/promo.png" class="menu-icon red-icon" alt="Промо">
             <span class="promo-text">ПРОМО</span>
           </mat-panel-title>
         </mat-expansion-panel-header>
-        <!-- Empty panel content, since it's just a link -->
       </mat-expansion-panel>
 
       <mat-expansion-panel class="calculator-item" hideToggle="true" routerLink="/calculator">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <mat-icon class="menu-icon">calculate</mat-icon>
+            <img src="assets/product-icons/calculator.png" class="menu-icon" alt="Калкулатор">
             <span>Калкулатор за климатик</span>
           </mat-panel-title>
         </mat-expansion-panel-header>
@@ -138,7 +137,7 @@
       <mat-expansion-panel class="menu-item" hideToggle="true" routerLink="/installation">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <mat-icon class="menu-icon">handyman</mat-icon>
+            <img src="assets/product-icons/tools.png" class="menu-icon" alt="Монтаж">
             <span>Монтаж</span>
           </mat-panel-title>
         </mat-expansion-panel-header>
@@ -147,16 +146,16 @@
       <mat-expansion-panel class="menu-item" hideToggle="true" routerLink="/profilaktika">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <mat-icon class="menu-icon">shield_plus</mat-icon>
+            <img src="assets/product-icons/rpa.png" class="menu-icon" alt="Профилактика">
             <span>Профилактика</span>
           </mat-panel-title>
         </mat-expansion-panel-header>
       </mat-expansion-panel>
 
-      <mat-expansion-panel class="menu-item" hideToggle="true" routerLink="/serviz">
+      <mat-expansion-panel class="menu-item" hideToggle="true" routerLink="/service">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <mat-icon class="menu-icon">settings</mat-icon>
+            <img src="assets/product-icons/services.png" class="menu-icon" alt="Сервиз">
             <span>Сервиз</span>
           </mat-panel-title>
         </mat-expansion-panel-header>
@@ -165,7 +164,7 @@
       <mat-expansion-panel #panel5 hideToggle="true">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <mat-icon class="menu-icon">info</mat-icon>
+            <img src="assets/product-icons/info.png" class="menu-icon" alt="За нас">
             <span>За нас</span>
             <span class="flex-spacer"></span>
             <mat-icon *ngIf="!panel5.expanded">chevron_right</mat-icon>

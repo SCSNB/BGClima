@@ -745,6 +745,15 @@ body {
       height: 56px;
       padding: 0 16px;
       font-size: 1rem;
+      font-weight: 400 !important; /* Ensure normal weight */
+    }
+    
+    /* Ensure all text in menu items is normal weight */
+    .mat-expansion-panel-header-title,
+    .mat-expansion-panel-header-title span,
+    .mat-list-item,
+    .mat-list-item span {
+      font-weight: 400 !important;
     }
 
     .menu-icon {
@@ -763,6 +772,14 @@ body {
     }
 
     .promo-item {
+      .red-icon {
+        filter: invert(20%) sepia(100%) saturate(5000%) hue-rotate(0deg) brightness(100%) contrast(100%);
+      }
+      
+      .promo-text {
+        color: #ff0000;
+        font-weight: 400; /* Changed from bold to normal weight */
+      }
       .mat-expansion-panel-header-title {
         color: #d9534f; // Red text color
         align-items: center;

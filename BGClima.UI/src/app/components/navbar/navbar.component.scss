@@ -56,12 +56,27 @@
   letter-spacing: 0.03em;
 }
 .menu-icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 0.7rem;
-  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
   vertical-align: middle;
-  position: static;
+  object-fit: contain;
+}
+.services-dropdown {
+  .mat-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    
+    .menu-icon {
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    
+    span {
+      white-space: nowrap;
+    }
+  }
 }
 .navbar-link mat-icon {
   margin-left: 0.7rem;
