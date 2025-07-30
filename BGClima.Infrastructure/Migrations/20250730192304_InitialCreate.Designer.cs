@@ -3,6 +3,7 @@ using System;
 using BGClima.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BGClima.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250730192304_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -338,7 +341,7 @@ namespace BGClima.Infrastructure.Migrations
                     b.Property<decimal>("PriceValue")
                         .HasColumnType("numeric");
 
-                    b.Property<int?>("ProductId")
+                    b.Property<int>("ProductId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ValidFrom")
@@ -636,7 +639,9 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasOne("BGClima.Domain.Entities.Product", "Product")
                         .WithOne("Price")
-                        .HasForeignKey("BGClima.Domain.Entities.Price", "ProductId");
+                        .HasForeignKey("BGClima.Domain.Entities.Price", "ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Product");
                 });
