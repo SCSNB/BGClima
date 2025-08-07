@@ -1,8 +1,7 @@
-using BGClima.Infrastructure;
-using BGClima.Domain.Entities;
-using BGClima.Application.Services;
+using BGClima.API.Data;
+using BGClima.API.Models;
 using Microsoft.EntityFrameworkCore;
-using BGClima.Infrastructure.Repositories;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,97 +11,68 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllersWithViews();
 
-// Register AppDbContext with PostgreSQL
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection") ??
-        "Host=localhost;Database=bgclima;Username=postgres;Password=admin"));
+// Register DbContext with PostgreSQL
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
+                      "Host=localhost;Port=5432;Database=bgclima;Username=postgres;Password=;";
+
+builder.Services.AddDbContext<BGClima.Infrastructure.AppDbContext>(options =>
+    options.UseNpgsql(connectionString, npgsqlOptions =>
+    {
+        npgsqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorCodesToAdd: null);
+    }));
 
 // Register repositories
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<BGClima.Domain.Entities.IProductRepository, BGClima.Infrastructure.Repositories.ProductRepository>();
+
+// Register application services
+builder.Services.AddScoped<BGClima.Application.Services.IProductService, BGClima.Application.Services.ProductService>();
+
+// Register BGClimaContext for backward compatibility (if needed)
+builder.Services.AddDbContext<BGClimaContext>(options =>
+    options.UseNpgsql(connectionString));
+
+// Enable detailed errors and sensitive data logging in development
+// Note: Removed AddDatabaseDeveloperPageExceptionFilter as it's not available in the current context
 
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularDev",
         policy => policy
-            .WithOrigins("http://localhost:4200") // Angular dev server
+            .WithOrigins(
+                "http://localhost:4200", // Angular dev server (default port)
+                "http://localhost:4201"  // Angular dev server (custom port)
+            )
             .AllowAnyHeader()
-            .AllowAnyMethod());
+            .AllowAnyMethod()
+            .AllowCredentials());
 });
 
 var app = builder.Build();
 
 // Apply pending migrations on startup
-using (var scope = app.Services.CreateScope())
+try
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
-
-    // Only seed in Development
-    var env = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
-    if (env.IsDevelopment())
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<BGClimaContext>();
+    
+    // Apply migrations and seed initial data
+    if (app.Environment.IsDevelopment())
     {
-        SeedTestData(db);
+        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        DbInitializer.Initialize(dbContext, logger);
     }
 }
-
-void SeedTestData(AppDbContext db)
+catch (Exception ex)
 {
-    // Seed categories if not present
-    if (!db.Categories.Any())
-    {
-        db.Categories.AddRange(
-            new Category { Id = 1, Name = "Solar Panels" },
-            new Category { Id = 2, Name = "Inverters" },
-            new Category { Id = 3, Name = "Batteries" }
-        );
-        db.SaveChanges();
-    }
-
-    // Only seed if there are no products, prices, stocks, images, or features
-    bool needSeed = !db.Products.Any() && !db.Prices.Any() && !db.Stocks.Any() && !db.ProductImages.Any() && !db.ProductFeatures.Any();
-    if (needSeed)
-    {
-        for (int i = 1; i <= 50; i++)
-        {
-            int categoryId = (i % 3) + 1;
-            var product = new Product
-            {
-                Name = $"Product {i}",
-                Description = $"Description for product {i}",
-                CategoryId = categoryId
-            };
-            db.Products.Add(product);
-            db.SaveChanges(); // Save to get product.Id for FK
-
-            db.Prices.Add(new Price
-            {
-                ProductId = product.Id,
-                Amount = 100 + i,
-                Currency = "EUR"
-            });
-            db.Stocks.Add(new Stock
-            {
-                ProductId = product.Id,
-                Quantity = 10 + i
-            });
-            db.ProductImages.Add(new ProductImage
-            {
-                ProductId = product.Id,
-                Url = "/assets/solar-panel-placeholder.jpg"
-            });
-            db.ProductFeatures.Add(new ProductFeature
-            {
-                ProductId = product.Id,
-                Name = $"Feature {i}",
-                Value = $"Value {i}"
-            });
-        }
-        db.SaveChanges();
-    }
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "An error occurred while migrating or initializing the database.");
 }
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
