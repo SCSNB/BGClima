@@ -14,6 +14,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { HomeComponent } from './components/home/home.component';
 import { ProductListComponent } from './components/admin/product-list.component';
+import { ProductDialogComponent } from './components/admin/product-dialog.component';
 import { DashboardHomeComponent } from './components/admin/dashboard-home.component';
 
 // Material Imports
@@ -32,9 +33,14 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatMenuModule } from '@angular/material/menu';
-
-// Services and Interceptors
-import { AuthService } from './services/auth.service';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatSelectModule } from '@angular/material/select';
+ 
+ // Services and Interceptors
+ import { AuthService } from './services/auth.service';
 import { AuthGuard } from './guards/auth.guard';
 import { JwtInterceptor, ErrorInterceptor } from './interceptors';
 import { ContactsComponent } from './components/contacts/contacts.component';
@@ -63,13 +69,14 @@ import { ServizComponent } from './components/serviz/serviz.component';
     MainActivityComponent,
     ResourceComponent,
     CertificatesComponent,
-    ProjectsComponent,
-    ConsultingComponent,
-    ProductListComponent,
-	DashboardHomeComponent,
-	ProfilaktikaComponent,
-	ServizComponent
-  ],
+         ProjectsComponent,
+     ConsultingComponent,
+     ProductListComponent,
+     ProductDialogComponent,
+ 	DashboardHomeComponent,
+ 	ProfilaktikaComponent,
+ 	ServizComponent
+   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -93,8 +100,13 @@ import { ServizComponent } from './components/serviz/serviz.component';
     MatExpansionModule,
     MatSliderModule,
     MatDividerModule,
-    MatMenuModule
-  ],
+         MatMenuModule,
+     MatTableModule,
+     MatPaginatorModule,
+     MatSortModule,
+     MatDialogModule,
+     MatSelectModule
+   ],
   providers: [
     AuthService,
     AuthGuard,
