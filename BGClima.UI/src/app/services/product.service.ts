@@ -56,6 +56,8 @@ export interface CreateProductDto {
   seoTitle?: string;
   seoDescription?: string;
   seoKeywords?: string;
+  metaDescription?: string;
+  metaKeywords?: string;
   imageUrl?: string;
 }
 

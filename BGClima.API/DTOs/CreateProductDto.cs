@@ -21,6 +21,8 @@ namespace BGClima.API.DTOs
         public string SeoTitle { get; set; }
         public string SeoDescription { get; set; }
         public string SeoKeywords { get; set; }
+        public string MetaDescription { get; set; }
+        public string MetaKeywords { get; set; }
         public string ImageUrl { get; set; }
         
         public ICollection<CreateProductAttributeDto> Attributes { get; set; } = new List<CreateProductAttributeDto>();

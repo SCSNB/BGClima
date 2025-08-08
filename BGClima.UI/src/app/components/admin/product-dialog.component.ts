@@ -62,9 +62,11 @@ export class ProductDialogComponent implements OnInit {
       isOnSale: false,
       isFeatured: false,
       stockQuantity: 0,
-      seoTitle: '',
-      seoDescription: '',
-      seoKeywords: ''
+      seoTitle: this.form.value.name,
+      seoDescription: this.form.value.description ?? '',
+      seoKeywords: this.form.value.name,
+      metaDescription: this.form.value.description ?? '',
+      metaKeywords: this.form.value.name
     };
 
     this.dialogRef.close({ action: this.data.mode, dto });
