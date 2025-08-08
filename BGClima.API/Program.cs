@@ -30,9 +30,18 @@ builder.Services.AddScoped<BGClima.Domain.Entities.IProductRepository, BGClima.I
 // Register application services
 builder.Services.AddScoped<BGClima.Application.Services.IProductService, BGClima.Application.Services.ProductService>();
 
-// Register BGClimaContext for backward compatibility (if needed)
+// Register BGClimaContext with PostgreSQL
 builder.Services.AddDbContext<BGClimaContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(connectionString, npgsqlOptions =>
+    {
+        npgsqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorCodesToAdd: null);
+    }));
+
+// Register AutoMapper
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 // Enable detailed errors and sensitive data logging in development
 // Note: Removed AddDatabaseDeveloperPageExceptionFilter as it's not available in the current context
@@ -59,11 +68,11 @@ try
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<BGClimaContext>();
     
-    // Apply migrations and seed initial data
+    // Apply migrations
     if (app.Environment.IsDevelopment())
     {
-        var logger = app.Services.GetRequiredService<ILogger<Program>>();
-        DbInitializer.Initialize(dbContext, logger);
+        // We'll apply migrations automatically
+        dbContext.Database.Migrate();
     }
 }
 catch (Exception ex)

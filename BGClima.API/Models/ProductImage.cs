@@ -1,31 +1,30 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BGClima.API.Models
 {
-    [Table("product_images", Schema = "bgclima")]
-    public class ProductImage : BaseEntity
+    [Table("ProductImage", Schema = "bgclima")]
+    public class ProductImage
     {
-        [Required]
-        [Column("product_id")]
-        public int ProductId { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
 
         [Required]
-        [Column("image_url")]
-        [StringLength(500)]
+        [ForeignKey("Product")]
+        public int ProductId { get; set; }
+        public virtual Product Product { get; set; }
+
+        [Required]
         public string ImageUrl { get; set; }
 
-        [Column("is_primary")]
-        public bool IsPrimary { get; set; } = false;
-
-        [Column("display_order")]
-        public int DisplayOrder { get; set; } = 0;
-
-        [StringLength(250)]
+        [StringLength(255)]
         public string AltText { get; set; }
 
-        // Navigation property
-        [ForeignKey("ProductId")]
-        public virtual Product Product { get; set; }
+        public int DisplayOrder { get; set; } = 0;
+        public bool IsPrimary { get; set; } = false;
+        
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

@@ -1,103 +1,76 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using BGClima.API.Models.Enums;
 
 namespace BGClima.API.Models
 {
     /// <summary>
     /// Основен клас за продуктите в системата (климатици и топлинни помпи)
     /// </summary>
-    [Table("products", Schema = "bgclima")]
-    public class Product : BaseEntity
+    [Table("Product", Schema = "bgclima")]
+    public class Product
     {
-        /// <summary>
-        /// Тип на продукта (климатик или топлинна помпа)
-        /// </summary>
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
         [Required]
-        [Column("product_type")]
-        public ProductType ProductType { get; set; }
-
-        /// <summary>
-        /// Идентификатор на конкретния продукт в съответната таблица (AirConditioner или HeatPump)
-        /// </summary>
-        [Required]
-        [Column("product_id")]
-        public int ProductId { get; set; }
-
-        /// <summary>
-        /// Идентификатор на категорията, към която принадлежи продуктът
-        /// </summary>
-        [Column("category_id")]
-        public int? CategoryId { get; set; }
-        
-        /// <summary>
-        /// Навигационно свойство към категорията на продукта
-        /// </summary>
-        [ForeignKey("CategoryId")]
-        public virtual ProductCategory Category { get; set; }
-
-        /// <summary>
-        /// Идентификатор на марката на продукта
-        /// </summary>
-        [Column("brand_id")]
-        public int? BrandId { get; set; }
-        
-        /// <summary>
-        /// Навигационно свойство към марката на продукта
-        /// </summary>
-        [ForeignKey("BrandId")]
-        public virtual Brand Brand { get; set; }
-
-        /// <summary>
-        /// Уникален артикулен номер на продукта
-        /// </summary>
-        [StringLength(100)]
-        public string SKU { get; set; }
-
-        /// <summary>
-        /// Име на продукта (задължително поле)
-        /// </summary>
-        [Required]
-        [StringLength(250)]
+        [StringLength(255)]
         public string Name { get; set; }
 
-        /// <summary>
-        /// Кратко описание на продукта за списъчни изгледи
-        /// </summary>
-        [Column("short_description")]
-        public string ShortDescription { get; set; }
+        public string Description { get; set; }
 
-        /// <summary>
-        /// Основна цена на продукта
-        /// </summary>
+        [Required]
+        [ForeignKey("Brand")]
+        public int BrandId { get; set; }
+        public virtual Brand Brand { get; set; }
+
+        [ForeignKey("BTU")]
+        public int? BTUId { get; set; }
+        public virtual BTU BTU { get; set; }
+
+        [ForeignKey("EnergyClass")]
+        public int? EnergyClassId { get; set; }
+        public virtual EnergyClass EnergyClass { get; set; }
+
+        [Required]
+        [ForeignKey("ProductType")]
+        public int ProductTypeId { get; set; }
+        public virtual ProductType ProductType { get; set; }
+
+        [Required]
         [Column(TypeName = "decimal(10, 2)")]
         public decimal Price { get; set; }
 
-        /// <summary>
-        /// Промоционална цена на продукта (незадължително)
-        /// </summary>
-        [Column("promo_price", TypeName = "decimal(10, 2)")]
-        public decimal? PromoPrice { get; set; }
+        [Column(TypeName = "decimal(10, 2)")]
+        public decimal? OldPrice { get; set; }
 
-        /// <summary>
-        /// Дали продуктът е маркиран като препоръчан
-        /// </summary>
-        [Column("is_featured")]
-        public bool IsFeatured { get; set; } = false;
-
-        /// <summary>
-        /// Дали продуктът е активен и трябва да се показва в каталога
-        /// </summary>
-        [Column("is_active")]
+        public int StockQuantity { get; set; } = 0;
         public bool IsActive { get; set; } = true;
+        public bool IsFeatured { get; set; } = false;
+        public bool IsOnSale { get; set; } = false;
+        public bool IsNew { get; set; } = true;
 
-        /// <summary>
-        /// Заглавие за SEO цели
-        /// </summary>
-        [Column("meta_title")]
-        [StringLength(250)]
-        public string MetaTitle { get; set; }
+        [StringLength(100)]
+        public string Sku { get; set; }
+
+        [StringLength(255)]
+        public string SeoTitle { get; set; }
+        
+        public string SeoDescription { get; set; }
+        
+        [StringLength(500)]
+        public string SeoKeywords { get; set; }
+
+        public string ImageUrl { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+        // Navigation properties
+        public virtual ICollection<ProductAttribute> Attributes { get; set; } = new List<ProductAttribute>();
+        public virtual ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
 
         /// <summary>
         /// Мета описание за SEO цели
@@ -110,27 +83,5 @@ namespace BGClima.API.Models
         /// </summary>
         [Column("meta_keywords")]
         public string MetaKeywords { get; set; }
-
-        // Navigation properties
-        
-        /// <summary>
-        /// Детайли за продукта, ако е климатик
-        /// </summary>
-        public virtual AirConditioner AirConditioner { get; set; }
-        
-        /// <summary>
-        /// Детайли за продукта, ако е топлинна помпа
-        /// </summary>
-        public virtual HeatPump HeatPump { get; set; }
-        
-        /// <summary>
-        /// Колекция от изображения на продукта
-        /// </summary>
-        public virtual ICollection<ProductImage> Images { get; set; }
-        
-        /// <summary>
-        /// Колекция от спецификации на продукта
-        /// </summary>
-        public virtual ICollection<ProductSpecification> Specifications { get; set; }
     }
 }

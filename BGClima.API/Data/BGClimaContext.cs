@@ -1,5 +1,4 @@
 using BGClima.API.Models;
-using BGClima.API.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,68 +10,132 @@ namespace BGClima.API.Data
         {
         }
 
-        // Основни модели
+        // DbSet свойства за всяка таблица
         public DbSet<Brand> Brands { get; set; }
-        public DbSet<ProductCategory> ProductCategories { get; set; }
+        public DbSet<BTU> BTUs { get; set; }
+        public DbSet<EnergyClass> EnergyClasses { get; set; }
+        public DbSet<ProductType> ProductTypes { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<AirConditioner> AirConditioners { get; set; }
-        public DbSet<HeatPump> HeatPumps { get; set; }
+        public DbSet<ProductAttribute> ProductAttributes { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
-        public DbSet<ProductSpecification> ProductSpecifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Конфигурация на схемата по подразбиране
+            // Задаване на схема по подразбиране
             modelBuilder.HasDefaultSchema("bgclima");
 
-            // Конфигурация на връзките за Product
+            // Конфигурация на Brand
+            modelBuilder.Entity<Brand>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Country).HasMaxLength(100);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
+
+            // Конфигурация на BTU
+            modelBuilder.Entity<BTU>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Value).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
+
+            // Конфигурация на EnergyClass
+            modelBuilder.Entity<EnergyClass>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Class).IsRequired().HasMaxLength(10);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
+
+            // Конфигурация на ProductType
+            modelBuilder.Entity<ProductType>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
+
+            // Конфигурация на Product
+            modelBuilder.Entity<Product>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(255);
+                entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.OldPrice).HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.Sku).HasMaxLength(100);
+                entity.Property(e => e.SeoTitle).HasMaxLength(255);
+                entity.Property(e => e.SeoKeywords).HasMaxLength(500);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                // Връзки
+                entity.HasOne(p => p.Brand)
+                    .WithMany(b => b.Products)
+                    .HasForeignKey(p => p.BrandId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(p => p.BTU)
+                    .WithMany()
+                    .HasForeignKey(p => p.BTUId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(p => p.EnergyClass)
+                    .WithMany()
+                    .HasForeignKey(p => p.EnergyClassId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(p => p.ProductType)
+                    .WithMany(pt => pt.Products)
+                    .HasForeignKey(p => p.ProductTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Конфигурация на ProductAttribute
+            modelBuilder.Entity<ProductAttribute>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.AttributeKey).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.AttributeValue).IsRequired().HasMaxLength(255);
+                entity.Property(e => e.GroupName).HasMaxLength(100);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.HasOne(pa => pa.Product)
+                    .WithMany(p => p.Attributes)
+                    .HasForeignKey(pa => pa.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Конфигурация на ProductImage
+            modelBuilder.Entity<ProductImage>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.AltText).HasMaxLength(255);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.HasOne(pi => pi.Product)
+                    .WithMany(p => p.Images)
+                    .HasForeignKey(pi => pi.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Създаване на индекси
             modelBuilder.Entity<Product>()
-                .HasOne(p => p.Brand)
-                .WithMany(b => b.Products)
-                .HasForeignKey(p => p.BrandId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .HasIndex(p => p.BrandId);
 
             modelBuilder.Entity<Product>()
-                .HasOne(p => p.Category)
-                .WithMany(c => c.Products)
-                .HasForeignKey(p => p.CategoryId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .HasIndex(p => p.ProductTypeId);
 
-            // Конфигурация на връзката между Product и AirConditioner
-            modelBuilder.Entity<Product>()
-                .HasOne(p => p.AirConditioner)
-                .WithOne(a => a.Product)
-                .HasForeignKey<AirConditioner>(a => a.Id)
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ProductAttribute>()
+                .HasIndex(pa => pa.ProductId);
 
-            // Конфигурация на връзката между Product и HeatPump
-            modelBuilder.Entity<Product>()
-                .HasOne(p => p.HeatPump)
-                .WithOne(h => h.Product)
-                .HasForeignKey<HeatPump>(h => h.Id)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // Конфигурация на връзките за изображения и спецификации
             modelBuilder.Entity<ProductImage>()
-                .HasOne(pi => pi.Product)
-                .WithMany(p => p.Images)
-                .HasForeignKey(pi => pi.ProductId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<ProductSpecification>()
-                .HasOne(ps => ps.Product)
-                .WithMany(p => p.Specifications)
-                .HasForeignKey(ps => ps.ProductId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // Конфигурация на йерархична категория
-            modelBuilder.Entity<ProductCategory>()
-                .HasOne(c => c.Parent)
-                .WithMany(c => c.Children)
-                .HasForeignKey(c => c.ParentId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasIndex(pi => pi.ProductId);
         }
     }
 }
