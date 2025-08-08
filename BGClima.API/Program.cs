@@ -30,15 +30,9 @@ builder.Services.AddScoped<BGClima.Domain.Entities.IProductRepository, BGClima.I
 // Register application services
 builder.Services.AddScoped<BGClima.Application.Services.IProductService, BGClima.Application.Services.ProductService>();
 
-// Register BGClimaContext with PostgreSQL
+// Register BGClimaContext: force InMemory for local dev/testing to avoid PostgreSQL requirement
 builder.Services.AddDbContext<BGClimaContext>(options =>
-    options.UseNpgsql(connectionString, npgsqlOptions =>
-    {
-        npgsqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 5,
-            maxRetryDelay: TimeSpan.FromSeconds(30),
-            errorCodesToAdd: null);
-    }));
+    options.UseInMemoryDatabase("BGClimaDb"));
 
 // Register AutoMapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
@@ -67,12 +61,11 @@ try
 {
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<BGClimaContext>();
-    
-    // Apply migrations
+
+    // Apply migrations and seed sample data
     if (app.Environment.IsDevelopment())
     {
-        // We'll apply migrations automatically
-        dbContext.Database.Migrate();
+        await SeedData.SeedAsync(dbContext);
     }
 }
 catch (Exception ex)

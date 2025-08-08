@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace BGClima.API.Controllers
 {
-    [Route("api/v2/[controller]")]
+    [Route("api/v2/products")]
     [ApiController]
     public class ProductsV2Controller : ControllerBase
     {
@@ -224,6 +224,21 @@ namespace BGClima.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { Message = "Грешка при извличане на типовете продукти.", Error = ex.Message });
+            }
+        }
+
+        // GET: api/v2/products/btu
+        [HttpGet("btu")]
+        public async Task<ActionResult<IEnumerable<BTUInfoDto>>> GetBTU()
+        {
+            try
+            {
+                var btu = await _context.BTUs.ToListAsync();
+                return Ok(_mapper.Map<List<BTUInfoDto>>(btu));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Грешка при извличане на BTU стойностите.", Error = ex.Message });
             }
         }
     }
