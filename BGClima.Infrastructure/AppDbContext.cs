@@ -1,10 +1,12 @@
 
 using Microsoft.EntityFrameworkCore;
 using BGClima.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace BGClima.Infrastructure
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 

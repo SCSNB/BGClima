@@ -3,6 +3,10 @@ using BGClima.Domain.Entities;
 using BGClima.Application.Services;
 using Microsoft.EntityFrameworkCore;
 using BGClima.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,10 +21,42 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection") ??
         "Host=localhost;Database=bgclima;Username=postgres;Password=admin"));
 
-// Register repositories
+// Configure Identity
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+// Configure JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"] ?? "your-super-secret-key-with-at-least-32-characters");
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = true,
+        ValidIssuer = jwtSettings["Issuer"] ?? "BGClima",
+        ValidateAudience = true,
+        ValidAudience = jwtSettings["Audience"] ?? "BGClimaUsers",
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+// Register repositories and services
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Add CORS policy
 builder.Services.AddCors(options =>
@@ -45,6 +81,41 @@ using (var scope = app.Services.CreateScope())
     if (env.IsDevelopment())
     {
         SeedTestData(db);
+        await SeedIdentityData(scope.ServiceProvider);
+    }
+}
+
+async Task SeedIdentityData(IServiceProvider serviceProvider)
+{
+    var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    // Create roles if they don't exist
+    var roles = new[] { "ADMIN", "ContentManager", "USER" };
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+
+    // Create admin user if it doesn't exist
+    var adminUser = await userManager.FindByNameAsync("admin");
+    if (adminUser == null)
+    {
+        adminUser = new IdentityUser
+        {
+            UserName = "admin",
+            Email = "admin@bgclima.com",
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(adminUser, "admin");
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(adminUser, "ADMIN");
+        }
     }
 }
 
@@ -116,6 +187,9 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseCors("AllowAngularDev");
+
+// Add authentication and authorization middleware
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers(); 

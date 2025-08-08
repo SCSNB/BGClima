@@ -4,3 +4,35 @@ GET {{BGClima.API_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+### Login with admin user
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+### Register a new user
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "email": "test@example.com",
+  "password": "Test123!",
+  "confirmPassword": "Test123!"
+}
+
+### Logout
+POST {{baseUrl}}/api/auth/logout
+Authorization: Bearer {{authToken}}
+
+### Get Products (requires authentication)
+GET {{baseUrl}}/api/products
+Authorization: Bearer {{authToken}}
+
+### Variables
+@baseUrl = https://localhost:7001
+@authToken = your-jwt-token-here
