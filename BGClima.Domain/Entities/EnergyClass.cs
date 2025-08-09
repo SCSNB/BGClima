@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BGClima.API.Models
+namespace BGClima.Domain.Entities
 {
     [Table("EnergyClass", Schema = "bgclima")]
     public class EnergyClass

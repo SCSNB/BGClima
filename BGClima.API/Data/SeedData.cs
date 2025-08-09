@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BGClima.API.Models;
+using BGClima.Domain.Entities;
+using BGClima.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace BGClima.API.Data

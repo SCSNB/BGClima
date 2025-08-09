@@ -1,6 +1,6 @@
 using AutoMapper;
 using BGClima.API.DTOs;
-using BGClima.API.Models;
+using BGClima.Domain.Entities;
 
 namespace BGClima.API.Mapping
 {

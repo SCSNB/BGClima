@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BGClima.API.Models
+namespace BGClima.Domain.Entities
 {
     /// <summary>
     /// Представлява марка на климатични уреди и топлинни помпи

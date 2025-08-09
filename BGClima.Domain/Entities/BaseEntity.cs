@@ -1,6 +1,6 @@
 using System;
 
-namespace BGClima.API.Models
+namespace BGClima.Domain.Entities
 {
     /// <summary>
     /// Базов клас за всички модели, който съдържа общи полета

@@ -1,8 +1,8 @@
-using BGClima.API.Models;
+using BGClima.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace BGClima.API.Data
+namespace BGClima.Infrastructure.Data
 {
     public class BGClimaContext : DbContext
     {

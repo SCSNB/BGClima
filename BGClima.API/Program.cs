@@ -1,6 +1,13 @@
 using BGClima.API.Data;
-using BGClima.API.Models;
+using BGClima.Domain.Entities;
+using BGClima.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
+using System;
+using System.IO;
+using System.Reflection;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,13 +22,15 @@ builder.Services.AddControllersWithViews();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                       "Host=localhost;Port=5432;Database=bgclima;Username=postgres;Password=;";
 
-builder.Services.AddDbContext<BGClima.Infrastructure.AppDbContext>(options =>
+// Register BGClimaContext
+builder.Services.AddDbContext<BGClima.Infrastructure.Data.BGClimaContext>(options =>
     options.UseNpgsql(connectionString, npgsqlOptions =>
     {
         npgsqlOptions.EnableRetryOnFailure(
             maxRetryCount: 5,
             maxRetryDelay: TimeSpan.FromSeconds(30),
             errorCodesToAdd: null);
+        npgsqlOptions.MigrationsAssembly("BGClima.Infrastructure");
     }));
 
 // Register repositories
@@ -29,10 +38,6 @@ builder.Services.AddScoped<BGClima.Domain.Entities.IProductRepository, BGClima.I
 
 // Register application services
 builder.Services.AddScoped<BGClima.Application.Services.IProductService, BGClima.Application.Services.ProductService>();
-
-// Register BGClimaContext: force InMemory for local dev/testing to avoid PostgreSQL requirement
-builder.Services.AddDbContext<BGClimaContext>(options =>
-    options.UseInMemoryDatabase("BGClimaDb"));
 
 // Register AutoMapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);

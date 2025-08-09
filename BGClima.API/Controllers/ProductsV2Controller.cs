@@ -1,7 +1,7 @@
 using AutoMapper;
-using BGClima.API.Data;
 using BGClima.API.DTOs;
-using BGClima.API.Models;
+using BGClima.Domain.Entities;
+using BGClima.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
