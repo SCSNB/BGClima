@@ -111,7 +111,7 @@ async Task SeedIdentityData(IServiceProvider serviceProvider)
             EmailConfirmed = true
         };
 
-        var result = await userManager.CreateAsync(adminUser, "admin");
+        var result = await userManager.CreateAsync(adminUser, "Admin1!");
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(adminUser, "ADMIN");
