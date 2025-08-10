@@ -45,6 +45,7 @@ export interface ProductDto {
   isOnSale?: boolean;
   isNew?: boolean;
   isFeatured?: boolean;
+  stockQuantity: number;
   sku?: string;
   seoTitle?: string;
   seoDescription?: string;

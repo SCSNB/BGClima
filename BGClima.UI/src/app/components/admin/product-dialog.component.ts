@@ -86,6 +86,7 @@ export class ProductDialogComponent implements OnInit {
       description: [data.product?.description ?? ''],
       price: [data.product?.price ?? 0, [Validators.required, Validators.min(0)]],
       oldPrice: [data.product?.oldPrice ?? null, [Validators.min(0)]],
+      stockQuantity: [data.product?.stockQuantity ?? 0, [Validators.required, Validators.min(0)]],
       brandId: [data.product?.brand?.id ?? null, Validators.required],
       productTypeId: [data.product?.productType?.id ?? null, Validators.required],
       btuId: [data.product?.btu?.id ?? null],
@@ -136,7 +137,7 @@ export class ProductDialogComponent implements OnInit {
       isNew: true,
       isOnSale: this.form.value.oldPrice > 0, // Автоматично маркиране като намален продукт, ако има стара цена
       isFeatured: false,
-      stockQuantity: 0,
+      stockQuantity: this.form.value.stockQuantity || 0,
       seoTitle: this.form.value.name,
       seoDescription: this.form.value.description || '',
       seoKeywords: this.form.value.name,
