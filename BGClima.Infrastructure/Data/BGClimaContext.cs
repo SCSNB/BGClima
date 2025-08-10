@@ -32,8 +32,6 @@ namespace BGClima.Infrastructure.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.Country).HasMaxLength(100);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // Конфигурация на BTU
@@ -41,7 +39,6 @@ namespace BGClima.Infrastructure.Data
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Value).IsRequired().HasMaxLength(50);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // Конфигурация на EnergyClass
@@ -49,7 +46,6 @@ namespace BGClima.Infrastructure.Data
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Class).IsRequired().HasMaxLength(10);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // Конфигурация на ProductType
@@ -57,7 +53,6 @@ namespace BGClima.Infrastructure.Data
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(50);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // Конфигурация на Product
@@ -114,7 +109,6 @@ namespace BGClima.Infrastructure.Data
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.AltText).HasMaxLength(255);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.HasOne(pi => pi.Product)
                     .WithMany(p => p.Images)

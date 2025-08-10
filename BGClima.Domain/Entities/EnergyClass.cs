@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -15,7 +16,6 @@ namespace BGClima.Domain.Entities
         [StringLength(10)]
         public string Class { get; set; }  // Пример: "A++", "A+++"
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation property
         public virtual ICollection<Product> Products { get; set; } = new List<Product>();

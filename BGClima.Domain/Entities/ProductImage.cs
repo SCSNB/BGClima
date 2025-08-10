@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -24,7 +23,5 @@ namespace BGClima.Domain.Entities
 
         public int DisplayOrder { get; set; } = 0;
         public bool IsPrimary { get; set; } = false;
-        
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

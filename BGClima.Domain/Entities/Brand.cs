@@ -27,16 +27,6 @@ namespace BGClima.Domain.Entities
         [StringLength(100)]
         public string Country { get; set; }
 
-        /// <summary>
-        /// Дата на създаване на записа
-        /// </summary>
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        /// <summary>
-        /// Дата на последна актуализация
-        /// </summary>
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-
         // Navigation properties
         /// <summary>
         /// Колекция от всички продукти на тази марка

@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,7 +13,5 @@ namespace BGClima.Domain.Entities
         [Required]
         [MaxLength(50)]
         public string Value { get; set; }  // Пример: "9000", "12000", "18000"
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }
