@@ -16,69 +16,64 @@ namespace BGClima.Infrastructure.Migrations
                 name: "bgclima");
 
             migrationBuilder.CreateTable(
-                name: "Brand",
+                name: "Brands",
                 schema: "bgclima",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Country = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    Country = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Brand", x => x.Id);
+                    table.PrimaryKey("PK_Brands", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "BTU",
+                name: "BTUs",
                 schema: "bgclima",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Value = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    Value = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BTU", x => x.Id);
+                    table.PrimaryKey("PK_BTUs", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "EnergyClass",
+                name: "EnergyClasses",
                 schema: "bgclima",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Class = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    Class = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EnergyClass", x => x.Id);
+                    table.PrimaryKey("PK_EnergyClasses", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductType",
+                name: "ProductTypes",
                 schema: "bgclima",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductType", x => x.Id);
+                    table.PrimaryKey("PK_ProductTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Product",
+                name: "Products",
                 schema: "bgclima",
                 columns: table => new
                 {
@@ -98,57 +93,52 @@ namespace BGClima.Infrastructure.Migrations
                     IsOnSale = table.Column<bool>(type: "boolean", nullable: false),
                     IsNew = table.Column<bool>(type: "boolean", nullable: false),
                     Sku = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    SeoTitle = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    SeoDescription = table.Column<string>(type: "text", nullable: false),
-                    SeoKeywords = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     ImageUrl = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    meta_description = table.Column<string>(type: "text", nullable: false),
-                    meta_keywords = table.Column<string>(type: "text", nullable: false),
                     EnergyClassId1 = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Product", x => x.Id);
+                    table.PrimaryKey("PK_Products", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Product_BTU_BTUId",
+                        name: "FK_Products_BTUs_BTUId",
                         column: x => x.BTUId,
                         principalSchema: "bgclima",
-                        principalTable: "BTU",
+                        principalTable: "BTUs",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
-                        name: "FK_Product_Brand_BrandId",
+                        name: "FK_Products_Brands_BrandId",
                         column: x => x.BrandId,
                         principalSchema: "bgclima",
-                        principalTable: "Brand",
+                        principalTable: "Brands",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Product_EnergyClass_EnergyClassId",
+                        name: "FK_Products_EnergyClasses_EnergyClassId",
                         column: x => x.EnergyClassId,
                         principalSchema: "bgclima",
-                        principalTable: "EnergyClass",
+                        principalTable: "EnergyClasses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
-                        name: "FK_Product_EnergyClass_EnergyClassId1",
+                        name: "FK_Products_EnergyClasses_EnergyClassId1",
                         column: x => x.EnergyClassId1,
                         principalSchema: "bgclima",
-                        principalTable: "EnergyClass",
+                        principalTable: "EnergyClasses",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Product_ProductType_ProductTypeId",
+                        name: "FK_Products_ProductTypes_ProductTypeId",
                         column: x => x.ProductTypeId,
                         principalSchema: "bgclima",
-                        principalTable: "ProductType",
+                        principalTable: "ProductTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductAttribute",
+                name: "ProductAttributes",
                 schema: "bgclima",
                 columns: table => new
                 {
@@ -165,18 +155,18 @@ namespace BGClima.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductAttribute", x => x.Id);
+                    table.PrimaryKey("PK_ProductAttributes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductAttribute_Product_ProductId",
+                        name: "FK_ProductAttributes_Products_ProductId",
                         column: x => x.ProductId,
                         principalSchema: "bgclima",
-                        principalTable: "Product",
+                        principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductImage",
+                name: "ProductImages",
                 schema: "bgclima",
                 columns: table => new
                 {
@@ -186,93 +176,92 @@ namespace BGClima.Infrastructure.Migrations
                     ImageUrl = table.Column<string>(type: "text", nullable: false),
                     AltText = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     DisplayOrder = table.Column<int>(type: "integer", nullable: false),
-                    IsPrimary = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    IsPrimary = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductImage", x => x.Id);
+                    table.PrimaryKey("PK_ProductImages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductImage_Product_ProductId",
+                        name: "FK_ProductImages_Products_ProductId",
                         column: x => x.ProductId,
                         principalSchema: "bgclima",
-                        principalTable: "Product",
+                        principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Product_BrandId",
+                name: "IX_ProductAttributes_ProductId",
                 schema: "bgclima",
-                table: "Product",
+                table: "ProductAttributes",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductImages_ProductId",
+                schema: "bgclima",
+                table: "ProductImages",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_BrandId",
+                schema: "bgclima",
+                table: "Products",
                 column: "BrandId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Product_BTUId",
+                name: "IX_Products_BTUId",
                 schema: "bgclima",
-                table: "Product",
+                table: "Products",
                 column: "BTUId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Product_EnergyClassId",
+                name: "IX_Products_EnergyClassId",
                 schema: "bgclima",
-                table: "Product",
+                table: "Products",
                 column: "EnergyClassId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Product_EnergyClassId1",
+                name: "IX_Products_EnergyClassId1",
                 schema: "bgclima",
-                table: "Product",
+                table: "Products",
                 column: "EnergyClassId1");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Product_ProductTypeId",
+                name: "IX_Products_ProductTypeId",
                 schema: "bgclima",
-                table: "Product",
+                table: "Products",
                 column: "ProductTypeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductAttribute_ProductId",
-                schema: "bgclima",
-                table: "ProductAttribute",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductImage_ProductId",
-                schema: "bgclima",
-                table: "ProductImage",
-                column: "ProductId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ProductAttribute",
+                name: "ProductAttributes",
                 schema: "bgclima");
 
             migrationBuilder.DropTable(
-                name: "ProductImage",
+                name: "ProductImages",
                 schema: "bgclima");
 
             migrationBuilder.DropTable(
-                name: "Product",
+                name: "Products",
                 schema: "bgclima");
 
             migrationBuilder.DropTable(
-                name: "BTU",
+                name: "BTUs",
                 schema: "bgclima");
 
             migrationBuilder.DropTable(
-                name: "Brand",
+                name: "Brands",
                 schema: "bgclima");
 
             migrationBuilder.DropTable(
-                name: "EnergyClass",
+                name: "EnergyClasses",
                 schema: "bgclima");
 
             migrationBuilder.DropTable(
-                name: "ProductType",
+                name: "ProductTypes",
                 schema: "bgclima");
         }
     }

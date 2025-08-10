@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BGClima.Domain.Entities
 {
-    [Table("ProductImage", Schema = "bgclima")]
     public class ProductImage
     {
         [Key]

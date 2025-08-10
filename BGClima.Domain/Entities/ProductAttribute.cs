@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BGClima.Domain.Entities
 {
-    [Table("ProductAttribute", Schema = "bgclima")]
     public class ProductAttribute
     {
         [Key]

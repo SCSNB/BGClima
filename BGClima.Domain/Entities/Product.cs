@@ -8,7 +8,6 @@ namespace BGClima.Domain.Entities
     /// <summary>
     /// Основен клас за продуктите в системата (климатици и топлинни помпи)
     /// </summary>
-    [Table("Product", Schema = "bgclima")]
     public class Product
     {
         [Key]

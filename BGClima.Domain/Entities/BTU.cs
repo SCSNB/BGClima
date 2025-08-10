@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BGClima.Domain.Entities
 {
-    [Table("BTU", Schema = "bgclima")]
     public class BTU
     {
         [Key]

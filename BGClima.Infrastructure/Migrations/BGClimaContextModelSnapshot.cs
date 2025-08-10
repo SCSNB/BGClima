@@ -38,7 +38,7 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BTU", "bgclima");
+                    b.ToTable("BTUs", "bgclima");
                 });
 
             modelBuilder.Entity("BGClima.Domain.Entities.Brand", b =>
@@ -61,7 +61,7 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Brand", "bgclima");
+                    b.ToTable("Brands", "bgclima");
                 });
 
             modelBuilder.Entity("BGClima.Domain.Entities.EnergyClass", b =>
@@ -79,7 +79,7 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EnergyClass", "bgclima");
+                    b.ToTable("EnergyClasses", "bgclima");
                 });
 
             modelBuilder.Entity("BGClima.Domain.Entities.Product", b =>
@@ -166,7 +166,7 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasIndex("ProductTypeId");
 
-                    b.ToTable("Product", "bgclima");
+                    b.ToTable("Products", "bgclima");
                 });
 
             modelBuilder.Entity("BGClima.Domain.Entities.ProductAttribute", b =>
@@ -215,7 +215,7 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductAttribute", "bgclima");
+                    b.ToTable("ProductAttributes", "bgclima");
                 });
 
             modelBuilder.Entity("BGClima.Domain.Entities.ProductImage", b =>
@@ -248,7 +248,7 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductImage", "bgclima");
+                    b.ToTable("ProductImages", "bgclima");
                 });
 
             modelBuilder.Entity("BGClima.Domain.Entities.ProductType", b =>
@@ -266,7 +266,7 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProductType", "bgclima");
+                    b.ToTable("ProductTypes", "bgclima");
                 });
 
             modelBuilder.Entity("BGClima.Domain.Entities.Product", b =>

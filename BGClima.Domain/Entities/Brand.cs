@@ -7,7 +7,6 @@ namespace BGClima.Domain.Entities
     /// <summary>
     /// Представлява марка на климатични уреди и топлинни помпи
     /// </summary>
-    [Table("Brand", Schema = "bgclima")]
     public class Brand
     {
         [Key]
