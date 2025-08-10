@@ -12,6 +12,11 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
+      <mat-label>Стара цена</mat-label>
+      <input matInput type="number" formControlName="oldPrice" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
       <mat-label>Марка</mat-label>
       <mat-select formControlName="brandId">
         <mat-option *ngFor="let b of brands" [value]="b.id">{{ b.name }}</mat-option>
