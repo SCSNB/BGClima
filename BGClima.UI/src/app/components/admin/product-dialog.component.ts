@@ -137,12 +137,7 @@ export class ProductDialogComponent implements OnInit {
       isNew: true,
       isOnSale: this.form.value.oldPrice > 0, // Автоматично маркиране като намален продукт, ако има стара цена
       isFeatured: false,
-      stockQuantity: this.form.value.stockQuantity || 0,
-      seoTitle: this.form.value.name,
-      seoDescription: this.form.value.description || '',
-      seoKeywords: this.form.value.name,
-      metaDescription: this.form.value.description || '',
-      metaKeywords: this.form.value.name
+      stockQuantity: this.form.value.stockQuantity || 0
     };
 
     console.log('Submitting product:', dto);

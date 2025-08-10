@@ -68,8 +68,6 @@ namespace BGClima.Infrastructure.Data
                 entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
                 entity.Property(e => e.OldPrice).HasColumnType("decimal(10, 2)");
                 entity.Property(e => e.Sku).HasMaxLength(100);
-                entity.Property(e => e.SeoTitle).HasMaxLength(255);
-                entity.Property(e => e.SeoKeywords).HasMaxLength(500);
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 

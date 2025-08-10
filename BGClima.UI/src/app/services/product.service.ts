@@ -47,12 +47,9 @@ export interface ProductDto {
   isFeatured?: boolean;
   stockQuantity: number;
   sku?: string;
-  seoTitle?: string;
-  seoDescription?: string;
-  seoKeywords?: string;
   imageUrl?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
   brand?: BrandDto;
   btu?: BTUDto;
   productType?: ProductTypeDto;
@@ -91,11 +88,6 @@ export interface CreateProductDto {
   isOnSale?: boolean;
   isNew?: boolean;
   sku?: string;
-  seoTitle?: string;
-  seoDescription?: string;
-  seoKeywords?: string;
-  metaDescription?: string;
-  metaKeywords?: string;
   imageUrl?: string;
 }
 

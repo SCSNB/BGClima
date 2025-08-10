@@ -14,9 +14,6 @@ namespace BGClima.API.DTOs
         public bool IsNew { get; set; }
         public bool IsFeatured { get; set; }
         public string Sku { get; set; }
-        public string SeoTitle { get; set; }
-        public string SeoDescription { get; set; }
-        public string SeoKeywords { get; set; }
         public string ImageUrl { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }

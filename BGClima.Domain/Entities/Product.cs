@@ -55,14 +55,6 @@ namespace BGClima.Domain.Entities
         [StringLength(100)]
         public string Sku { get; set; }
 
-        [StringLength(255)]
-        public string SeoTitle { get; set; }
-        
-        public string SeoDescription { get; set; }
-        
-        [StringLength(500)]
-        public string SeoKeywords { get; set; }
-
         public string ImageUrl { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -71,17 +63,5 @@ namespace BGClima.Domain.Entities
         // Navigation properties
         public virtual ICollection<ProductAttribute> Attributes { get; set; } = new List<ProductAttribute>();
         public virtual ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
-
-        /// <summary>
-        /// Мета описание за SEO цели
-        /// </summary>
-        [Column("meta_description")]
-        public string MetaDescription { get; set; }
-
-        /// <summary>
-        /// Ключови думи за търсачки
-        /// </summary>
-        [Column("meta_keywords")]
-        public string MetaKeywords { get; set; }
     }
 }

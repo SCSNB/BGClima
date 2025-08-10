@@ -18,11 +18,6 @@ namespace BGClima.API.DTOs
         public bool IsOnSale { get; set; } = false;
         public bool IsNew { get; set; } = true;
         public string Sku { get; set; }
-        public string SeoTitle { get; set; }
-        public string SeoDescription { get; set; }
-        public string SeoKeywords { get; set; }
-        public string MetaDescription { get; set; }
-        public string MetaKeywords { get; set; }
         public string ImageUrl { get; set; }
         
         public ICollection<CreateProductAttributeDto> Attributes { get; set; } = new List<CreateProductAttributeDto>();
