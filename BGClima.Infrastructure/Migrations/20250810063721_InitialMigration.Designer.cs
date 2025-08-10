@@ -9,11 +9,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace BGClima.Infrastructure.Data.Migrations
+namespace BGClima.Infrastructure.Migrations
 {
     [DbContext(typeof(BGClimaContext))]
-    [Migration("20250809132938_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250810063721_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

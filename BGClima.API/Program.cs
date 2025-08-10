@@ -8,7 +8,9 @@ using Npgsql.EntityFrameworkCore.PostgreSQL;
 using System;
 using System.IO;
 using System.Reflection;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
 
 // Register DbContext with PostgreSQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
@@ -86,9 +88,15 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    
+    // Only use HTTPS redirection in production
+    app.UseHttpsRedirection();
+}
+else
+{
+    app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseRouting();
@@ -96,6 +104,23 @@ app.UseCors("AllowAngularDev");
 app.UseAuthorization();
 
 app.MapControllers(); 
+
+// Log all registered routes
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    
+    // Log all registered routes
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    var source = endpoints.DataSources.First();
+    foreach (var endpoint in source.Endpoints.OfType<RouteEndpoint>())
+    {
+        var routePattern = endpoint.RoutePattern.RawText;
+        var httpMethod = endpoint.Metadata.OfType<HttpMethodMetadata>().FirstOrDefault()?.HttpMethods.FirstOrDefault() ?? "(any)";
+        logger.LogInformation($"Registered route: {httpMethod} {routePattern}");
+    }
+});
+
 app.MapFallbackToFile("index.html");
 
 app.Run();

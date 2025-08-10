@@ -12,7 +12,7 @@ import { ProductDialogComponent } from './product-dialog.component';
 })
 export class ProductListComponent implements OnInit {
   dataSource = new MatTableDataSource<ProductDto>([]);
-  displayedColumns = ['id', 'name', 'price', 'brand', 'type', 'actions'];
+  displayedColumns = ['id', 'name', 'price', 'brand', 'type', 'btu', 'energyClass', 'actions'];
   loading = true;
   error: string | null = null;
 
@@ -53,14 +53,35 @@ export class ProductListComponent implements OnInit {
   }
 
   editProduct(product: ProductDto): void {
-    const dialogRef = this.dialog.open(ProductDialogComponent, { width: '600px', data: { mode: 'edit', product } });
-    dialogRef.afterClosed().subscribe(result => {
-      if (!result) return;
-      const dto: CreateProductDto = result.dto;
-      this.service.update(product.id, dto).subscribe({
-        next: () => { this.snack.open('Промените са записани', 'OK', { duration: 2000 }); this.load(); },
-        error: () => this.snack.open('Грешка при запис', 'OK', { duration: 3000 })
-      });
+    this.service.getProduct(product.id).subscribe({
+      next: (fullProduct: ProductDto) => {
+        const dialogRef = this.dialog.open(ProductDialogComponent, { 
+          width: '800px', 
+          data: { 
+            mode: 'edit', 
+            product: fullProduct 
+          } 
+        });
+        
+        dialogRef.afterClosed().subscribe(result => {
+          if (!result) return;
+          const dto: CreateProductDto = result.dto;
+          this.service.update(product.id, dto).subscribe({
+            next: () => { 
+              this.snack.open('Промените са записани', 'OK', { duration: 2000 }); 
+              this.load(); 
+            },
+            error: (error: any) => {
+              console.error('Error updating product:', error);
+              this.snack.open('Грешка при запис: ' + (error.error?.message || 'Неизвестна грешка'), 'OK', { duration: 5000 });
+            }
+          });
+        });
+      },
+      error: (error: any) => {
+        console.error('Error loading product:', error);
+        this.snack.open('Грешка при зареждане на продукта', 'OK', { duration: 3000 });
+      }
     });
   }
 
