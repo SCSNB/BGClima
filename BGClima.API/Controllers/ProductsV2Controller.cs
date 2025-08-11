@@ -112,6 +112,22 @@ namespace BGClima.API.Controllers
                 product.CreatedAt = DateTime.UtcNow;
                 product.UpdatedAt = DateTime.UtcNow;
 
+                // Ensure collections
+                product.Attributes ??= new List<ProductAttribute>();
+                product.Images ??= new List<ProductImage>();
+
+                // Attach back-references and add to context
+                foreach (var attr in product.Attributes)
+                {
+                    attr.Product = product;
+                    attr.CreatedAt = DateTime.UtcNow;
+                    attr.UpdatedAt = DateTime.UtcNow;
+                }
+                foreach (var img in product.Images)
+                {
+                    img.Product = product;
+                }
+
                 _context.Products.Add(product);
                 await _context.SaveChangesAsync();
 
@@ -145,25 +161,67 @@ namespace BGClima.API.Controllers
                     return NotFound(new { Message = $"Продукт с ID {id} не е намерен." });
                 }
 
-                // Мапване на данните от DTO към съществуващия продукт
-                _mapper.Map(updateProductDto, existingProduct);
+                // Мапване на основните данни от DTO към съществуващия продукт (без колекции)
+                existingProduct.Name = updateProductDto.Name;
+                existingProduct.Description = updateProductDto.Description;
+                existingProduct.Price = updateProductDto.Price;
+                existingProduct.OldPrice = updateProductDto.OldPrice;
+                existingProduct.IsOnSale = updateProductDto.IsOnSale;
+                existingProduct.IsNew = updateProductDto.IsNew;
+                existingProduct.IsFeatured = updateProductDto.IsFeatured;
+                existingProduct.Sku = updateProductDto.Sku;
+                existingProduct.ImageUrl = updateProductDto.ImageUrl;
+                existingProduct.BrandId = updateProductDto.BrandId;
+                existingProduct.ProductTypeId = updateProductDto.ProductTypeId;
+                existingProduct.BTUId = updateProductDto.BTUId;
+                existingProduct.EnergyClassId = updateProductDto.EnergyClassId;
                 existingProduct.UpdatedAt = DateTime.UtcNow;
 
                 // Обновяване на атрибутите
                 if (updateProductDto.Attributes != null)
                 {
+                    // Изтриваме старите атрибути
                     _context.ProductAttributes.RemoveRange(existingProduct.Attributes);
-                    existingProduct.Attributes = _mapper.Map<List<ProductAttribute>>(updateProductDto.Attributes);
+                    
+                    // Създаваме нови атрибути ръчно
+                    var newAttributes = new List<ProductAttribute>();
+                    foreach (var attrDto in updateProductDto.Attributes)
+                    {
+                        var newAttr = new ProductAttribute
+                        {
+                            ProductId = existingProduct.Id,
+                            Product = existingProduct,
+                            AttributeKey = attrDto.AttributeKey,
+                            AttributeValue = attrDto.AttributeValue,
+                            GroupName = attrDto.GroupName,
+                            DisplayOrder = attrDto.DisplayOrder,
+                            IsVisible = attrDto.IsVisible,
+                            CreatedAt = DateTime.UtcNow,
+                            UpdatedAt = DateTime.UtcNow
+                        };
+                        _context.ProductAttributes.Add(newAttr);
+                        newAttributes.Add(newAttr);
+                    }
+                    existingProduct.Attributes = newAttributes;
                 }
 
                 // Обновяване на изображенията
                 if (updateProductDto.Images != null)
                 {
+                    // Изтриваме старите изображения
                     _context.ProductImages.RemoveRange(existingProduct.Images);
-                    existingProduct.Images = _mapper.Map<List<ProductImage>>(updateProductDto.Images);
+                    
+                    // Създаваме нови изображения
+                    var newImages = _mapper.Map<List<ProductImage>>(updateProductDto.Images);
+                    foreach (var img in newImages)
+                    {
+                        img.ProductId = existingProduct.Id;
+                        img.Product = existingProduct;
+                        _context.ProductImages.Add(img);
+                    }
+                    existingProduct.Images = newImages;
                 }
 
-                _context.Entry(existingProduct).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
 
                 return NoContent();

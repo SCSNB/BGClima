@@ -17,8 +17,10 @@ namespace BGClima.API.Mapping
             CreateMap<ProductAttribute, ProductAttributeDto>();
             CreateMap<ProductImage, ProductImageDto>();
 
-            // Map от DTO към модел (за създаване)
-            CreateMap<CreateProductDto, Product>();
+            // Map от DTO към модел (за създаване/редакция)
+            CreateMap<CreateProductDto, Product>()
+                .ForMember(dest => dest.Attributes, opt => opt.MapFrom(src => src.Attributes))
+                .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images));
             CreateMap<CreateProductAttributeDto, ProductAttribute>();
             CreateMap<CreateProductImageDto, ProductImage>();
         }
