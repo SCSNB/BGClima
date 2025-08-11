@@ -53,8 +53,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAngularDev",
         policy => policy
             .WithOrigins(
-                "http://localhost:4200", // Angular dev server (default port)
-                "http://localhost:4201"  // Angular dev server (custom port)
+                "http://localhost:4200" // Angular dev server (default port)
             )
             .AllowAnyHeader()
             .AllowAnyMethod()
