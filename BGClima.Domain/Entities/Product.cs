@@ -56,9 +56,6 @@ namespace BGClima.Domain.Entities
 
         public string ImageUrl { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-
         // Navigation properties
         public virtual ICollection<ProductAttribute> Attributes { get; set; } = new List<ProductAttribute>();
         public virtual ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();

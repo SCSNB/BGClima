@@ -29,8 +29,5 @@ namespace BGClima.Domain.Entities
         public string GroupName { get; set; }      // Пример: "Производителност", "Консумация"
 
         public bool IsVisible { get; set; } = true; // Скриване на вътрешни атрибути
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

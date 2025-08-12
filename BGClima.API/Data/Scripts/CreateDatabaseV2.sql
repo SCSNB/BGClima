@@ -5,30 +5,25 @@ CREATE SCHEMA IF NOT EXISTS bgclima;
 CREATE TABLE IF NOT EXISTS bgclima.Brand (
     Id SERIAL PRIMARY KEY,
     Name VARCHAR(100) NOT NULL,
-    Country VARCHAR(100) NULL,
-    CreatedAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    UpdatedAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    Country VARCHAR(100) NULL
 );
 
 -- Създаване на таблица за BTU стойности
 CREATE TABLE IF NOT EXISTS bgclima.BTU (
     Id SERIAL PRIMARY KEY,
-    Value VARCHAR(50) NOT NULL, -- Пример: "9000", "12000", "18000"
-    CreatedAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    Value VARCHAR(50) NOT NULL -- Пример: "9000", "12000", "18000"
 );
 
 -- Създаване на таблица за енергийни класове
 CREATE TABLE IF NOT EXISTS bgclima.EnergyClass (
     Id SERIAL PRIMARY KEY,
-    Class VARCHAR(10) NOT NULL, -- Пример: "A++", "A+++"
-    CreatedAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    Class VARCHAR(10) NOT NULL -- Пример: "A++", "A+++"
 );
 
 -- Създаване на таблица за типове продукти
 CREATE TABLE IF NOT EXISTS bgclima.ProductType (
     Id SERIAL PRIMARY KEY,
-    Name VARCHAR(50) NOT NULL, -- Пример: "Климатик", "Термопомпа"
-    CreatedAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    Name VARCHAR(50) NOT NULL -- Пример: "Климатик", "Термопомпа"
 );
 
 -- Създаване на таблица за продукти
@@ -52,8 +47,6 @@ CREATE TABLE IF NOT EXISTS bgclima.Product (
     SeoDescription TEXT NULL,
     SeoKeywords VARCHAR(500) NULL,
     ImageUrl TEXT NULL,
-    CreatedAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    UpdatedAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     
     -- Връзки с други таблици
     CONSTRAINT FK_Product_Brand FOREIGN KEY (BrandId) REFERENCES bgclima.Brand(Id) ON DELETE RESTRICT,
@@ -71,8 +64,6 @@ CREATE TABLE IF NOT EXISTS bgclima.ProductAttribute (
     DisplayOrder INT DEFAULT 0,           -- Контролира реда при сравнение
     GroupName VARCHAR(100) NULL,          -- Пример: "Производителност", "Консумация"
     IsVisible BOOLEAN DEFAULT TRUE,       -- Скриване на вътрешни атрибути
-    CreatedAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    UpdatedAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     
     -- Връзка с таблицата за продукти
     CONSTRAINT FK_ProductAttribute_Product FOREIGN KEY (ProductId) 
@@ -87,7 +78,6 @@ CREATE TABLE IF NOT EXISTS bgclima.ProductImage (
     AltText VARCHAR(255) NULL,
     DisplayOrder INT DEFAULT 0,
     IsPrimary BOOLEAN DEFAULT FALSE,
-    CreatedAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     
     -- Връзка с таблицата за продукти
     CONSTRAINT FK_ProductImage_Product FOREIGN KEY (ProductId) 
@@ -100,27 +90,7 @@ CREATE INDEX IF NOT EXISTS IDX_Product_ProductTypeId ON bgclima.Product(ProductT
 CREATE INDEX IF NOT EXISTS IDX_ProductAttribute_ProductId ON bgclima.ProductAttribute(ProductId);
 CREATE INDEX IF NOT EXISTS IDX_ProductImage_ProductId ON bgclima.ProductImage(ProductId);
 
--- Функция за автоматично обновяване на UpdatedAt полето
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.UpdatedAt = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Тригери за автоматично обновяване на UpdatedAt
-CREATE TRIGGER update_brand_updated_at
-BEFORE UPDATE ON bgclima.Brand
-FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_product_updated_at
-BEFORE UPDATE ON bgclima.Product
-FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_product_attribute_updated_at
-BEFORE UPDATE ON bgclima.ProductAttribute
-FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- Премахнати са CreatedAt/UpdatedAt и свързани тригери
 
 -- Инициализиране на референтни данни
 INSERT INTO bgclima.BTU (Value) VALUES 

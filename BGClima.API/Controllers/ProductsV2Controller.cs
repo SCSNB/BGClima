@@ -109,8 +109,6 @@ namespace BGClima.API.Controllers
                 }
 
                 var product = _mapper.Map<Product>(createProductDto);
-                product.CreatedAt = DateTime.UtcNow;
-                product.UpdatedAt = DateTime.UtcNow;
 
                 // Ensure collections
                 product.Attributes ??= new List<ProductAttribute>();
@@ -120,8 +118,6 @@ namespace BGClima.API.Controllers
                 foreach (var attr in product.Attributes)
                 {
                     attr.Product = product;
-                    attr.CreatedAt = DateTime.UtcNow;
-                    attr.UpdatedAt = DateTime.UtcNow;
                 }
                 foreach (var img in product.Images)
                 {
@@ -166,6 +162,7 @@ namespace BGClima.API.Controllers
                 existingProduct.Description = updateProductDto.Description;
                 existingProduct.Price = updateProductDto.Price;
                 existingProduct.OldPrice = updateProductDto.OldPrice;
+                existingProduct.StockQuantity = updateProductDto.StockQuantity;
                 existingProduct.IsOnSale = updateProductDto.IsOnSale;
                 existingProduct.IsNew = updateProductDto.IsNew;
                 existingProduct.IsFeatured = updateProductDto.IsFeatured;
@@ -175,7 +172,6 @@ namespace BGClima.API.Controllers
                 existingProduct.ProductTypeId = updateProductDto.ProductTypeId;
                 existingProduct.BTUId = updateProductDto.BTUId;
                 existingProduct.EnergyClassId = updateProductDto.EnergyClassId;
-                existingProduct.UpdatedAt = DateTime.UtcNow;
 
                 // Обновяване на атрибутите
                 if (updateProductDto.Attributes != null)
@@ -195,10 +191,9 @@ namespace BGClima.API.Controllers
                             AttributeValue = attrDto.AttributeValue,
                             GroupName = attrDto.GroupName,
                             DisplayOrder = attrDto.DisplayOrder,
-                            IsVisible = attrDto.IsVisible,
-                            CreatedAt = DateTime.UtcNow,
-                            UpdatedAt = DateTime.UtcNow
+                            IsVisible = attrDto.IsVisible
                         };
+
                         _context.ProductAttributes.Add(newAttr);
                         newAttributes.Add(newAttr);
                     }

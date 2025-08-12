@@ -63,8 +63,6 @@ namespace BGClima.Infrastructure.Data
                 entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
                 entity.Property(e => e.OldPrice).HasColumnType("decimal(10, 2)");
                 entity.Property(e => e.Sku).HasMaxLength(100);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 // Връзки
                 entity.HasOne(p => p.Brand)
@@ -95,8 +93,6 @@ namespace BGClima.Infrastructure.Data
                 entity.Property(e => e.AttributeKey).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.AttributeValue).IsRequired().HasMaxLength(255);
                 entity.Property(e => e.GroupName).HasMaxLength(100);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.HasOne(pa => pa.Product)
                     .WithMany(p => p.Attributes)

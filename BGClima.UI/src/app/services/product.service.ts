@@ -32,8 +32,6 @@ export interface ProductAttributeDto {
   displayOrder: number;
   isVisible: boolean;
   productId: number;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface ProductDto {
@@ -48,8 +46,6 @@ export interface ProductDto {
   stockQuantity: number;
   sku?: string;
   imageUrl?: string;
-  createdAt: string;
-  updatedAt: string;
   brand?: BrandDto;
   btu?: BTUDto;
   productType?: ProductTypeDto;

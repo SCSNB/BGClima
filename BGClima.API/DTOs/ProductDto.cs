@@ -13,10 +13,9 @@ namespace BGClima.API.DTOs
         public bool IsOnSale { get; set; }
         public bool IsNew { get; set; }
         public bool IsFeatured { get; set; }
+        public int StockQuantity { get; set; }
         public string Sku { get; set; }
         public string ImageUrl { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
         
         // Navigation properties
         public BrandDto Brand { get; set; }

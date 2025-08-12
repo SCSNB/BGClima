@@ -12,7 +12,7 @@ import { ProductDialogComponent } from './product-dialog.component';
 })
 export class ProductListComponent implements OnInit {
   dataSource = new MatTableDataSource<ProductDto>([]);
-  displayedColumns = ['id', 'name', 'price', 'brand', 'type', 'btu', 'energyClass', 'actions'];
+  displayedColumns = ['id', 'name', 'price', 'stock', 'brand', 'type', 'btu', 'energyClass', 'actions'];
   loading = true;
   error: string | null = null;
 
