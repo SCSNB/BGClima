@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BGClima.API.Controllers
 {
-    [Route("api/v2/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class EnergyClassController : ControllerBase
     {

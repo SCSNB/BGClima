@@ -11,20 +11,20 @@ using System.Threading.Tasks;
 
 namespace BGClima.API.Controllers
 {
-    [Route("api/v2/products")]
+    [Route("api/products")]
     [ApiController]
-    public class ProductsV2Controller : ControllerBase
+    public class ProductsController : ControllerBase
     {
         private readonly BGClimaContext _context;
         private readonly IMapper _mapper;
 
-        public ProductsV2Controller(BGClimaContext context, IMapper mapper)
+        public ProductsController(BGClimaContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        // GET: api/v2/products
+        // GET: api/products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts(
             [FromQuery] int? brandId = null,
@@ -69,7 +69,7 @@ namespace BGClima.API.Controllers
             }
         }
 
-        // GET: api/v2/products/5
+        // GET: api/products/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDto>> GetProduct(int id)
         {
@@ -97,7 +97,7 @@ namespace BGClima.API.Controllers
             }
         }
 
-        // POST: api/v2/products
+        // POST: api/products
         [HttpPost]
         public async Task<ActionResult<ProductDto>> CreateProduct([FromBody] CreateProductDto createProductDto)
         {
@@ -138,7 +138,7 @@ namespace BGClima.API.Controllers
             }
         }
 
-        // PUT: api/v2/products/5
+        // PUT: api/products/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] CreateProductDto updateProductDto)
         {
@@ -233,7 +233,7 @@ namespace BGClima.API.Controllers
             }
         }
 
-        // DELETE: api/v2/products/5
+        // DELETE: api/products/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
@@ -256,7 +256,7 @@ namespace BGClima.API.Controllers
             }
         }
 
-        // GET: api/v2/products/brands
+        // GET: api/products/brands
         [HttpGet("brands")]
         public async Task<ActionResult<IEnumerable<BrandDto>>> GetBrands()
         {
@@ -271,7 +271,7 @@ namespace BGClima.API.Controllers
             }
         }
 
-        // GET: api/v2/products/types
+        // GET: api/products/types
         [HttpGet("types")]
         public async Task<ActionResult<IEnumerable<ProductTypeDto>>> GetProductTypes()
         {
@@ -286,7 +286,7 @@ namespace BGClima.API.Controllers
             }
         }
 
-        // GET: api/v2/products/btu
+        // GET: api/products/btu
         [HttpGet("btu")]
         public async Task<ActionResult<IEnumerable<BTUInfoDto>>> GetBTU()
         {

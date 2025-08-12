@@ -90,8 +90,8 @@ export interface CreateProductDto {
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
-  private readonly baseUrl = 'http://localhost:5000/api/v2/products';
-  private readonly apiUrl = 'http://localhost:5000/api/v2';
+  private readonly baseUrl = 'http://localhost:5000/api/products';
+  private readonly apiUrl = 'http://localhost:5000/api';
 
   constructor(private http: HttpClient) {}
 
