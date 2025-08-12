@@ -76,7 +76,7 @@ namespace BGClima.Infrastructure.Data
                     .OnDelete(DeleteBehavior.SetNull);
 
                 entity.HasOne(p => p.EnergyClass)
-                    .WithMany()
+                    .WithMany(ec => ec.Products)
                     .HasForeignKey(p => p.EnergyClassId)
                     .OnDelete(DeleteBehavior.SetNull);
 
