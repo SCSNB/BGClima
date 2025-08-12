@@ -109,6 +109,8 @@ namespace BGClima.API.Controllers
                 }
 
                 var product = _mapper.Map<Product>(createProductDto);
+                // Автоматично определяне на активност по наличност
+                product.IsActive = product.StockQuantity > 0;
 
                 // Ensure collections
                 product.Attributes ??= new List<ProductAttribute>();
@@ -163,6 +165,10 @@ namespace BGClima.API.Controllers
                 existingProduct.Price = updateProductDto.Price;
                 existingProduct.OldPrice = updateProductDto.OldPrice;
                 existingProduct.StockQuantity = updateProductDto.StockQuantity;
+                // Автоматично определяне на активност по наличност
+                existingProduct.IsActive = existingProduct.StockQuantity > 0;
+                // Явно маркираме полето като променено, за да се изпише в UPDATE
+                _context.Entry(existingProduct).Property(p => p.IsActive).IsModified = true;
                 existingProduct.IsOnSale = updateProductDto.IsOnSale;
                 existingProduct.IsNew = updateProductDto.IsNew;
                 existingProduct.IsFeatured = updateProductDto.IsFeatured;

@@ -38,6 +38,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
+import { MatCheckboxModule } from '@angular/material/checkbox';
  
  // Services and Interceptors
  import { AuthService } from './services/auth.service';
@@ -105,7 +106,8 @@ import { ServizComponent } from './components/serviz/serviz.component';
      MatPaginatorModule,
      MatSortModule,
      MatDialogModule,
-     MatSelectModule
+     MatSelectModule,
+     MatCheckboxModule
    ],
   providers: [
     AuthService,

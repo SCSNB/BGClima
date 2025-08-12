@@ -93,6 +93,10 @@ export class ProductDialogComponent implements OnInit {
       energyClassId: [data.product?.energyClass?.id ?? null],
       sku: [data.product?.sku ?? ''],
       imageUrl: [data.product?.imageUrl ?? ''],
+      // isActive се управлява автоматично от бекенда спрямо наличност
+      isFeatured: [data.product?.isFeatured ?? false],
+      isOnSale: [data.product?.isOnSale ?? (data.product?.oldPrice ? true : false)],
+      isNew: [data.product?.isNew ?? true],
       attributeKey: [''],
       attributeValue: ['']
     });
@@ -133,10 +137,9 @@ export class ProductDialogComponent implements OnInit {
       sku: this.form.value.sku || '',
       imageUrl: this.form.value.imageUrl || '',
       attributes: this.attributes.length > 0 ? this.attributes : undefined,
-      isActive: true,
-      isNew: true,
-      isOnSale: this.form.value.oldPrice > 0, // Автоматично маркиране като намален продукт, ако има стара цена
-      isFeatured: false,
+      isNew: !!this.form.value.isNew,
+      isOnSale: !!this.form.value.isOnSale,
+      isFeatured: !!this.form.value.isFeatured,
       stockQuantity: this.form.value.stockQuantity || 0
     };
 
