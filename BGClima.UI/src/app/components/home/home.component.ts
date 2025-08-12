@@ -8,19 +8,19 @@ import { Component } from '@angular/core';
 export class HomeComponent {
   slides = [
     {
-      title: 'СЕРИЯ KMCG-B',
-      image: 'assets/hero/kmcg-b.jpg',
-      link: '/products/kmcg-b'
+      title: 'Ново предложение 1',
+      image: 'assets/hero/7-slide.jpg',
+      link: '#'
     },
     {
-      title: 'СЕРИЯ KNCA',
-      image: 'assets/hero/knca.jpg',
-      link: '/products/knca'
+      title: 'Ново предложение 2',
+      image: 'assets/hero/8-slide.jpg',
+      link: '#'
     },
     {
-      title: 'СЕРИЯ ECO',
-      image: 'assets/hero/eco.jpg',
-      link: '/products/eco'
+      title: 'Ново предложение 3',
+      image: 'assets/hero/9-slide.jpg',
+      link: '#'
     }
   ];
 

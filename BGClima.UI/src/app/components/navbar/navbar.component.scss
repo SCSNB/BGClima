@@ -56,12 +56,27 @@
   letter-spacing: 0.03em;
 }
 .menu-icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 0.7rem;
-  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
   vertical-align: middle;
-  position: static;
+  object-fit: contain;
+}
+.services-dropdown {
+  .mat-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    
+    .menu-icon {
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    
+    span {
+      white-space: nowrap;
+    }
+  }
 }
 .navbar-link mat-icon {
   margin-left: 0.7rem;
@@ -69,8 +84,54 @@
   vertical-align: middle;
 }
 @media (max-width: 900px) {
+  .main-navbar {
+    padding: 0.5rem 0;
+    
+    .navbar-list {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      white-space: nowrap;
+      padding: 0.5rem 1rem;
+      justify-content: flex-start;
+      gap: 1rem;
+      
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      
+      li {
+        display: inline-block;
+        flex: 0 0 auto;
+      }
+      
+      .navbar-link {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.8rem;
+        white-space: nowrap;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        
+        &:hover, &:focus {
+          background: rgba(58, 102, 255, 0.2);
+        }
+        
+        mat-icon {
+          font-size: 1rem;
+          margin-left: 0.3rem;
+        }
+      }
+      
+      .products-link, .promo-link {
+        font-weight: 600;
+      }
+    }
+  }
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
   .main-navbar .navbar-list {
-    flex-wrap: wrap;
-    gap: 0.7rem;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
   }
 }
