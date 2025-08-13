@@ -1,0 +1,107 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+<div mat-dialog-content>
+  <form [formGroup]="form" class="form-grid">
+    <mat-form-field appearance="outline">
+      <mat-label>Име</mat-label>
+      <input matInput formControlName="name" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Цена</mat-label>
+      <input matInput type="number" formControlName="price" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Стара цена</mat-label>
+      <input matInput type="number" formControlName="oldPrice" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Марка</mat-label>
+      <mat-select formControlName="brandId">
+        <mat-option *ngFor="let b of brands" [value]="b.id">{{ b.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Тип продукт</mat-label>
+      <mat-select formControlName="productTypeId">
+        <mat-option *ngFor="let t of types" [value]="t.id">{{ t.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>BTU</mat-label>
+      <mat-select formControlName="btuId">
+        <mat-option [value]="null">Без BTU</mat-option>
+        <mat-option *ngFor="let b of btu" [value]="b.id">{{ b.value }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Енергиен клас</mat-label>
+      <mat-select formControlName="energyClassId">
+        <mat-option [value]="null">Без енергиен клас</mat-option>
+        <mat-option *ngFor="let ec of energyClasses" [value]="ec.id">{{ ec.class }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Описание</mat-label>
+      <textarea matInput rows="3" formControlName="description"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>SKU</mat-label>
+      <input matInput formControlName="sku" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Image URL</mat-label>
+      <input matInput formControlName="imageUrl" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Наличност (бр.)</mat-label>
+      <input matInput type="number" formControlName="stockQuantity" min="0" />
+    </mat-form-field>
+
+    <!-- isActive се управлява автоматично според наличност -->
+    <mat-checkbox formControlName="isFeatured">Акцентиран</mat-checkbox>
+    <mat-checkbox formControlName="isOnSale">Промоция</mat-checkbox>
+    <mat-checkbox formControlName="isNew">Нов</mat-checkbox>
+
+    <div class="full">
+      <h4>Атрибути</h4>
+      <div class="attributes-list">
+        <div class="attribute-item" *ngFor="let attr of attributes; let i = index">
+          <span class="attribute-key">{{ attr.attributeKey }}:</span>
+          <span class="attribute-value">{{ attr.attributeValue }}</span>
+          <button mat-icon-button color="warn" (click)="removeAttribute(i)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+      
+      <div class="add-attribute">
+        <mat-form-field appearance="outline" class="attribute-key">
+          <mat-label>Ключ на атрибут</mat-label>
+          <input matInput formControlName="attributeKey" />
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="attribute-value">
+          <mat-label>Стойност</mat-label>
+          <input matInput formControlName="attributeValue" />
+        </mat-form-field>
+        
+        <button mat-stroked-button color="primary" (click)="addAttribute()" [disabled]="!form.get('attributeKey')?.value || !form.get('attributeValue')?.value">
+          <mat-icon>add</mat-icon> Добави атрибут
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Отказ</button>
+  <button mat-flat-button color="primary" (click)="submit()" [disabled]="form.invalid">Запази</button>
+</div> 

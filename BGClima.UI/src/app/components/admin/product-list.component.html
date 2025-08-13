@@ -1,7 +1,62 @@
-<div *ngIf="loading">Loading products...</div>
-<div *ngIf="error" class="error">{{ error }}</div>
-<ul *ngIf="!loading && !error">
-  <li *ngFor="let product of products">
-    {{ product.name }} (ID: {{ product.id }})
-  </li>
-</ul> 
+<div class="toolbar">
+  <button mat-flat-button color="primary" (click)="addProduct()">
+    <mat-icon>add</mat-icon>
+    Нов продукт
+  </button>
+</div>
+
+<table mat-table [dataSource]="dataSource" class="mat-elevation-z1" *ngIf="!loading && !error">
+  <ng-container matColumnDef="id">
+    <th mat-header-cell *matHeaderCellDef>ID</th>
+    <td mat-cell *matCellDef="let p">{{ p.id }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef>Име</th>
+    <td mat-cell *matCellDef="let p">{{ p.name }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="price">
+    <th mat-header-cell *matHeaderCellDef>Цена</th>
+    <td mat-cell *matCellDef="let p">{{ p.price | number:'1.2-2' }} лв.</td>
+  </ng-container>
+
+  <ng-container matColumnDef="stock">
+    <th mat-header-cell *matHeaderCellDef>Наличност</th>
+    <td mat-cell *matCellDef="let p">{{ p.stockQuantity }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="brand">
+    <th mat-header-cell *matHeaderCellDef>Марка</th>
+    <td mat-cell *matCellDef="let p">{{ p.brand?.name }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="type">
+    <th mat-header-cell *matHeaderCellDef>Тип</th>
+    <td mat-cell *matCellDef="let p">{{ p.productType?.name }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="btu">
+    <th mat-header-cell *matHeaderCellDef>BTU</th>
+    <td mat-cell *matCellDef="let p">{{ p.btu?.value || '-' }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="energyClass">
+    <th mat-header-cell *matHeaderCellDef>Енерг. клас</th>
+    <td mat-cell *matCellDef="let p">{{ p.energyClass?.class || '-' }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef class="actions-col">Действия</th>
+    <td mat-cell *matCellDef="let p">
+      <button mat-icon-button color="primary" (click)="editProduct(p)"><mat-icon>edit</mat-icon></button>
+      <button mat-icon-button color="warn" (click)="deleteProduct(p)"><mat-icon>delete</mat-icon></button>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+
+<div *ngIf="loading">Зареждане...</div>
+<div *ngIf="error" class="error">{{ error }}</div> 
