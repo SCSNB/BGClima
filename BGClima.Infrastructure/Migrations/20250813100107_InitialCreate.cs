@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -93,10 +92,7 @@ namespace BGClima.Infrastructure.Migrations
                     IsOnSale = table.Column<bool>(type: "boolean", nullable: false),
                     IsNew = table.Column<bool>(type: "boolean", nullable: false),
                     Sku = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    ImageUrl = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    EnergyClassId1 = table.Column<int>(type: "integer", nullable: true)
+                    ImageUrl = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -123,12 +119,6 @@ namespace BGClima.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
-                        name: "FK_Products_EnergyClasses_EnergyClassId1",
-                        column: x => x.EnergyClassId1,
-                        principalSchema: "bgclima",
-                        principalTable: "EnergyClasses",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_Products_ProductTypes_ProductTypeId",
                         column: x => x.ProductTypeId,
                         principalSchema: "bgclima",
@@ -149,9 +139,7 @@ namespace BGClima.Infrastructure.Migrations
                     AttributeValue = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     DisplayOrder = table.Column<int>(type: "integer", nullable: false),
                     GroupName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    IsVisible = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    IsVisible = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -219,12 +207,6 @@ namespace BGClima.Infrastructure.Migrations
                 schema: "bgclima",
                 table: "Products",
                 column: "EnergyClassId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Products_EnergyClassId1",
-                schema: "bgclima",
-                table: "Products",
-                column: "EnergyClassId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_ProductTypeId",

@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BGClima.Infrastructure.Migrations
 {
     [DbContext(typeof(BGClimaContext))]
-    [Migration("20250812083653_FixEnergyClassRelation")]
-    partial class FixEnergyClassRelation
+    [Migration("20250813100107_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
