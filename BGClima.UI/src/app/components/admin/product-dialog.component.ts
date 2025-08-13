@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormArray, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { 
   ProductService, 
@@ -64,6 +64,59 @@ export interface ProductDialogData {
     .add-attribute .mat-form-field {
       flex: 1;
     }
+
+    /* Image gallery styles */
+    .images-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .image-item {
+      position: relative;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 0.5rem;
+      background: #fff;
+      transition: all 0.2s;
+    }
+
+    .image-item.primary {
+      border: 2px solid #3f51b5;
+      box-shadow: 0 0 0 1px #3f51b5;
+    }
+
+    .image-item img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 3px;
+      display: block;
+    }
+
+    .image-actions {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .primary-badge {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: #3f51b5;
+      color: white;
+      font-size: 0.7rem;
+      padding: 0.1rem 0.5rem;
+      border-radius: 10px;
+    }
+
+    .add-image-btn {
+      margin-top: 1rem;
+      width: 100%;
+    }
   `]
 })
 export class ProductDialogComponent implements OnInit {
@@ -74,6 +127,8 @@ export class ProductDialogComponent implements OnInit {
   energyClasses: EnergyClassDto[] = [];
   attributes: CreateProductAttributeDto[] = [];
   title = '';
+  images: { url: string, isPrimary: boolean }[] = [];
+  newImageUrl: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -92,7 +147,6 @@ export class ProductDialogComponent implements OnInit {
       btuId: [data.product?.btu?.id ?? null],
       energyClassId: [data.product?.energyClass?.id ?? null],
       sku: [data.product?.sku ?? ''],
-      imageUrl: [data.product?.imageUrl ?? ''],
       // isActive се управлява автоматично от бекенда спрямо наличност
       isFeatured: [data.product?.isFeatured ?? false],
       isOnSale: [data.product?.isOnSale ?? (data.product?.oldPrice ? true : false)],
@@ -104,48 +158,73 @@ export class ProductDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.title = this.data.mode === 'create' ? 'Нов продукт' : 'Редакция на продукт';
+    this.loadData();
+  }
 
+  loadData(): void {
     this.productService.getBrands().subscribe(brands => this.brands = brands);
     this.productService.getTypes().subscribe(types => this.types = types);
     this.productService.getBTU().subscribe(btu => this.btu = btu);
     this.productService.getEnergyClasses().subscribe(classes => this.energyClasses = classes);
-    
-    // Load existing attributes if in edit mode
-    if (this.data.mode === 'edit' && this.data.product?.attributes) {
-      this.attributes = this.data.product.attributes.map(attr => ({
+
+    if (this.data.mode === 'edit' && this.data.product) {
+      this.title = 'Редактиране на продукт';
+      this.attributes = this.data.product.attributes?.map(attr => ({
         attributeKey: attr.attributeKey,
         attributeValue: attr.attributeValue,
-        groupName: attr.groupName,
         displayOrder: attr.displayOrder,
+        groupName: attr.groupName,
         isVisible: attr.isVisible
-      }));
+      })) || [];
+
+      // Load existing images
+      if (this.data.product.images && this.data.product.images.length > 0) {
+        this.images = this.data.product.images.map(img => ({
+          url: img.imageUrl,
+          isPrimary: img.isPrimary
+        }));
+      } else if (this.data.product.imageUrl) {
+        // For backward compatibility with single image
+        this.images = [{
+          url: this.data.product.imageUrl,
+          isPrimary: true
+        }];
+      }
+    } else {
+      this.title = 'Добавяне на нов продукт';
     }
   }
 
-  submit(): void {
-    if (this.form.invalid) return;
+  save(): void {
+    if (this.form.invalid) {
+      return;
+    }
 
-    const dto: CreateProductDto = {
-      name: this.form.value.name,
-      description: this.form.value.description || '',
-      price: this.form.value.price,
-      oldPrice: this.form.value.oldPrice || null,
-      brandId: this.form.value.brandId,
-      productTypeId: this.form.value.productTypeId,
-      btuId: this.form.value.btuId || null,
-      energyClassId: this.form.value.energyClassId || null,
-      sku: this.form.value.sku || '',
-      imageUrl: this.form.value.imageUrl || '',
+    if (this.images.length === 0) {
+      alert('Моля, добавете поне една снимка към продукта');
+      return;
+    }
+
+    const primaryImage = this.images.find(img => img.isPrimary) || this.images[0];
+    
+    const productData: any = {
+      ...this.form.value,
       attributes: this.attributes.length > 0 ? this.attributes : undefined,
+      imageUrl: primaryImage.url, // For backward compatibility
       isNew: !!this.form.value.isNew,
       isOnSale: !!this.form.value.isOnSale,
       isFeatured: !!this.form.value.isFeatured,
-      stockQuantity: this.form.value.stockQuantity || 0
+      stockQuantity: this.form.value.stockQuantity || 0,
+      images: this.images.map((img, index) => ({
+        imageUrl: img.url,
+        altText: `Снимка на ${this.form.get('name')?.value || 'продукт'}`,
+        displayOrder: index,
+        isPrimary: img.isPrimary
+      }))
     };
 
-    console.log('Submitting product:', dto);
-
-    this.dialogRef.close({ action: this.data.mode, dto });
+    console.log('Submitting product:', productData);
+    this.dialogRef.close({ action: this.data.mode, dto: productData });
   }
 
   addAttribute(): void {
@@ -167,6 +246,34 @@ export class ProductDialogComponent implements OnInit {
 
   removeAttribute(index: number): void {
     this.attributes.splice(index, 1);
+  }
+
+  // Image management methods
+  addImage(): void {
+    if (this.newImageUrl && !this.images.some(img => img.url === this.newImageUrl)) {
+      this.images.push({
+        url: this.newImageUrl,
+        isPrimary: this.images.length === 0 // First image is primary by default
+      });
+      this.newImageUrl = '';
+    }
+  }
+
+  removeImage(index: number): void {
+    const wasPrimary = this.images[index].isPrimary;
+    this.images.splice(index, 1);
+    
+    // If we removed the primary image, set the first image as primary
+    if (wasPrimary && this.images.length > 0) {
+      this.images[0].isPrimary = true;
+    }
+  }
+
+  setPrimaryImage(index: number): void {
+    // Set all images as not primary
+    this.images.forEach(img => img.isPrimary = false);
+    // Set the selected image as primary
+    this.images[index].isPrimary = true;
   }
 
   cancel(): void {
