@@ -3,10 +3,10 @@
   <div class="header-top">
     <div class="logo-search">
       <div class="logo-block">
-        <a routerLink="/" class="logo-link" style="cursor:pointer">
+        <a routerLink="/" class="logo-link">
           <img src="assets/logo.png" alt="БГ Клима" class="logo-image">
+          <div class="logo-subtitle">КЛИМАТИЗАЦИЯ И ВЕНТИЛАЦИЯ</div>
         </a>
-        <div class="logo-subtitle" style="color:#fff;font-size:0.8rem;margin-top:0.7rem;text-align:center;text-transform:uppercase;line-height:1.1;font-weight:400;">КЛИМАТИЗАЦИЯ И ВЕНТИЛАЦИЯ</div>
       </div>
       <div class="search-bar">
         <mat-form-field appearance="outline" class="search-white-bg">
@@ -20,17 +20,176 @@
         <span class="phone-number"><mat-icon>call</mat-icon> 042 / 638 248</span>
         <span class="phone-desc">Безплатна консултация</span>
       </div>
-      <button mat-icon-button><mat-icon>calculate</mat-icon></button>
-      <button mat-icon-button><mat-icon>swap_vert</mat-icon></button>
-      <button mat-icon-button><mat-icon>shopping_cart</mat-icon></button>
+      <button mat-icon-button aria-label="Калкулатор" class="desktop-only">
+        <mat-icon>calculate</mat-icon>
+      </button>
+      <button mat-icon-button aria-label="Сравняване" class="desktop-only">
+        <mat-icon>swap_vert</mat-icon>
+      </button>
     </div>
+  </div>
+
+  <!-- MOBILE ACTION BAR -->
+  <nav class="mobile-action-bar">
+    <button mat-icon-button class="nav-item menu-button" (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <button mat-icon-button class="nav-item" (click)="toggleMobileSearch()">
+      <mat-icon>search</mat-icon>
+    </button>
+    <button mat-icon-button class="nav-item" routerLink="/contacts">
+      <mat-icon>call</mat-icon>
+    </button>
+    <button mat-icon-button class="nav-item mobile-only">
+      <mat-icon>swap_vert</mat-icon>
+    </button>
+  </nav>
+
+  <!-- MOBILE SEARCH BAR -->
+  <div class="mobile-search-container" *ngIf="isMobileSearchVisible">
+    <mat-form-field appearance="outline" class="search-mobile">
+      <input matInput type="text" placeholder="Търси продукт...">
+      <button mat-icon-button matSuffix><mat-icon>search</mat-icon></button>
+    </mat-form-field>
   </div>
 </header>
 
 <!-- NAVBAR -->
-<app-navbar></app-navbar>
+<mat-sidenav-container class="main-container">
+  <mat-sidenav #sidenav mode="over" class="mobile-sidenav">
+
+
+    <mat-accordion class="sidenav-accordion" displayMode="flat" multi>
+
+      <mat-expansion-panel #panel1 hideToggle="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <img src="assets/product-icons/ico1.png" class="menu-icon" alt="Климатици"> Климатици
+            <span class="flex-spacer"></span>
+            <mat-icon *ngIf="!panel1.expanded">chevron_right</mat-icon>
+            <mat-icon *ngIf="panel1.expanded">expand_more</mat-icon>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="submenu-items">
+          <a mat-list-item>Климатици стенен тип</a>
+          <a mat-list-item>Климатици колонен тип</a>
+          <a mat-list-item>Климатици канален тип</a>
+          <a mat-list-item>Климатици касетъчен тип</a>
+          <a mat-list-item>Климатици подов тип</a>
+          <a mat-list-item>Климатици подово - таванен тип</a>
+          <a mat-list-item>VRF / VRV</a>
+          <a mat-list-item>Мобилни / преносими климатици</a>
+        </div>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel #panel2 hideToggle="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <img src="assets/product-icons/ico2.png" class="menu-icon" alt="Термопомпи"> Термопомпи
+            <span class="flex-spacer"></span>
+            <mat-icon *ngIf="!panel2.expanded">chevron_right</mat-icon>
+            <mat-icon *ngIf="panel2.expanded">expand_more</mat-icon>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="submenu-items">
+          <a mat-list-item>Термопомпени системи</a>
+          <a mat-list-item>Мултисплит системи</a>
+          <a mat-list-item>БГКЛИМА тръбни топлообменници</a>
+        </div>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel #panel3 hideToggle="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <img src="assets/product-icons/ico3.png" class="menu-icon" alt="Вентилация"> Вентилация
+            <span class="flex-spacer"></span>
+            <mat-icon *ngIf="!panel3.expanded">chevron_right</mat-icon>
+            <mat-icon *ngIf="panel3.expanded">expand_more</mat-icon>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="submenu-items">
+          <a mat-list-item>Проектиране на вентилационни системи</a>
+          <a mat-list-item>Монтаж на вентилационни системи</a>
+          <a mat-list-item>Профилактика и сервиз</a>
+        </div>
+      </mat-expansion-panel>
+
+
+
+      <mat-expansion-panel class="promo-item" hideToggle="true" routerLink="/promo">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <img src="assets/product-icons/promo.png" class="menu-icon red-icon" alt="Промо">
+            <span class="promo-text">ПРОМО</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel class="calculator-item" hideToggle="true" routerLink="/calculator">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <img src="assets/product-icons/calculator.png" class="menu-icon" alt="Калкулатор">
+            <span>Калкулатор за климатик</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel class="menu-item" hideToggle="true" routerLink="/installation">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <img src="assets/product-icons/tools.png" class="menu-icon" alt="Монтаж">
+            <span>Монтаж</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel class="menu-item" hideToggle="true" routerLink="/profilaktika">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <img src="assets/product-icons/rpa.png" class="menu-icon" alt="Профилактика">
+            <span>Профилактика</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel class="menu-item" hideToggle="true" routerLink="/service">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <img src="assets/product-icons/services.png" class="menu-icon" alt="Сервиз">
+            <span>Сервиз</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel #panel5 hideToggle="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <img src="assets/product-icons/info.png" class="menu-icon" alt="За нас">
+            <span>За нас</span>
+            <span class="flex-spacer"></span>
+            <mat-icon *ngIf="!panel5.expanded">chevron_right</mat-icon>
+            <mat-icon *ngIf="panel5.expanded">expand_more</mat-icon>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="submenu-items">
+          <a mat-list-item routerLink="/about-company">За фирмата</a>
+          <a mat-list-item routerLink="/main-activity">Основна дейност</a>
+          <a mat-list-item routerLink="/resource">Ресурс</a>
+          <a mat-list-item routerLink="/certificates">Сертификати</a>
+          <a mat-list-item routerLink="/projects">Обекти</a>
+          <a mat-list-item routerLink="/contacts">Контакти</a>
+        </div>
+      </mat-expansion-panel>
+
+    </mat-accordion>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <app-navbar></app-navbar>
 
 <!-- ROUTER OUTLET -->
 <router-outlet></router-outlet>
 
-<app-footer></app-footer>
+    <app-footer></app-footer>
+  </mat-sidenav-content>
+</mat-sidenav-container>

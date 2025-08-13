@@ -1,0 +1,59 @@
+name: Build .NET API & Angular
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Check out the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2️⃣ Setup .NET
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      # 3️⃣ Setup Node.js for Angular
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # 4️⃣ Install Angular dependencies & build
+      - name: Install Angular dependencies
+        working-directory: ./BGClima.UI
+        run: npm install
+
+      - name: Build Angular app
+        working-directory: ./BGClima.UI
+        run: npm run build -- --configuration production
+
+      # 5️⃣ Copy Angular dist to .NET wwwroot
+      - name: Copy Angular build to API wwwroot
+        run: |
+          rm -rf ./BGClima.API/wwwroot/*
+          cp -r ./BGClima.UI/dist/* ./BGClima.API/wwwroot/
+
+      # 6️⃣ Restore & build .NET API
+      - name: Restore .NET dependencies
+        working-directory: ./BGClima.API
+        run: dotnet restore
+
+      - name: Build .NET API
+        working-directory: ./BGClima.API
+        run: dotnet build --configuration Release --no-restore
+
+      # 7️⃣ Publish .NET API
+      - name: Publish .NET API
+        working-directory: ./BGClima.API
+        run: dotnet publish --configuration Release --output ./publish
