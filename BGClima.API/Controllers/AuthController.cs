@@ -17,7 +17,7 @@ namespace BGClima.API.Controllers
 
         [HttpPost("login")]
         public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
-        {
+        {   
             try
             {
                 var response = await _authService.LoginAsync(request);

@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { User, LoginRequest, LoginResponse } from '../models/user.model';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ import { Router } from '@angular/router';
 export class AuthService {
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser: Observable<User | null>;
-  private apiUrl = '/api/auth'; // API endpoint
+  private apiUrl = environment.production ? '/api/auth' : `${environment.apiUrl}/api/auth`; // API endpoint
   private readonly AUTH_COOKIE = 'bgclima_auth';
 
   constructor(private http: HttpClient, private router: Router) {
