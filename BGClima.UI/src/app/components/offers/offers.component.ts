@@ -1,147 +1,73 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ProductDto, ProductService } from '../../services/product.service';
 
 @Component({
   selector: 'app-offers',
   templateUrl: './offers.component.html',
   styleUrls: ['./offers.component.scss']
 })
-export class OffersComponent {
-  offers = [
-    {
-      image: 'assets/product1.png',
-      badges: [
-        { text: 'НОВО', bg: '#F54387', color: '#fff' },
-        { text: 'WiFi Вграден модул', bg: '#3B82F6', color: '#fff' },
-        { text: 'Йоно-дезодориращ филтър', bg: '#3B82F6', color: '#fff' }
-      ],
-      title: 'Инверторен климатик стенен General Fujitsu ASHH09KMCG/AOHN09KMCG',
-      price: { current: '1499.00 лв.', old: '1629.00 лв.' },
-      brand: { logo: 'assets/general_logo.svg', text: 'GENERAL Fujitsu General Limited' },
+export class OffersComponent implements OnInit {
+  featured: Array<{
+    id: number;
+    image: string;
+    title: string;
+    priceBgn: number;
+    priceEur: number;
+    oldPriceBgn?: number | null;
+    oldPriceEur?: number | null;
+    brandText: string;
+    badges: { text: string; bg: string; color: string }[];
+    specs: { label: string; value: string; icon: string }[];
+  }> = [];
+
+  constructor(private productService: ProductService) {}
+
+  ngOnInit(): void {
+    this.productService.getProducts().subscribe((products) => {
+      const items = products.filter(p => !!p.isFeatured);
+      const top = items.slice(0, 8);
+      this.featured = top.map(p => this.mapToCard(p));
+    });
+  }
+
+  private mapToCard(p: ProductDto) {
+    const bgn = p.price ?? 0;
+    const eur = this.toEur(bgn);
+    const oldBgn = p.oldPrice ?? null;
+    const oldEur = oldBgn != null ? this.toEur(oldBgn) : null;
+
+    const getAttr = (key: string): string => {
+      const found = (p.attributes || []).find(a => (a.attributeKey || '').trim().toLowerCase() === key.toLowerCase());
+      return (found?.attributeValue ?? '0').toString();
+    };
+
+    const hasWifi = (p.attributes || []).some(a => (a.attributeKey + ' ' + a.attributeValue).toLowerCase().includes('wifi'));
+    const badges: { text: string; bg: string; color: string }[] = [];
+    if (p.isNew) badges.push({ text: 'НОВО', bg: '#F54387', color: '#fff' });
+    if (p.isOnSale) badges.push({ text: 'ПРОМО', bg: '#E6003E', color: '#fff' });
+    if (hasWifi) badges.push({ text: 'WiFi', bg: '#3B82F6', color: '#fff' });
+
+    return {
+      id: p.id,
+      image: p.imageUrl || 'assets/solar-panel-placeholder.jpg',
+      title: p.name,
+      priceBgn: bgn,
+      priceEur: eur,
+      oldPriceBgn: oldBgn,
+      oldPriceEur: oldEur,
+      brandText: p.brand?.name || '',
+      badges,
       specs: [
-        { label: 'Мощност', value: '9', icon: 'assets/power.svg', color: '#A855F7' },
-        { label: 'Клас', value: 'A++', icon: 'assets/leaf.svg', color: '#10B981' },
-        { label: 'Охлаждане', value: '2.50', icon: 'assets/snowflake.svg', color: '#00BFFF' },
-        { label: 'Отопление', value: '2.80', icon: 'assets/sun.svg', color: '#FDBA74' }
+        { label: 'Мощност', value: getAttr('Мощност'), icon: 'assets/product-icons/ico1.png' },
+        { label: 'Клас', value: p.energyClass?.class || getAttr('Клас') || '0', icon: 'assets/product-icons/info.png' },
+        { label: 'Охлаждане', value: getAttr('Охлаждане'), icon: 'assets/product-icons/ico2.png' },
+        { label: 'Отопление', value: getAttr('Отопление'), icon: 'assets/product-icons/ico3.png' }
       ]
-    },
-    {
-      image: 'assets/product2.png',
-      badges: [
-        { text: 'НОВО', bg: '#F54387', color: '#fff' },
-        { text: 'WiFi Вграден модул', bg: '#3B82F6', color: '#fff' },
-        { text: 'Йоно-дезодориращ филтър', bg: '#3B82F6', color: '#fff' }
-      ],
-      title: 'Инверторен климатик стенен General Fujitsu ASHH07KMCG/AOHN07KMCG',
-      price: { current: '1419.00 лв.', old: '1479.00 лв.' },
-      brand: { logo: 'assets/general_logo.svg', text: 'GENERAL Fujitsu General Limited' },
-      specs: [
-        { label: 'Мощност', value: '7', icon: 'assets/power.svg', color: '#A855F7' },
-        { label: 'Клас', value: 'A++', icon: 'assets/leaf.svg', color: '#10B981' },
-        { label: 'Охлаждане', value: '2.00', icon: 'assets/snowflake.svg', color: '#00BFFF' },
-        { label: 'Отопление', value: '2.50', icon: 'assets/sun.svg', color: '#FDBA74' }
-      ]
-    },
-    {
-      image: 'assets/product3.png',
-      badges: [
-        { text: 'НОВО', bg: '#F54387', color: '#fff' },
-        { text: 'WiFi Вграден модул', bg: '#3B82F6', color: '#fff' },
-        { text: 'Йоно-дезодориращ филтър', bg: '#3B82F6', color: '#fff' }
-      ],
-      title: 'Инверторен климатик стенен General Fujitsu ASHH12KMCG/AOHN12KMCG',
-      price: { current: '1729.00 лв.', old: '1749.00 лв.' },
-      brand: { logo: 'assets/general_logo.svg', text: 'GENERAL Fujitsu General Limited' },
-      specs: [
-        { label: 'Мощност', value: '12', icon: 'assets/power.svg', color: '#A855F7' },
-        { label: 'Клас', value: 'A++', icon: 'assets/leaf.svg', color: '#10B981' },
-        { label: 'Охлаждане', value: '3.40', icon: 'assets/snowflake.svg', color: '#00BFFF' },
-        { label: 'Отопление', value: '4.00', icon: 'assets/sun.svg', color: '#FDBA74' }
-      ]
-    },
-    {
-      image: 'assets/product4.png',
-      badges: [
-        { text: 'НОВО', bg: '#F54387', color: '#fff' },
-        { text: 'WiFi Вграден модул', bg: '#3B82F6', color: '#fff' },
-        { text: 'Йоно-дезодориращ филтър', bg: '#3B82F6', color: '#fff' }
-      ],
-      title: 'Инверторен климатик стенен General Fujitsu ASHH14KMCG/AOHN14KMCG',
-      price: { current: '2239.00 лв.', old: '2379.00 лв.' },
-      brand: { logo: 'assets/general_logo.svg', text: 'GENERAL Fujitsu General Limited' },
-      specs: [
-        { label: 'Мощност', value: '14', icon: 'assets/power.svg', color: '#A855F7' },
-        { label: 'Клас', value: 'A++', icon: 'assets/leaf.svg', color: '#10B981' },
-        { label: 'Охлаждане', value: '4.20', icon: 'assets/snowflake.svg', color: '#00BFFF' },
-        { label: 'Отопление', value: '5.40', icon: 'assets/sun.svg', color: '#FDBA74' }
-      ]
-    },
-    {
-      image: 'assets/product5.png',
-      badges: [
-        { text: 'НОВО', bg: '#F54387', color: '#fff' },
-        { text: 'WiFi Вграден модул', bg: '#3B82F6', color: '#fff' },
-        { text: 'Йоно-дезодориращ филтър', bg: '#3B82F6', color: '#fff' }
-      ],
-      title: 'Инверторен климатик стенен General Fujitsu ASHH16KMCG/AOHN16KMCG',
-      price: { current: '2599.00 лв.', old: '2699.00 лв.' },
-      brand: { logo: 'assets/general_logo.svg', text: 'GENERAL Fujitsu General Limited' },
-      specs: [
-        { label: 'Мощност', value: '16', icon: 'assets/power.svg', color: '#A855F7' },
-        { label: 'Клас', value: 'A++', icon: 'assets/leaf.svg', color: '#10B981' },
-        { label: 'Охлаждане', value: '5.00', icon: 'assets/snowflake.svg', color: '#00BFFF' },
-        { label: 'Отопление', value: '6.00', icon: 'assets/sun.svg', color: '#FDBA74' }
-      ]
-    },
-    {
-      image: 'assets/product6.png',
-      badges: [
-        { text: 'НОВО', bg: '#F54387', color: '#fff' },
-        { text: 'WiFi Вграден модул', bg: '#3B82F6', color: '#fff' },
-        { text: 'Йоно-дезодориращ филтър', bg: '#3B82F6', color: '#fff' }
-      ],
-      title: 'Инверторен климатик стенен General Fujitsu ASHH18KMCG/AOHN18KMCG',
-      price: { current: '2999.00 лв.', old: '3199.00 лв.' },
-      brand: { logo: 'assets/general_logo.svg', text: 'GENERAL Fujitsu General Limited' },
-      specs: [
-        { label: 'Мощност', value: '18', icon: 'assets/power.svg', color: '#A855F7' },
-        { label: 'Клас', value: 'A++', icon: 'assets/leaf.svg', color: '#10B981' },
-        { label: 'Охлаждане', value: '6.00', icon: 'assets/snowflake.svg', color: '#00BFFF' },
-        { label: 'Отопление', value: '7.00', icon: 'assets/sun.svg', color: '#FDBA74' }
-      ]
-    },
-    {
-      image: 'assets/product7.png',
-      badges: [
-        { text: 'НОВО', bg: '#F54387', color: '#fff' },
-        { text: 'WiFi Вграден модул', bg: '#3B82F6', color: '#fff' },
-        { text: 'Йоно-дезодориращ филтър', bg: '#3B82F6', color: '#fff' }
-      ],
-      title: 'Инверторен климатик стенен General Fujitsu ASHH20KMCG/AOHN20KMCG',
-      price: { current: '3399.00 лв.', old: '3599.00 лв.' },
-      brand: { logo: 'assets/general_logo.svg', text: 'GENERAL Fujitsu General Limited' },
-      specs: [
-        { label: 'Мощност', value: '20', icon: 'assets/power.svg', color: '#A855F7' },
-        { label: 'Клас', value: 'A++', icon: 'assets/leaf.svg', color: '#10B981' },
-        { label: 'Охлаждане', value: '7.00', icon: 'assets/snowflake.svg', color: '#00BFFF' },
-        { label: 'Отопление', value: '8.00', icon: 'assets/sun.svg', color: '#FDBA74' }
-      ]
-    },
-    {
-      image: 'assets/product8.png',
-      badges: [
-        { text: 'НОВО', bg: '#F54387', color: '#fff' },
-        { text: 'WiFi Вграден модул', bg: '#3B82F6', color: '#fff' },
-        { text: 'Йоно-дезодориращ филтър', bg: '#3B82F6', color: '#fff' }
-      ],
-      title: 'Инверторен климатик стенен General Fujitsu ASHH24KMCG/AOHN24KMCG',
-      price: { current: '3999.00 лв.', old: '4299.00 лв.' },
-      brand: { logo: 'assets/general_logo.svg', text: 'GENERAL Fujitsu General Limited' },
-      specs: [
-        { label: 'Мощност', value: '24', icon: 'assets/power.svg', color: '#A855F7' },
-        { label: 'Клас', value: 'A++', icon: 'assets/leaf.svg', color: '#10B981' },
-        { label: 'Охлаждане', value: '9.00', icon: 'assets/snowflake.svg', color: '#00BFFF' },
-        { label: 'Отопление', value: '10.00', icon: 'assets/sun.svg', color: '#FDBA74' }
-      ]
-    }
-  ];
+    };
+  }
+
+  private toEur(amountBgn: number): number {
+    const rate = 1.95583;
+    return Math.round((amountBgn / rate) * 100) / 100;
+  }
 }
