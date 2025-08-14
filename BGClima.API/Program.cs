@@ -109,56 +109,19 @@ try
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<BGClimaContext>();
 
-    // Apply migrations and seed sample data
-    if (app.Environment.IsDevelopment())
-    {
-        //SeedTestData(db);
-        await SeedIdentityData(scope.ServiceProvider);
-    }
+            // Apply migrations and seed sample data
+        if (app.Environment.IsDevelopment())
+        {
+            //SeedTestData(db);
+            await SeedData.SeedIdentityDataAsync(scope.ServiceProvider);
+            await SeedData.SeedAsync(dbContext);
+        }
 }
 catch (Exception ex)
 {
     var logger = app.Services.GetRequiredService<ILogger<Program>>();
     logger.LogError(ex, "An error occurred while migrating or initializing the database.");
 }
-
-async Task SeedIdentityData(IServiceProvider serviceProvider)
-{
-    var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
-    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-    // Create roles if they don't exist
-    var roles = new[] { "ADMIN", "ContentManager", "USER" };
-    foreach (var role in roles)
-    {
-        if (!await roleManager.RoleExistsAsync(role))
-        {
-            await roleManager.CreateAsync(new IdentityRole(role));
-        }
-    }
-
-    // Create admin user if it doesn't exist
-    var adminUser = await userManager.FindByNameAsync("admin");
-    if (adminUser == null)
-    {
-        adminUser = new IdentityUser
-        {
-            UserName = "admin",
-            Email = "admin@bgclima.com",
-            EmailConfirmed = true
-        };
-
-        var result = await userManager.CreateAsync(adminUser, "Admin1!");
-        if (result.Succeeded)
-        {
-            await userManager.AddToRoleAsync(adminUser, "ADMIN");
-        }
-//=======
-//        await SeedData.SeedAsync(dbContext);
-//>>>>>>> main
-    }
-}
-
 
 
 // Configure the HTTP request pipeline.
