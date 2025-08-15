@@ -2,17 +2,20 @@ using BGClima.API.Data;
 using BGClima.Domain.Entities;
 using BGClima.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using BGClima.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
-using System;
-using System.IO;
-using System.Reflection;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Http;
-using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Kestrel to listen on HTTP in development
+if (builder.Environment.IsDevelopment())
+{
+    builder.WebHost.UseUrls("http://localhost:5000");
+}
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -25,7 +28,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
                       "Host=localhost;Port=5432;Database=bgclima;Username=postgres;Password=;";
 
 // Register BGClimaContext
-builder.Services.AddDbContext<BGClima.Infrastructure.Data.BGClimaContext>(options =>
+builder.Services.AddDbContext<BGClimaContext>(options =>
     options.UseNpgsql(connectionString, npgsqlOptions =>
     {
         npgsqlOptions.EnableRetryOnFailure(
@@ -35,11 +38,47 @@ builder.Services.AddDbContext<BGClima.Infrastructure.Data.BGClimaContext>(option
         npgsqlOptions.MigrationsAssembly("BGClima.Infrastructure");
     }));
 
-// Register repositories
-builder.Services.AddScoped<BGClima.Domain.Entities.IProductRepository, BGClima.Infrastructure.Repositories.ProductRepository>();
+// Configure Identity
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<BGClimaContext>()
+    .AddDefaultTokenProviders();
 
-// Register application services
+// Configure JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"] ?? "your-super-secret-key-with-at-least-32-characters");
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = true,
+        ValidIssuer = jwtSettings["Issuer"] ?? "BGClima",
+        ValidateAudience = true,
+        ValidAudience = jwtSettings["Audience"] ?? "BGClimaUsers",
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+// Register repositories and services
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<BGClima.Application.Services.IProductService, BGClima.Application.Services.ProductService>();
+builder.Services.AddScoped<BGClima.Application.Services.IAuthService, BGClima.Application.Services.AuthService>();
+//// Register repositories
+//builder.Services.AddScoped<BGClima.Domain.Entities.IProductRepository, BGClima.Infrastructure.Repositories.ProductRepository>();
+
+//// Register application services
+//builder.Services.AddScoped<BGClima.Application.Services.IProductService, BGClima.Application.Services.ProductService>();
 
 // Register AutoMapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
@@ -68,11 +107,13 @@ try
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<BGClimaContext>();
 
-    // Apply migrations and seed sample data
-    if (app.Environment.IsDevelopment())
-    {
-        await SeedData.SeedAsync(dbContext);
-    }
+            // Apply migrations and seed sample data
+        if (app.Environment.IsDevelopment())
+        {
+            //SeedTestData(db);
+            await SeedData.SeedIdentityDataAsync(scope.ServiceProvider);
+            await SeedData.SeedAsync(dbContext);
+        }
 }
 catch (Exception ex)
 {
@@ -81,15 +122,14 @@ catch (Exception ex)
 }
 
 
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
     
-    // Only use HTTPS redirection in production
-    app.UseHttpsRedirection();
+    // Don't use HTTPS redirection in development
+    // app.UseHttpsRedirection();
 }
 else
 {
@@ -100,6 +140,9 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseCors("AllowAngularDev");
+
+// Add authentication and authorization middleware
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers(); 

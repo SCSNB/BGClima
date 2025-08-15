@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { User, LoginRequest, LoginResponse } from '../models/user.model';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ import { Router } from '@angular/router';
 export class AuthService {
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser: Observable<User | null>;
-  private apiUrl = 'api/auth'; // Replace with your actual API URL
+  private apiUrl = environment.production ? '/api/auth' : `${environment.apiUrl}/api/auth`; // API endpoint
   private readonly AUTH_COOKIE = 'bgclima_auth';
 
   constructor(private http: HttpClient, private router: Router) {
@@ -72,46 +73,35 @@ export class AuthService {
   login(loginRequest: LoginRequest): Observable<User> {
     console.log('Login attempt with:', loginRequest.username);
     
-    // For demo purposes, we'll simulate a successful login
-    // In a real application, replace this with an actual API call
-    if (loginRequest.username === 'admin' && loginRequest.password === 'admin') {
-      const mockResponse: LoginResponse = {
-        id: '1',
-        username: 'admin',  
-        email: 'admin@bgclima.com',
-        roles: ['ADMIN'],
-        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwibmFtZSI6ImFkbWluIiwicm9sZXMiOlsiQURNSU4iXSwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
-      };
-      
-      console.log('Login successful, user:', mockResponse);
-      
-      return of(mockResponse).pipe(
-        tap(response => {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, loginRequest)
+      .pipe(
+        map(response => {
+          console.log('Login successful, user:', response);
           const userJson = JSON.stringify(response);
           console.log('Storing user in cookie:', userJson);
           this.setCookie(this.AUTH_COOKIE, userJson);
           this.currentUserSubject.next(response);
+          return response;
+        }),
+        catchError(error => {
+          console.error('Login error:', error);
+          return throwError(() => new Error(error.error?.message || 'Login failed'));
         })
       );
-    }
-    
-    // In a real application, you would use this HTTP call instead:
-    // return this.http.post<LoginResponse>(`${this.apiUrl}/login`, loginRequest)
-    //   .pipe(
-    //     map(response => {
-    //       this.setCookie(this.AUTH_COOKIE, JSON.stringify(response));
-    //       this.currentUserSubject.next(response);
-    //       return response;
-    //     })
-    //   );
-    
-    // For demo, return error for invalid credentials
-    console.log('Login failed: Invalid credentials');
-    return throwError(() => new Error('Invalid username or password'));
   }
 
   logout(): void {
     console.log('Logging out');
+    // Call logout API endpoint
+    this.http.post(`${this.apiUrl}/logout`, {}).subscribe({
+      next: () => {
+        console.log('Logout API call successful');
+      },
+      error: (error) => {
+        console.error('Logout API call failed:', error);
+      }
+    });
+    
     this.deleteCookie(this.AUTH_COOKIE);
     this.currentUserSubject.next(null);
     this.router.navigate(['/login']);
