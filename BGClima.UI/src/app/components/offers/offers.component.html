@@ -10,10 +10,16 @@
       </div>
       <div class="offer-card-title">{{ item.title }}</div>
       <div class="offer-card-prices">
-        <span class="current-price">{{ item.priceBgn | number:'1.2-2' }} лв.</span>
-        <span class="current-price-eur">/ {{ item.priceEur | number:'1.2-2' }} €</span>
-        <span class="old-price" *ngIf="item.oldPriceBgn">{{ item.oldPriceBgn | number:'1.2-2' }} лв.</span>
-        <span class="old-price-eur" *ngIf="item.oldPriceEur">/ {{ item.oldPriceEur | number:'1.2-2' }} €</span>
+        <div class="price-container">
+          <div class="current-prices">
+            <span class="current-price">{{ item.priceBgn | number:'1.2-2' }} лв.</span>
+            <span class="current-price-eur">/ {{ item.priceEur | number:'1.2-2' }} €</span>
+          </div>
+          <div class="old-prices" *ngIf="item.oldPriceBgn">
+            <span class="old-price">{{ item.oldPriceBgn | number:'1.2-2' }} лв.</span>
+            <span class="old-price-eur" *ngIf="item.oldPriceEur">/ {{ item.oldPriceEur | number:'1.2-2' }} €</span>
+          </div>
+        </div>
       </div>
       <div class="offer-card-brand-row">
         <img src="assets/logo.png" alt="brand" class="brand-logo" />
@@ -22,8 +28,13 @@
       </div>
       <div class="offer-card-specs">
         <div class="spec" *ngFor="let spec of item.specs">
-          <img [src]="spec.icon" [alt]="spec.label" />
-          <span>{{ spec.value || '0' }}</span>
+          <div class="spec-icon" [ngClass]="spec.icon">
+            <span class="material-icons">{{ spec.icon }}</span>
+          </div>
+          <div class="spec-details">
+            <div class="spec-label">{{ spec.label }}</div>
+            <div class="spec-value">{{ spec.value || '0' }}</div>
+          </div>
         </div>
       </div>
     </div>

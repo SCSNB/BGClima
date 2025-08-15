@@ -63,31 +63,47 @@
       font-weight: 500;
     }
     .offer-card-prices {
-      display: flex;
-      align-items: center;
-      gap: 10px;
       margin-bottom: 10px;
-      .current-price {
-        color: #E6003E;
-        font-size: 24px;
-        font-weight: 700;
+      
+      .price-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
       }
-      .current-price-eur {
-        color: #E6003E;
-        font-size: 16px;
-        font-weight: 600;
+      
+      .current-prices {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        line-height: 1;
+        margin-bottom: 2px;
+        
+        .current-price, .current-price-eur {
+          color: #E6003E;
+          font-size: 16px;
+          font-weight: 600;
+        }
       }
-      .old-price {
-        color: #9aa0a6;
-        font-size: 14px;
-        text-decoration: line-through;
-        font-weight: 500;
-      }
-      .old-price-eur {
-        color: #9aa0a6;
-        font-size: 12px;
-        text-decoration: line-through;
-        font-weight: 500;
+      
+      .old-prices {
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+        line-height: 1;
+        
+        .old-price {
+          color: #9aa0a6;
+          font-size: 13px;
+          text-decoration: line-through;
+          font-weight: 400;
+        }
+        
+        .old-price-eur {
+          color: #9aa0a6;
+          font-size: 11px;
+          text-decoration: line-through;
+          font-weight: 400;
+        }
       }
     }
     .offer-card-brand-row {
@@ -121,28 +137,75 @@
       }
     }
     .offer-card-specs {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       width: 100%;
-      margin-top: 10px;
+      margin-top: 15px;
+      gap: 10px;
+      
       .spec {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
-        font-size: 13px;
-        img {
-          width: 24px;
-          height: 24px;
-          margin-bottom: 2px;
+        gap: 6px;
+        width: 100%;
+        min-width: 0;
+        
+        .spec-icon {
+          width: 40px;
+          height: 40px;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #f8f9fa;
+          flex-shrink: 0;
+          
+          .material-icons {
+            font-size: 22px;
+          }
+          
+          // Colors for different icons
+          &.bolt .material-icons { 
+            color: #8B5CF6; // Лилав
+          }
+          &.eco .material-icons { 
+            color: #10B981; // Зелен
+          }
+          &.ac_unit .material-icons { 
+            color: #3B82F6; // Син
+          }
+          &.wb_sunny .material-icons { 
+            color: #FBBF24; // Жълт
+          }
         }
-        span {
-          font-weight: 600;
+        
+        .spec-details {
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          justify-content: center;
+          
+          .spec-label {
+            font-size: 10px;
+            color: #6B7280;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 0;
+            line-height: 1.2;
+          }
+          
+          .spec-value {
+            font-weight: 500;
+            font-size: 14px;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
         }
       }
-      .spec:nth-child(1) span { color: #A855F7; }
-      .spec:nth-child(2) span { color: #10B981; }
-      .spec:nth-child(3) span { color: #00BFFF; }
-      .spec:nth-child(4) span { color: #FDBA74; }
     }
   }
 }

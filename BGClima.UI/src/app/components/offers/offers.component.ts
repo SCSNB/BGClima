@@ -58,10 +58,10 @@ export class OffersComponent implements OnInit {
       brandText: p.brand?.name || '',
       badges,
       specs: [
-        { label: 'Мощност', value: getAttr('Мощност'), icon: 'assets/product-icons/ico1.png' },
-        { label: 'Клас', value: p.energyClass?.class || getAttr('Клас') || '0', icon: 'assets/product-icons/info.png' },
-        { label: 'Охлаждане', value: getAttr('Охлаждане'), icon: 'assets/product-icons/ico2.png' },
-        { label: 'Отопление', value: getAttr('Отопление'), icon: 'assets/product-icons/ico3.png' }
+        { label: 'Мощност', value: getAttr('Мощност'), icon: 'bolt' },
+        { label: 'Клас', value: p.energyClass?.class || getAttr('Клас') || 'A+', icon: 'eco' },
+        { label: 'Охлаждане', value: getAttr('Охлаждане'), icon: 'ac_unit' },
+        { label: 'Отопление', value: getAttr('Отопление'), icon: 'wb_sunny' }
       ]
     };
   }
