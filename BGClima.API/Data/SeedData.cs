@@ -71,58 +71,197 @@ namespace BGClima.API.Data
                 await context.SaveChangesAsync();
             }
 
-            // Не презапълваме, ако вече има продукти
-            if (await context.Products.AnyAsync())
-            {
-                return;
-            }
-
             // Намираме нужните референтни записи
             var ACType = await context.ProductTypes.FirstAsync();
 
-            var daikin = await context.Brands.FirstAsync(b => b.Name == "Daikin");
-            var mitsubishi = await context.Brands.FirstAsync(b => b.Name == "Mitsubishi Electric");
-            var gree = await context.Brands.FirstAsync(b => b.Name == "Gree");
+            // Добавяме Nippon ако го няма
+            if (!await context.Brands.AnyAsync(b => b.Name == "Nippon"))
+            {
+                await context.Brands.AddAsync(new Brand { Name = "Nippon", Country = "Japan" });
+                await context.SaveChangesAsync();
+            }
 
+            var daikin = await context.Brands.FirstAsync(b => b.Name == "Daikin");
+            var nippon = await context.Brands.FirstAsync(b => b.Name == "Nippon");
+            
+            // Изтриваме старите продукти, ако има такива
+            var existingProducts = await context.Products.ToListAsync();
+            if (existingProducts.Any())
+            {
+                context.Products.RemoveRange(existingProducts);
+                await context.SaveChangesAsync();
+            }
+
+            // Добавяме текущите продукти
             var products = new List<Product>
             {
                 new Product
                 {
-                    Name = "Daikin FTXB35C",
+                    Id = 1,
+                    Name = "Daikin FTXA20BT / RXA20A",
                     Description = "Енергоефективен стенен климатик",
                     BrandId = daikin.Id,
                     ProductTypeId = ACType.Id,
-                    Price = 1399.00m,
+                    BTUId = 2,
+                    EnergyClassId = 3,
+                    Price = 3890.00m,
+                    OldPrice = 4046.00m,
+                    StockQuantity = 1,
                     Sku = "DK-FTXB35C",
-                    ImageUrl = "https://via.placeholder.com/300x200?text=Daikin+FTXB35C",
+                    ImageUrl = "https://www.bgclima.com/cms/climaimg/251/img1.jpg",
                     IsActive = true,
-                    IsNew = true
-                },
-                new Product
-                {
-                    Name = "Mitsubishi MSZ-HR25",
-                    Description = "Тих и надежден климатик за дома",
-                    BrandId = mitsubishi.Id,
-                    ProductTypeId = ACType.Id,
-                    Price = 1199.00m,
-                    Sku = "ME-MSZ-HR25",
-                    ImageUrl = "https://via.placeholder.com/300x200?text=Mitsubishi+MSZ-HR25",
-                    IsActive = true,
-                    IsNew = true
-                },
-                new Product
-                {
-                    Name = "Gree Fairy 12",
-                    Description = "Климатик с вграден Wi‑Fi",
-                    BrandId = gree.Id,
-                    ProductTypeId = ACType.Id,
-                    Price = 999.00m,
-                    Sku = "GR-FAIRY-12",
-                    ImageUrl = "https://via.placeholder.com/300x200?text=Gree+Fairy+12",
-                    IsActive = true,
-                    IsNew = true,
+                    IsFeatured = true,
                     IsOnSale = true,
-                    OldPrice = 1099.00m
+                    IsNew = false
+                },
+                new Product
+                {
+                    Id = 2,
+                    Name = "Daikin -FTXC35D / RXC35D",
+                    Description = "Тих и надежден климатик за дома",
+                    BrandId = daikin.Id,
+                    ProductTypeId = ACType.Id,
+                    BTUId = 2,
+                    EnergyClassId = 1,
+                    Price = 1590.00m,
+                    OldPrice = 1770.00m,
+                    StockQuantity = 2,
+                    Sku = "ME-MSZ-HR25",
+                    ImageUrl = "https://www.bgclima.com/cms/climaimg/284/img1.jpg",
+                    IsActive = true,
+                    IsFeatured = true,
+                    IsOnSale = true,
+                    IsNew = false
+                },
+                new Product
+                {
+                    Id = 4,
+                    Name = "Daikin FTXB35C",
+                    Description = "Климатик Daikin",
+                    BrandId = daikin.Id,
+                    ProductTypeId = ACType.Id,
+                    BTUId = 1,
+                    EnergyClassId = 2,
+                    Price = 1499.00m,
+                    OldPrice = 1699.00m,
+                    StockQuantity = 4,
+                    Sku = "model",
+                    ImageUrl = "https://www.klimaticite.bg/web/img/202502/37809/40061/0/invertoren-klimatik-daikin-sensira-ftxc35-e-rxc35-e.webp",
+                    IsActive = true,
+                    IsFeatured = true,
+                    IsOnSale = true,
+                    IsNew = true
+                },
+                new Product
+                {
+                    Id = 5,
+                    Name = "тест снимки",
+                    Description = "тест на снимки",
+                    BrandId = daikin.Id,
+                    ProductTypeId = ACType.Id,
+                    BTUId = 1,
+                    EnergyClassId = 1,
+                    Price = 123.00m,
+                    OldPrice = 1234.00m,
+                    StockQuantity = 1,
+                    Sku = "",
+                    ImageUrl = "https://www.klimaticite.bg/web/img/202502/37809/40061/0/invertoren-klimatik-daikin-sensira-ftxc35-e-rxc35-e.webp",
+                    IsActive = true,
+                    IsFeatured = false,
+                    IsOnSale = false,
+                    IsNew = true
+                },
+                new Product
+                {
+                    Id = 6,
+                    Name = "Daikin FTXB55C",
+                    Description = "DAIKIN",
+                    BrandId = daikin.Id,
+                    ProductTypeId = ACType.Id,
+                    BTUId = 2,
+                    EnergyClassId = 2,
+                    Price = 1399.00m,
+                    OldPrice = 1499.00m,
+                    StockQuantity = 1,
+                    Sku = "",
+                    ImageUrl = "https://www.bgclima.com/cms/climaimg/284/img1.jpg",
+                    IsActive = true,
+                    IsFeatured = true,
+                    IsOnSale = true,
+                    IsNew = false
+                },
+                new Product
+                {
+                    Id = 7,
+                    Name = "Daikin -FTXJ20AS / RXJ20A",
+                    Description = "",
+                    BrandId = daikin.Id,
+                    ProductTypeId = ACType.Id,
+                    BTUId = 1,
+                    EnergyClassId = 3,
+                    Price = 4075.00m,
+                    StockQuantity = 2,
+                    Sku = "",
+                    ImageUrl = "https://www.bgclima.com/cms/climaimg/377/img1.jpg",
+                    IsActive = true,
+                    IsFeatured = true,
+                    IsOnSale = false,
+                    IsNew = true
+                },
+                new Product
+                {
+                    Id = 8,
+                    Name = "Daikin -FTXJ25AB / RXJ25A",
+                    Description = "",
+                    BrandId = daikin.Id,
+                    ProductTypeId = ACType.Id,
+                    BTUId = 1,
+                    EnergyClassId = 3,
+                    Price = 4206.00m,
+                    StockQuantity = 1,
+                    Sku = "",
+                    ImageUrl = "https://www.bgclima.com/cms/climaimg/383/img1.jpg",
+                    IsActive = true,
+                    IsFeatured = true,
+                    IsOnSale = false,
+                    IsNew = true
+                },
+                new Product
+                {
+                    Id = 9,
+                    Name = "тест 2",
+                    Description = "",
+                    BrandId = daikin.Id,
+                    ProductTypeId = ACType.Id,
+                    BTUId = 1,
+                    EnergyClassId = 2,
+                    Price = 1234.00m,
+                    OldPrice = 1255.00m,
+                    StockQuantity = 1,
+                    Sku = "",
+                    ImageUrl = "https://www.bgclima.com/cms/climaimg/284/img1.jpg",
+                    IsActive = true,
+                    IsFeatured = true,
+                    IsOnSale = true,
+                    IsNew = false
+                },
+                new Product
+                {
+                    Id = 10,
+                    Name = "Nippon - KFR 14DC ECO ENERGY",
+                    Description = "",
+                    BrandId = nippon.Id,
+                    ProductTypeId = ACType.Id,
+                    BTUId = 2,
+                    EnergyClassId = 2,
+                    Price = 1380.00m,
+                    StockQuantity = 1,
+                    Sku = "",
+                    ImageUrl = "https://www.bgclima.com/cms/climaimg/337/img1.jpg",
+                    IsActive = true,
+                    IsFeatured = true,
+                    IsOnSale = false,
+                    IsNew = true
                 }
             };
 
