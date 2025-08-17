@@ -8,10 +8,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace BGClima.Infrastructure.Migrations
+namespace BGClima.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(BGClimaContext))]
-    [Migration("20250813100107_InitialCreate")]
+    [Migration("20250817124252_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

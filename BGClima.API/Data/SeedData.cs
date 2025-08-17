@@ -89,40 +89,115 @@ namespace BGClima.API.Data
                 new Product
                 {
                     Name = "Daikin FTXB35C",
-                    Description = "Енергоефективен стенен климатик",
+                    Description = "Енергоефективен стенен климатик с инверторна технология",
                     BrandId = daikin.Id,
                     ProductTypeId = ACType.Id,
-                    Price = 1399.00m,
+                    Price = 1899.00m,
+                    OldPrice = 1999.00m,
                     Sku = "DK-FTXB35C",
                     ImageUrl = "https://via.placeholder.com/300x200?text=Daikin+FTXB35C",
                     IsActive = true,
-                    IsNew = true
+                    IsNew = true,
+                    IsOnSale = true,
+                    StockQuantity = 5
                 },
                 new Product
                 {
                     Name = "Mitsubishi MSZ-HR25",
-                    Description = "Тих и надежден климатик за дома",
+                    Description = "Тих и надежден климатик за дома с филтър за прахови частици",
                     BrandId = mitsubishi.Id,
                     ProductTypeId = ACType.Id,
-                    Price = 1199.00m,
+                    Price = 1699.00m,
+                    OldPrice = 1799.00m,
                     Sku = "ME-MSZ-HR25",
                     ImageUrl = "https://via.placeholder.com/300x200?text=Mitsubishi+MSZ-HR25",
                     IsActive = true,
-                    IsNew = true
+                    IsNew = true,
+                    IsOnSale = true,
+                    StockQuantity = 3
                 },
                 new Product
                 {
-                    Name = "Gree Fairy 12",
-                    Description = "Климатик с вграден Wi‑Fi",
+                    Name = "Gree Bora GWH09AAB-K6DNA5A/I",
+                    Description = "Иновативен климатик с вграден Wi-Fi и тих режим на работа",
                     BrandId = gree.Id,
                     ProductTypeId = ACType.Id,
-                    Price = 999.00m,
-                    Sku = "GR-FAIRY-12",
-                    ImageUrl = "https://via.placeholder.com/300x200?text=Gree+Fairy+12",
+                    Price = 1399.00m,
+                    OldPrice = 1499.00m,
+                    Sku = "GR-BORA-09",
+                    ImageUrl = "https://via.placeholder.com/300x200?text=Gree+Bora",
                     IsActive = true,
                     IsNew = true,
                     IsOnSale = true,
-                    OldPrice = 1099.00m
+                    StockQuantity = 4
+                },
+                new Product
+                {
+                    Name = "Fujitsu ASYG09LMCA",
+                    Description = "Високоефективен климатик с ниско ниво на шум",
+                    BrandId = await context.Brands.Where(b => b.Name == "Fujitsu").Select(b => b.Id).FirstAsync(),
+                    ProductTypeId = ACType.Id,
+                    Price = 1599.00m,
+                    OldPrice = 1699.00m,
+                    Sku = "FJ-ASYG09LMCA",
+                    ImageUrl = "https://via.placeholder.com/300x200?text=Fujitsu+ASYG09LMCA",
+                    IsActive = true,
+                    IsNew = true,
+                    StockQuantity = 2
+                },
+                new Product
+                {
+                    Name = "Daikin Emura FTXJ20MW",
+                    Description = "Елегантен дизайн с висока енергийна ефективност",
+                    BrandId = daikin.Id,
+                    ProductTypeId = ACType.Id,
+                    Price = 2199.00m,
+                    Sku = "DK-EMURA-20",
+                    ImageUrl = "https://via.placeholder.com/300x200?text=Daikin+Emura",
+                    IsActive = true,
+                    IsNew = true,
+                    StockQuantity = 1
+                },
+                new Product
+                {
+                    Name = "Mitsubishi Heavy SRK20ZS-W",
+                    Description = "Мощен климатик за големи помещения",
+                    BrandId = mitsubishi.Id,
+                    ProductTypeId = ACType.Id,
+                    Price = 1999.00m,
+                    OldPrice = 2199.00m,
+                    Sku = "MH-SRK20ZS",
+                    ImageUrl = "https://via.placeholder.com/300x200?text=Mitsubishi+Heavy",
+                    IsActive = true,
+                    IsOnSale = true,
+                    StockQuantity = 3
+                },
+                new Product
+                {
+                    Name = "Gree U-Crown 24",
+                    Description = "Интелигентен климатик с WiFi управление и йонен филтър",
+                    BrandId = gree.Id,
+                    ProductTypeId = ACType.Id,
+                    Price = 1799.00m,
+                    Sku = "GR-UCROWN-24",
+                    ImageUrl = "https://via.placeholder.com/300x200?text=Gree+U-Crown",
+                    IsActive = true,
+                    IsNew = true,
+                    StockQuantity = 2
+                },
+                new Product
+                {
+                    Name = "Daikin Perfera FTXP25M",
+                    Description = "Тих и енергийно ефективен климатик с вграден WiFi",
+                    BrandId = daikin.Id,
+                    ProductTypeId = ACType.Id,
+                    Price = 2099.00m,
+                    OldPrice = 2299.00m,
+                    Sku = "DK-PERFERA-25",
+                    ImageUrl = "https://via.placeholder.com/300x200?text=Daikin+Perfera",
+                    IsActive = true,
+                    IsOnSale = true,
+                    StockQuantity = 3
                 }
             };
 

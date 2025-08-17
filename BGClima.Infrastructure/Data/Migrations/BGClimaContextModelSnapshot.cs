@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace BGClima.Infrastructure.Migrations
+namespace BGClima.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(BGClimaContext))]
     partial class BGClimaContextModelSnapshot : ModelSnapshot
