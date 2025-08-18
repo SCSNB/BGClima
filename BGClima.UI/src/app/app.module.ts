@@ -41,9 +41,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
  
- // Services and Interceptors
- import { AuthService } from './services/auth.service';
+ // Shared Module
+import { SharedModule } from './shared/shared.module';
+
+// Services and Interceptors
+import { AuthService } from './services/auth.service';
 import { AuthGuard } from './guards/auth.guard';
 import { JwtInterceptor, ErrorInterceptor } from './interceptors';
 import { ContactsComponent } from './components/contacts/contacts.component';
@@ -114,10 +118,12 @@ import { PromoBannersComponent } from './components/shared/promo-banners/promo-b
      MatPaginatorModule,
      MatSortModule,
      MatDialogModule,
-     MatSelectModule,
-     MatCheckboxModule,
-     MatChipsModule,
-     MatSlideToggleModule
+    MatSelectModule,
+    MatCheckboxModule,
+    MatChipsModule,
+    MatSlideToggleModule,
+    MatTooltipModule,
+    SharedModule,
    ],
   providers: [
     AuthService,

@@ -1,12 +1,14 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSort, Sort } from '@angular/material/sort';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+import { BannerDialogComponent } from './banner-dialog/banner-dialog.component';
+import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog.component';
 import { Banner, BannerType } from '../../../../app/models/banner.model';
 import { BannerService } from '../../../../app/services/banner.service';
-import { BannerDialogComponent } from './banner-dialog/banner-dialog.component';
 
 @Component({
   selector: 'app-banners',
@@ -14,35 +16,101 @@ import { BannerDialogComponent } from './banner-dialog/banner-dialog.component';
   styleUrls: ['./banners.component.scss']
 })
 export class BannersComponent implements OnInit, AfterViewInit {
-  banners: Banner[] = [];
-  loading = true;
-  
   // Table properties
-  displayedColumns: string[] = ['position', 'title', 'image', 'status', 'actions'];
+  displayedColumns: string[] = ['id', 'image', 'title', 'position', 'status', 'actions'];
   dataSource: MatTableDataSource<Banner> = new MatTableDataSource<Banner>([]);
-  
+  loading = false;
+  banners: Banner[] = [];
+
   // Sort and paginator
-  @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  
+  @ViewChild(MatSort) sort!: MatSort;
+
   // Filter properties
   filterValue = '';
   selectedType = -1; // -1 means all types
   
-  // Banner positions
+  // Position options for filtering
   bannerPositions = [
-    { value: 0, viewValue: 'Главен слайдер' },
-    { value: 1, viewValue: 'Голям банер (ляво)' },
-    { value: 2, viewValue: 'Малък банер (горе дясно)' },
-    { value: 3, viewValue: 'Малък банер (среда дясно)' },
-    { value: 4, viewValue: 'Малък банер (долу дясно)' },
+    { value: BannerType.HeroSlider, viewValue: 'Главен слайд' },
+    { value: BannerType.MainLeft, viewValue: 'Голям банер (ляво)' },
+    { value: BannerType.TopRight, viewValue: 'Малък банер (горе дясно)' },
+    { value: BannerType.MiddleRight, viewValue: 'Малък банер (среда дясно)' },
+    { value: BannerType.BottomRight, viewValue: 'Малък банер (долу дясно)' }
   ];
+
+  // Position class mapping for styling
+  private positionClasses: { [key: number]: string } = {
+    [BannerType.HeroSlider]: 'hero-slider',
+    [BannerType.MainLeft]: 'main-left',
+    [BannerType.TopRight]: 'top-right',
+    [BannerType.MiddleRight]: 'middle-right',
+    [BannerType.BottomRight]: 'bottom-right'
+  };
 
   constructor(
     private bannerService: BannerService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) {}
+
+  // Get CSS class for position badge
+  getPositionClass(type: BannerType): string {
+    return this.positionClasses[type] || '';
+  }
+
+  // Open dialog to add new banner
+  openAddBannerDialog(): void {
+    this.addBanner();
+  }
+
+  // Open dialog to edit banner
+  openEditBannerDialog(banner: Banner): void {
+    this.editBanner(banner);
+  }
+
+  // Confirm before deleting a banner
+  confirmDelete(banner: Banner): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Потвърждение за изтриване',
+        message: `Сигурни ли сте, че искате да изтриете банер "${banner.name}"?`,
+        confirmText: 'Изтрий',
+        cancelText: 'Отказ'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.deleteBanner(banner.id);
+      }
+    });
+  }
+
+  /**
+   * Deletes a banner by ID
+   * @param id The ID of the banner to delete
+   */
+  private deleteBanner(id: number): void {
+    this.bannerService.deleteBanner(id).subscribe({
+      next: () => {
+        this.snackBar.open('Банерът е изтрит успешно!', 'Затвори', {
+          duration: 3000,
+          panelClass: 'success-snackbar'
+        });
+        this.loadBanners();
+      },
+      error: (error) => {
+        console.error('Error deleting banner:', error);
+        this.snackBar.open('Грешка при изтриване на банер!', 'Затвори', {
+          duration: 5000,
+          panelClass: 'error-snackbar'
+        });
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.loadBanners();
@@ -187,6 +255,9 @@ export class BannersComponent implements OnInit, AfterViewInit {
     });
   }
 
+  /**
+   * Opens a dialog to add a new banner
+   */
   addBanner(): void {
     const dialogRef = this.dialog.open(BannerDialogComponent, {
       width: '600px',
@@ -200,6 +271,10 @@ export class BannersComponent implements OnInit, AfterViewInit {
     });
   }
 
+  /**
+   * Opens a dialog to edit an existing banner
+   * @param banner The banner to edit
+   */
   editBanner(banner: Banner): void {
     const dialogRef = this.dialog.open(BannerDialogComponent, {
       width: '600px',
@@ -213,20 +288,6 @@ export class BannersComponent implements OnInit, AfterViewInit {
     });
   }
 
-  deleteBanner(id: number): void {
-    if (confirm('Сигурни ли сте, че искате да изтриете този банер?')) {
-      this.bannerService.deleteBanner(id).subscribe({
-        next: (): void => {
-          this.snackBar.open('Банерът беше изтрит успешно', 'Затвори', { duration: 3000 });
-          this.loadBanners();
-        },
-        error: (error: any): void => {
-          console.error('Error deleting banner:', error);
-          this.snackBar.open('Грешка при изтриване на банер', 'Затвори', { duration: 3000 });
-        }
-      });
-    }
-  }
 
   /**
    * Compares two values for sorting purposes
