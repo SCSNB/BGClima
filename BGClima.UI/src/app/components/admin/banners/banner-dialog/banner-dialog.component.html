@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>{{ data.isEdit ? 'Редактиране на банер' : 'Добавяне на нов банер' }}</h2>
+<h2 mat-dialog-title>{{ isEditMode ? 'Редактиране на банер' : 'Добавяне на нов банер' }}</h2>
 
 <mat-dialog-content>
   <form [formGroup]="bannerForm" (ngSubmit)="onSubmit()">
@@ -24,24 +24,30 @@
           <mat-label>Име на банер</mat-label>
           <input matInput formControlName="name" placeholder="Въведете име на банер" required>
           <mat-error *ngIf="bannerForm.get('name')?.hasError('required')">Името е задължително</mat-error>
+          <mat-error *ngIf="bannerForm.get('name')?.hasError('maxlength')">Името трябва да бъде до 100 символа</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>URL на изображението</mat-label>
           <input matInput formControlName="imageUrl" placeholder="https://example.com/image.jpg" required>
           <mat-error *ngIf="bannerForm.get('imageUrl')?.hasError('required')">URL на изображението е задължителен</mat-error>
+          <mat-error *ngIf="bannerForm.get('imageUrl')?.hasError('maxlength')">URL адресът трябва да бъде до 500 символа</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Целеви URL</mat-label>
           <input matInput formControlName="targetUrl" placeholder="https://example.com">
           <mat-hint>URL, към който да сочи банерът</mat-hint>
+          <mat-error *ngIf="bannerForm.get('targetUrl')?.hasError('maxlength')">URL адресът трябва да бъде до 1000 символа</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="half-width">
-          <mat-label>Поръчка</mat-label>
+          <mat-label>Пореден номер </mat-label>
           <input matInput type="number" formControlName="displayOrder" min="0">
           <mat-hint>По-малки числа са по-напред</mat-hint>
+          <mat-error *ngIf="bannerForm.get('displayOrder')?.hasError('required')">Полето е задължително</mat-error>
+          <mat-error *ngIf="bannerForm.get('displayOrder')?.hasError('min')">Стойността трябва да бъде по-голяма или равна на 0</mat-error>
+          <mat-error *ngIf="bannerForm.get('displayOrder')?.hasError('pattern')">Моля, въведете валидно число</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="half-width">
@@ -65,10 +71,10 @@
     mat-raised-button 
     color="primary" 
     (click)="onSubmit()" 
-    [disabled]="bannerForm.invalid || loading"
-    [class.spinner]="loading"
+    [disabled]="bannerForm.invalid || isSubmitting"
+    [class.spinner]="isSubmitting"
   >
-    <span *ngIf="!loading">{{ data.isEdit ? 'Запази' : 'Създай' }}</span>
-    <mat-spinner *ngIf="loading" diameter="24"></mat-spinner>
+    <span *ngIf="!isSubmitting">{{ isEditMode ? 'Запази' : 'Създай' }}</span>
+    <mat-spinner *ngIf="isSubmitting" diameter="24"></mat-spinner>
   </button>
 </mat-dialog-actions>

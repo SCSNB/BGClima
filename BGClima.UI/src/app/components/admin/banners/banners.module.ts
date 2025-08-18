@@ -10,6 +10,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { SharedModule } from '../../../shared/shared.module';
 import { BannersComponent } from './banners.component';
 import { BannerDialogComponent } from './banner-dialog/banner-dialog.component';
@@ -38,6 +40,8 @@ const routes: Routes = [
     MatSnackBarModule,
     MatSlideToggleModule,
     MatTooltipModule,
+    MatFormFieldModule,
+    MatInputModule,
     SharedModule
   ],
   entryComponents: [

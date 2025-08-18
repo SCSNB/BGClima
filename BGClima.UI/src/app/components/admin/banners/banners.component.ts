@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { BannerDialogComponent } from './banner-dialog/banner-dialog.component';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog.component';
 import { Banner, BannerType } from '../../../../app/models/banner.model';
-import { BannerService } from '../../../../app/services/banner.service';
+import { BannerService, BannerDto } from '../../../../app/services/banner.service';
 
 @Component({
   selector: 'app-banners',
@@ -18,9 +18,9 @@ import { BannerService } from '../../../../app/services/banner.service';
 export class BannersComponent implements OnInit, AfterViewInit {
   // Table properties
   displayedColumns: string[] = ['id', 'image', 'title', 'position', 'status', 'actions'];
-  dataSource: MatTableDataSource<Banner> = new MatTableDataSource<Banner>([]);
+  dataSource: MatTableDataSource<BannerDto> = new MatTableDataSource<BannerDto>([]);
   loading = false;
-  banners: Banner[] = [];
+  banners: BannerDto[] = [];
 
   // Sort and paginator
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -66,12 +66,14 @@ export class BannersComponent implements OnInit, AfterViewInit {
   }
 
   // Open dialog to edit banner
-  openEditBannerDialog(banner: Banner): void {
+  openEditBannerDialog(banner: BannerDto): void {
     this.editBanner(banner);
   }
 
   // Confirm before deleting a banner
-  confirmDelete(banner: Banner): void {
+  confirmDelete(banner: BannerDto): void {
+    if (!banner.id) return;
+    
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
       data: {
@@ -83,7 +85,7 @@ export class BannersComponent implements OnInit, AfterViewInit {
     });
 
     dialogRef.afterClosed().subscribe(confirmed => {
-      if (confirmed) {
+      if (confirmed && banner.id) {
         this.deleteBanner(banner.id);
       }
     });
@@ -93,7 +95,8 @@ export class BannersComponent implements OnInit, AfterViewInit {
    * Deletes a banner by ID
    * @param id The ID of the banner to delete
    */
-  private deleteBanner(id: number): void {
+  deleteBanner(id: number): void {
+    this.loading = true;
     this.bannerService.deleteBanner(id).subscribe({
       next: () => {
         this.snackBar.open('Банерът е изтрит успешно!', 'Затвори', {
@@ -108,6 +111,7 @@ export class BannersComponent implements OnInit, AfterViewInit {
           duration: 5000,
           panelClass: 'error-snackbar'
         });
+        this.loading = false;
       }
     });
   }
@@ -117,33 +121,17 @@ export class BannersComponent implements OnInit, AfterViewInit {
   }
 
   loadBanners(): void {
-    console.log('Loading banners...');
     this.loading = true;
     this.bannerService.getBanners().subscribe({
-      next: (banners: Banner[]) => {
-        console.log('Banners loaded:', banners);
-        // Ensure we have valid banner data
-        if (banners && Array.isArray(banners)) {
-          this.banners = banners.map(banner => ({
-            ...banner,
-            // Ensure imageUrl is properly formatted
-            imageUrl: banner.imageUrl ? this.getFullImageUrl(banner.imageUrl) : null
-          }));
-          console.log('Processed banners:', this.banners);
-          this.initializeDataSource(this.banners);
-        } else {
-          console.warn('No banners found or invalid data format:', banners);
-          this.banners = [];
-          this.initializeDataSource([]);
-        }
+      next: (banners: BannerDto[]) => {
+        this.banners = banners;
+        this.initializeDataSource(banners);
         this.loading = false;
       },
-      error: (error: any) => {
+      error: (error) => {
         console.error('Error loading banners:', error);
-        this.snackBar.open('Грешка при зареждане на банери: ' + (error.message || 'Неизвестна грешка'), 'Затвори', { duration: 5000 });
+        this.snackBar.open('Грешка при зареждане на банерите', 'Затвори', { duration: 3000 });
         this.loading = false;
-        this.banners = [];
-        this.initializeDataSource([]);
       }
     });
   }
@@ -167,11 +155,11 @@ export class BannersComponent implements OnInit, AfterViewInit {
     }
   }
   
-  private initializeDataSource(banners: Banner[]): void {
+  private initializeDataSource(banners: BannerDto[]): void {
     this.dataSource = new MatTableDataSource(banners);
     
     // Set up custom filter predicate for filtering by name and type
-    this.dataSource.filterPredicate = (data: Banner, filter: string) => {
+    this.dataSource.filterPredicate = (data: BannerDto, filter: string) => {
       const searchStr = JSON.parse(filter);
       const matchesSearch = data.name.toLowerCase().includes(searchStr.searchText);
       const matchesType = searchStr.selectedType === -1 || data.type === searchStr.selectedType;
@@ -179,7 +167,7 @@ export class BannersComponent implements OnInit, AfterViewInit {
     };
     
     // Set up sorting
-    this.dataSource.sortData = (data: Banner[], sort: Sort): Banner[] => {
+    this.dataSource.sortData = (data: BannerDto[], sort: Sort): BannerDto[] => {
       if (!sort.active || sort.direction === '') {
         return data;
       }
@@ -239,7 +227,9 @@ export class BannersComponent implements OnInit, AfterViewInit {
     return position ? position.viewValue : 'Неизвестна позиция';
   }
 
-  toggleBannerStatus(banner: any): void {
+  toggleBannerStatus(banner: BannerDto): void {
+    if (!banner.id) return;
+    
     banner.isActive = !banner.isActive;
     // Here you would typically call your banner service to update the status
     this.bannerService.updateBanner(banner.id, { isActive: banner.isActive }).subscribe({
@@ -261,7 +251,9 @@ export class BannersComponent implements OnInit, AfterViewInit {
   addBanner(): void {
     const dialogRef = this.dialog.open(BannerDialogComponent, {
       width: '600px',
-      data: { isEdit: false }
+      data: { 
+        mode: 'create' as const
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -275,15 +267,28 @@ export class BannersComponent implements OnInit, AfterViewInit {
    * Opens a dialog to edit an existing banner
    * @param banner The banner to edit
    */
-  editBanner(banner: Banner): void {
-    const dialogRef = this.dialog.open(BannerDialogComponent, {
-      width: '600px',
-      data: { isEdit: true, banner: { ...banner } }
-    });
+  editBanner(banner: BannerDto): void {
+    if (!banner.id) return;
+    
+    this.bannerService.getBanner(banner.id).subscribe({
+      next: (bannerData) => {
+        const dialogRef = this.dialog.open(BannerDialogComponent, {
+          width: '600px',
+          data: { 
+            mode: 'edit' as const,
+            banner: bannerData
+          }
+        });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loadBanners();
+        dialogRef.afterClosed().subscribe(result => {
+          if (result) {
+            this.loadBanners();
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error loading banner for edit:', error);
+        this.snackBar.open('Грешка при зареждане на банера за редакция', 'Затвори', { duration: 3000 });
       }
     });
   }
