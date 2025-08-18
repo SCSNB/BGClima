@@ -105,6 +105,25 @@ export class BannerDialogComponent implements OnInit {
     // After upload, update the imageUrl with the returned URL
   }
 
+  private handleSuccess(action: string): void {
+    this.snackBar.open(
+      `Банерът беше ${action} успешно`,
+      'Затвори',
+      { duration: 3000 }
+    );
+    this.dialogRef.close(true);
+  }
+
+  private handleError(error: any): void {
+    console.error('Error saving banner:', error);
+    const errorMessage = error.error?.message || 'Възникна грешка при запазване на банера';
+    this.snackBar.open(
+      errorMessage,
+      'Затвори',
+      { duration: 5000, panelClass: 'error-snackbar' }
+    );
+  }
+
   onSubmit(): void {
     if (this.bannerForm.invalid || this.isSubmitting) {
       return;
@@ -123,32 +142,21 @@ export class BannerDialogComponent implements OnInit {
       type: formValue.type
     };
 
-    const operation = this.isEditMode && this.data.banner?.id
-      ? this.bannerService.updateBanner(this.data.banner.id, bannerData)
-      : this.bannerService.createBanner(bannerData as Omit<BannerDto, 'id'>);
-
-    operation.subscribe({
-      next: (result) => {
-        this.snackBar.open(
-          `Банерът беше ${this.isEditMode ? 'обновен' : 'създаден'} успешно`,
-          'Затвори',
-          { duration: 3000 }
-        );
-        this.dialogRef.close(true);
-      },
-      error: (error) => {
-        console.error('Error saving banner:', error);
-        const errorMessage = error.error?.message || 'Възникна грешка при запазване на банера';
-        this.snackBar.open(
-          errorMessage,
-          'Затвори',
-          { duration: 5000, panelClass: 'error-snackbar' }
-        );
-      },
-      complete: () => {
-        this.isSubmitting = false;
-      }
-    });
+    if (this.isEditMode && this.data.banner?.id) {
+      // Include the ID in the banner data for the update
+      bannerData.id = this.data.banner.id;
+      this.bannerService.updateBanner(this.data.banner.id, bannerData).subscribe({
+        next: () => this.handleSuccess('обновен'),
+        error: (error) => this.handleError(error),
+        complete: () => this.isSubmitting = false
+      });
+    } else {
+      this.bannerService.createBanner(bannerData as Omit<BannerDto, 'id'>).subscribe({
+        next: () => this.handleSuccess('създаден'),
+        error: (error) => this.handleError(error),
+        complete: () => this.isSubmitting = false
+      });
+    }
   }
 
   onCancel(): void {
