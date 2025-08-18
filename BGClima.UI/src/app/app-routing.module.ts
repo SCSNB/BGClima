@@ -16,6 +16,7 @@ import { ProfilaktikaComponent } from './components/profilaktika/profilaktika.co
 import { ServizComponent } from './components/serviz/serviz.component';
 import { ProductListComponent } from './components/admin/product-list.component';
 import { DashboardHomeComponent } from './components/admin/dashboard-home.component';
+import { BannersComponent } from './components/admin/banners/banners.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -26,7 +27,8 @@ const routes: Routes = [
     // data: { roles: ['ADMIN'] },
     children: [
       { path: '', component: DashboardHomeComponent },
-      { path: 'product', component: ProductListComponent }
+      { path: 'product', component: ProductListComponent },
+      { path: 'banners', component: BannersComponent }
     ]
   },
   { path: 'contacts', component: ContactsComponent },

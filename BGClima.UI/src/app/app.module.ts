@@ -39,6 +39,8 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
  
  // Services and Interceptors
  import { AuthService } from './services/auth.service';
@@ -54,6 +56,9 @@ import { ConsultingComponent } from './components/consulting/consulting.componen
 import { InstallationComponent } from './components/installation/installation.component';
 import { ProfilaktikaComponent } from './components/profilaktika/profilaktika.component';
 import { ServizComponent } from './components/serviz/serviz.component';
+import { BannersComponent } from './components/admin/banners/banners.component';
+import { BannerDialogComponent } from './components/admin/banners/banner-dialog/banner-dialog.component';
+import { PromoBannersComponent } from './components/shared/promo-banners/promo-banners.component';
 
 @NgModule({
   declarations: [
@@ -76,7 +81,10 @@ import { ServizComponent } from './components/serviz/serviz.component';
      ProductDialogComponent,
  	DashboardHomeComponent,
  	ProfilaktikaComponent,
- 	ServizComponent
+ 	ServizComponent,
+  BannersComponent,
+  BannerDialogComponent,
+  PromoBannersComponent
    ],
   imports: [
     BrowserModule,
@@ -107,7 +115,9 @@ import { ServizComponent } from './components/serviz/serviz.component';
      MatSortModule,
      MatDialogModule,
      MatSelectModule,
-     MatCheckboxModule
+     MatCheckboxModule,
+     MatChipsModule,
+     MatSlideToggleModule
    ],
   providers: [
     AuthService,

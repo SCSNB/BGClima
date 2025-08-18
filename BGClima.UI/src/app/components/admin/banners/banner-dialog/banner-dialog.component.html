@@ -1,0 +1,74 @@
+<h2 mat-dialog-title>{{ data.isEdit ? 'Редактиране на банер' : 'Добавяне на нов банер' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="bannerForm" (ngSubmit)="onSubmit()">
+    <div class="form-container">
+      <!-- Image Upload and Preview -->
+      <div class="image-upload-container">
+        <div class="image-preview" [class.has-image]="imagePreview">
+          <img *ngIf="imagePreview" [src]="imagePreview" alt="Banner Preview" class="preview-image">
+          <div *ngIf="!imagePreview" class="upload-placeholder">
+            <mat-icon>image</mat-icon>
+            <span>Изберете изображение</span>
+          </div>
+        </div>
+        <input type="file" accept="image/*" (change)="onFileSelected($event)" style="display: none" #fileInput>
+        <button type="button" mat-stroked-button color="primary" (click)="fileInput.click()" class="upload-button">
+          <mat-icon>cloud_upload</mat-icon> Изберете снимка
+        </button>
+      </div>
+
+      <!-- Form Fields -->
+      <div class="form-fields">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Име на банер</mat-label>
+          <input matInput formControlName="name" placeholder="Въведете име на банер" required>
+          <mat-error *ngIf="bannerForm.get('name')?.hasError('required')">Името е задължително</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>URL на изображението</mat-label>
+          <input matInput formControlName="imageUrl" placeholder="https://example.com/image.jpg" required>
+          <mat-error *ngIf="bannerForm.get('imageUrl')?.hasError('required')">URL на изображението е задължителен</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Целеви URL</mat-label>
+          <input matInput formControlName="targetUrl" placeholder="https://example.com">
+          <mat-hint>URL, към който да сочи банерът</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Поръчка</mat-label>
+          <input matInput type="number" formControlName="displayOrder" min="0">
+          <mat-hint>По-малки числа са по-напред</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Тип на банер</mat-label>
+          <mat-select formControlName="type">
+            <mat-option *ngFor="let type of bannerTypes" [value]="type.value">
+              {{ type.viewValue }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-checkbox formControlName="isActive" color="primary">Активен</mat-checkbox>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Отказ</button>
+  <button 
+    mat-raised-button 
+    color="primary" 
+    (click)="onSubmit()" 
+    [disabled]="bannerForm.invalid || loading"
+    [class.spinner]="loading"
+  >
+    <span *ngIf="!loading">{{ data.isEdit ? 'Запази' : 'Създай' }}</span>
+    <mat-spinner *ngIf="loading" diameter="24"></mat-spinner>
+  </button>
+</mat-dialog-actions>

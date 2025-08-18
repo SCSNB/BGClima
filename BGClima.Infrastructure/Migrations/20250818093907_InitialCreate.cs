@@ -3,7 +3,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace BGClima.Infrastructure.Data.Migrations
+namespace BGClima.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -13,6 +13,25 @@ namespace BGClima.Infrastructure.Data.Migrations
         {
             migrationBuilder.EnsureSchema(
                 name: "bgclima");
+
+            migrationBuilder.CreateTable(
+                name: "Banners",
+                schema: "bgclima",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    ImageUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    TargetUrl = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                    DisplayOrder = table.Column<int>(type: "integer", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Banners", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Brands",
@@ -218,6 +237,10 @@ namespace BGClima.Infrastructure.Data.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Banners",
+                schema: "bgclima");
+
             migrationBuilder.DropTable(
                 name: "ProductAttributes",
                 schema: "bgclima");

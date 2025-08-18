@@ -1,0 +1,27 @@
+<section class="promo-grid-container" *ngIf="!loading && banners.length > 0">
+  <div class="promo-grid">
+    <ng-container *ngFor="let banner of banners">
+      <div class="promo-item" [ngClass]="getBannerClass(banner.type)" 
+           [style.backgroundImage]="'url(' + banner.image + ')'">
+        <a [href]="banner.link" class="promo-link" *ngIf="banner.link !== '#'">
+          <div class="promo-content">
+            <!-- Content will be part of the background image -->
+          </div>
+        </a>
+        <div class="promo-content" *ngIf="!banner.link || banner.link === '#'">
+          <!-- Empty div for banners without links -->
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</section>
+
+<!-- Loading State -->
+<div *ngIf="loading" class="promo-loading">
+  <mat-spinner diameter="30"></mat-spinner>
+</div>
+
+<!-- Empty State (only show if not loading and no banners) -->
+<div *ngIf="!loading && banners.length === 0" class="no-promo-banners">
+  <p>Няма налични рекламни банери в момента.</p>
+</div>

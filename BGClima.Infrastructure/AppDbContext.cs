@@ -12,8 +12,8 @@ namespace BGClima.Infrastructure
         public DbSet<Category> Categories { get; set; } = null!;
         public DbSet<ProductImage> ProductImages { get; set; } = null!;
         public DbSet<ProductFeature> ProductFeatures { get; set; } = null!;
-        public DbSet<Stock> Stocks { get; set; } = null!;
         public DbSet<Price> Prices { get; set; } = null!;
+        public DbSet<Banner> Banners { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

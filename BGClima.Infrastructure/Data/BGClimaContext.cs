@@ -18,6 +18,7 @@ namespace BGClima.Infrastructure.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductAttribute> ProductAttributes { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
+        public DbSet<Banner> Banners { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -110,6 +111,18 @@ namespace BGClima.Infrastructure.Data
                     .WithMany(p => p.Images)
                     .HasForeignKey(pi => pi.ProductId)
                     .OnDelete(DeleteBehavior.Cascade);
+            });
+
+
+            modelBuilder.Entity<Banner>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.ImageUrl).IsRequired().HasMaxLength(500);
+                entity.Property(e => e.TargetUrl).HasMaxLength(1000);
+                entity.Property(e => e.DisplayOrder).IsRequired();
+                entity.Property(e => e.IsActive).IsRequired();
+                entity.Property(e => e.Type).IsRequired();
             });
 
             // Създаване на индекси
