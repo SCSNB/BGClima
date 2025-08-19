@@ -30,6 +30,18 @@
     padding: 8px 16px;
   }
   
+  /* Status text styles */
+  .status-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #757575;
+    
+    &.active {
+      color: #2e7d32;
+      font-weight: 600;
+    }
+  }
+
   /* Image thumbnail styles */
   .banner-thumbnail {
     width: 80px;
