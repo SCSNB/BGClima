@@ -43,6 +43,9 @@
 </div>
 
 <!-- Promo Grid Section -->
-<app-promo-banners *ngIf="!loading"></app-promo-banners>
+<div class="promo-section" *ngIf="!loading">
+  <h2 class="section-title">Специални предложения</h2>
+  <app-promo-banners></app-promo-banners>
+</div>
 
 <app-offers></app-offers>

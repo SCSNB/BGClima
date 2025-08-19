@@ -245,10 +245,38 @@
   height: 700px; /* Фиксирана височина за цялата мрежа */
 }
 
+/* Promo Section */
+.promo-section {
+  padding: 2rem 0;
+  background-color: #fff;
+  
+  .section-title {
+    text-align: center;
+    color: #1e1f57;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 1rem;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 3px;
+      background: linear-gradient(90deg, #3f51b5, #2196f3);
+      border-radius: 3px;
+    }
+  }
+}
+
 .promo-item {
   position: relative;
   overflow: hidden;
-  border-radius: 12px; /* Повече заобляне на ъглите */
+  border-radius: 12px;
   background-color: #f0f0f0;
   background-size: cover;
   background-position: center;

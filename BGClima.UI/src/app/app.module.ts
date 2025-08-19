@@ -62,7 +62,7 @@ import { ProfilaktikaComponent } from './components/profilaktika/profilaktika.co
 import { ServizComponent } from './components/serviz/serviz.component';
 import { BannersComponent } from './components/admin/banners/banners.component';
 import { BannerDialogComponent } from './components/admin/banners/banner-dialog/banner-dialog.component';
-import { PromoBannersComponent } from './components/shared/promo-banners/promo-banners.component';
+import { PromoBannersComponent } from './components/promo-banners/promo-banners.component';
 
 @NgModule({
   declarations: [
@@ -79,16 +79,16 @@ import { PromoBannersComponent } from './components/shared/promo-banners/promo-b
     MainActivityComponent,
     ResourceComponent,
     CertificatesComponent,
-         ProjectsComponent,
-     ConsultingComponent,
-     ProductListComponent,
-     ProductDialogComponent,
- 	DashboardHomeComponent,
- 	ProfilaktikaComponent,
- 	ServizComponent,
-  BannersComponent,
-  BannerDialogComponent,
-  PromoBannersComponent
+    ProjectsComponent,
+    ConsultingComponent,
+    ProductListComponent,
+    ProductDialogComponent,
+    DashboardHomeComponent,
+    ProfilaktikaComponent,
+    ServizComponent,
+    BannersComponent,
+    BannerDialogComponent,
+    PromoBannersComponent
    ],
   imports: [
     BrowserModule,

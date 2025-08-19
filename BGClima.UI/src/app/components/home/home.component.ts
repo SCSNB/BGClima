@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { BannerService } from '../../services/banner.service';
 import { Banner } from '../../models/banner.model';
+import { PromoBannersComponent } from '../promo-banners/promo-banners.component';
 
 interface Slide {
   title: string;
@@ -32,9 +33,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   loadBanners() {
     this.bannerService.getBanners().subscribe({
       next: (banners) => {
-        // Filter active banners and map to slides
+        // Filter only active HeroSlider banners and map to slides
         this.slides = banners
-          .filter(banner => banner.isActive)
+          .filter(banner => banner.isActive && banner.type === 0) // 0 is the value of BannerType.HeroSlider
+          .sort((a, b) => a.displayOrder - b.displayOrder) // Sort by displayOrder
           .map(banner => ({
             title: banner.name,
             image: banner.imageUrl,
