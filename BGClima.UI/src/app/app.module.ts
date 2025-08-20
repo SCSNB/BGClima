@@ -39,6 +39,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
  
  // Services and Interceptors
  import { AuthService } from './services/auth.service';
@@ -107,7 +108,8 @@ import { ServizComponent } from './components/serviz/serviz.component';
      MatSortModule,
      MatDialogModule,
      MatSelectModule,
-     MatCheckboxModule
+     MatCheckboxModule,
+     MatProgressBarModule
    ],
   providers: [
     AuthService,

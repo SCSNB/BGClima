@@ -80,6 +80,10 @@ builder.Services.AddScoped<BGClima.Application.Services.IAuthService, BGClima.Ap
 //// Register application services
 //builder.Services.AddScoped<BGClima.Application.Services.IProductService, BGClima.Application.Services.ProductService>();
 
+builder.Services.AddScoped<BGClima.Application.Services.IImageService, BGClima.Application.Services.ImageService>();
+//// Register repositories
+//builder.Services.AddScoped<BGClima.Domain.Entities.IProductRepository, BGClima.Infrastructure.Repositories.ProductRepository>();
+
 // Register AutoMapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
