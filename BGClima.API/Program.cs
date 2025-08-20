@@ -11,6 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile("appsettings.json")
+    .AddEnvironmentVariables();
+
 // Configure Kestrel to listen on HTTP in development
 if (builder.Environment.IsDevelopment())
 {

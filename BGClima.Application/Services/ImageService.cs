@@ -15,9 +15,14 @@ public class ImageService : IImageService
 
     public ImageService(IConfiguration configuration)
     {
-        var connectionString = configuration.GetSection("AzureStorage:ConnectionString").Value;
+        var connectionString = configuration["AzureStorage:ConnectionString"];
+        var envKey = Environment.GetEnvironmentVariable("AZURE_STORAGE_KEY");
         _containerName = configuration.GetSection("AzureStorage:Container").Value ?? "product-images";
-        
+        if (!string.IsNullOrEmpty(envKey))
+        {
+            connectionString = connectionString.Replace("${AZURE_STORAGE_KEY}", envKey);
+        }
+
         if (string.IsNullOrEmpty(connectionString) || connectionString.Contains("!!PASTE_YOUR_STORAGE_CONNECTION_STRING_HERE!!"))
         {
             throw new InvalidOperationException("Azure Storage connection string is not configured. Please update appsettings.json with your Azure Storage connection string.");
