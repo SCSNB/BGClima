@@ -3,6 +3,7 @@ using BGClima.Domain.Entities;
 using BGClima.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using BGClima.Infrastructure.Repositories;
+using BGClima.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -70,6 +71,7 @@ builder.Services.AddAuthentication(options =>
 // Register repositories and services
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IBannerRepository, BannerRepository>();
 builder.Services.AddScoped<BGClima.Application.Services.IProductService, BGClima.Application.Services.ProductService>();
 builder.Services.AddScoped<BGClima.Application.Services.IAuthService, BGClima.Application.Services.AuthService>();
 //// Register repositories
