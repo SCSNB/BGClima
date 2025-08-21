@@ -1,10 +1,11 @@
 using BGClima.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace BGClima.Infrastructure.Data
 {
-    public class BGClimaContext : DbContext
+    public class BGClimaContext : IdentityDbContext<IdentityUser, IdentityRole, string>
     {
         public BGClimaContext(DbContextOptions<BGClimaContext> options) : base(options)
         {

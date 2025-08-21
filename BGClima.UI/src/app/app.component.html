@@ -1,5 +1,5 @@
 <!-- HEADER -->
-<header class="main-header">
+<header class="main-header" *ngIf="!isAdminOrLoginRoute()">
   <div class="header-top">
     <div class="logo-search">
       <div class="logo-block">
@@ -56,7 +56,7 @@
 
 <!-- NAVBAR -->
 <mat-sidenav-container class="main-container">
-  <mat-sidenav #sidenav mode="over" class="mobile-sidenav">
+  <mat-sidenav #sidenav mode="over" class="mobile-sidenav" *ngIf="!isAdminOrLoginRoute()">
 
 
     <mat-accordion class="sidenav-accordion" displayMode="flat" multi>
@@ -185,11 +185,11 @@
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <app-navbar></app-navbar>
+    <app-navbar *ngIf="!isAdminOrLoginRoute()"></app-navbar>
 
 <!-- ROUTER OUTLET -->
 <router-outlet></router-outlet>
 
-    <app-footer></app-footer>
+    <app-footer *ngIf="!isAdminOrLoginRoute()"></app-footer>
   </mat-sidenav-content>
 </mat-sidenav-container>

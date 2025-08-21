@@ -4,21 +4,17 @@ using BGClima.Domain.Entities;
 using BGClima.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BGClima.API.Controllers
 {
     [Route("api/products")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class ProductController : ControllerBase
     {
         private readonly BGClimaContext _context;
         private readonly IMapper _mapper;
 
-        public ProductsController(BGClimaContext context, IMapper mapper)
+        public ProductController(BGClimaContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -66,6 +62,119 @@ namespace BGClima.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { Message = "Възникна грешка при извличане на продуктите.", Error = ex.Message });
+            }
+        }
+
+        // GET: api/products/admin
+        [HttpGet("admin")]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsForAdmin(
+            [FromQuery] int? brandId = null,
+            [FromQuery] int? productTypeId = null,
+            [FromQuery] bool? isActive = null,
+            [FromQuery] bool? isFeatured = null,
+            [FromQuery] bool? isOnSale = null,
+            [FromQuery] bool? isNew = null,
+            [FromQuery] string? searchTerm = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20,
+            [FromQuery] string? sortBy = "name",
+            [FromQuery] string? sortOrder = "asc")
+        {
+            try
+            {
+                var query = _context.Products
+                    .Include(p => p.Brand)
+                    .Include(p => p.BTU)
+                    .Include(p => p.EnergyClass)
+                    .Include(p => p.ProductType)
+                    .Include(p => p.Attributes)
+                    .Include(p => p.Images)
+                    .AsQueryable();
+
+                // Филтриране
+                if (brandId.HasValue)
+                    query = query.Where(p => p.BrandId == brandId);
+
+                if (productTypeId.HasValue)
+                    query = query.Where(p => p.ProductTypeId == productTypeId);
+
+                if (isActive.HasValue)
+                    query = query.Where(p => p.IsActive == isActive);
+
+                if (isFeatured.HasValue)
+                    query = query.Where(p => p.IsFeatured == isFeatured);
+
+                if (isOnSale.HasValue)
+                    query = query.Where(p => p.IsOnSale == isOnSale);
+
+                if (isNew.HasValue)
+                    query = query.Where(p => p.IsNew == isNew);
+
+                // Търсене по име или описание
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    searchTerm = searchTerm.ToLower();
+                    query = query.Where(p => 
+                        p.Name.ToLower().Contains(searchTerm) || 
+                        (p.Description != null && p.Description.ToLower().Contains(searchTerm)) ||
+                        (p.Sku != null && p.Sku.ToLower().Contains(searchTerm))
+                    );
+                }
+
+                // Сортиране
+                switch (sortBy?.ToLower())
+                {
+                    case "name":
+                        query = sortOrder?.ToLower() == "desc" 
+                            ? query.OrderByDescending(p => p.Name)
+                            : query.OrderBy(p => p.Name);
+                        break;
+                    case "price":
+                        query = sortOrder?.ToLower() == "desc" 
+                            ? query.OrderByDescending(p => p.Price)
+                            : query.OrderBy(p => p.Price);
+                        break;
+                    case "stock":
+                        query = sortOrder?.ToLower() == "desc" 
+                            ? query.OrderByDescending(p => p.StockQuantity)
+                            : query.OrderBy(p => p.StockQuantity);
+                        break;
+                    case "brand":
+                        query = sortOrder?.ToLower() == "desc" 
+                            ? query.OrderByDescending(p => p.Brand.Name)
+                            : query.OrderBy(p => p.Brand.Name);
+                        break;
+                    case "type":
+                        query = sortOrder?.ToLower() == "desc" 
+                            ? query.OrderByDescending(p => p.ProductType.Name)
+                            : query.OrderBy(p => p.ProductType.Name);
+                        break;
+                    case "created":
+                    default:
+                        query = sortOrder?.ToLower() == "desc" 
+                            ? query.OrderByDescending(p => p.Id)
+                            : query.OrderBy(p => p.Id);
+                        break;
+                }
+
+                // Пагинация
+                var totalCount = await query.CountAsync();
+                var products = await query
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                // Добавяме метаданни за пагинация
+                Response.Headers.Add("X-Total-Count", totalCount.ToString());
+                Response.Headers.Add("X-Page", page.ToString());
+                Response.Headers.Add("X-PageSize", pageSize.ToString());
+                Response.Headers.Add("X-Total-Pages", Math.Ceiling((double)totalCount / pageSize).ToString());
+
+                return Ok(_mapper.Map<List<ProductDto>>(products));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Възникна грешка при извличане на продуктите за администрация.", Error = ex.Message });
             }
         }
 
@@ -298,6 +407,41 @@ namespace BGClima.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { Message = "Грешка при извличане на BTU стойностите.", Error = ex.Message });
+            }
+        }
+
+        // GET: api/products/admin/stats
+        [HttpGet("admin/stats")]
+        public async Task<ActionResult<object>> GetAdminStats()
+        {
+            try
+            {
+                var totalProducts = await _context.Products.CountAsync();
+                var activeProducts = await _context.Products.CountAsync(p => p.IsActive);
+                var featuredProducts = await _context.Products.CountAsync(p => p.IsFeatured);
+                var onSaleProducts = await _context.Products.CountAsync(p => p.IsOnSale);
+                var newProducts = await _context.Products.CountAsync(p => p.IsNew);
+                var lowStockProducts = await _context.Products.CountAsync(p => p.StockQuantity <= 5 && p.StockQuantity > 0);
+                var outOfStockProducts = await _context.Products.CountAsync(p => p.StockQuantity == 0);
+
+                var stats = new
+                {
+                    totalProducts,
+                    activeProducts,
+                    featuredProducts,
+                    onSaleProducts,
+                    newProducts,
+                    lowStockProducts,
+                    outOfStockProducts,
+                    totalBrands = await _context.Brands.CountAsync(),
+                    totalProductTypes = await _context.ProductTypes.CountAsync()
+                };
+
+                return Ok(stats);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Грешка при извличане на статистиката.", Error = ex.Message });
             }
         }
     }
