@@ -136,9 +136,39 @@ export class ProductService {
   getProduct(id: number): Observable<ProductDto> {
     return this.http.get<ProductDto>(`${this.baseUrl}/${id}`).pipe(
       tap({
-        next: (product) => console.log('Received product:', product),
-        error: (err) => console.error(`Error fetching product ${id}:`, err)
+        next: (product) => {
+          console.log('Fetched product:', product);
+        },
+        error: (err) => {
+          console.error('Error fetching product:', err);
+        }
       })
     );
   }
-} 
+
+  getProductBySlug(slug: string): Observable<ProductDto> {
+    return this.http.get<ProductDto>(`${this.baseUrl}/by-slug/${slug}`).pipe(
+      tap({
+        next: (product) => {
+          console.log('Fetched product by slug:', product);
+        },
+        error: (err) => {
+          console.error('Error fetching product by slug:', err);
+        }
+      })
+    );
+  }
+
+  getRelatedProducts(productId: number, limit: number = 4): Observable<ProductDto[]> {
+    return this.http.get<ProductDto[]>(`${this.baseUrl}/${productId}/related?limit=${limit}`).pipe(
+      tap({
+        next: (products) => {
+          console.log(`Fetched ${products.length} related products`);
+        },
+        error: (err) => {
+          console.error('Error fetching related products:', err);
+        }
+      })
+    );
+  }
+}

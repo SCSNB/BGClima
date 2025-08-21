@@ -1,3 +1,14 @@
+.offer-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  
+  &:hover .offer-card {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+  }
+}
+
 .offers-section {
   margin-top: 40px;
   

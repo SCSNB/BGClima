@@ -17,8 +17,7 @@ import { ProductListComponent } from './components/admin/product-list.component'
 import { ProductDialogComponent } from './components/admin/product-dialog.component';
 import { DashboardHomeComponent } from './components/admin/dashboard-home.component';
 
-// Material Imports
-import { MatButtonModule } from '@angular/material/button';
+// Material Imports (only those not in SharedModule)
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -32,18 +31,14 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatMenuModule } from '@angular/material/menu';
 import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
- 
- // Shared Module
+
+// Shared Module
 import { SharedModule } from './shared/shared.module';
 
 // Services and Interceptors
@@ -63,6 +58,7 @@ import { ServizComponent } from './components/serviz/serviz.component';
 import { BannersComponent } from './components/admin/banners/banners.component';
 import { BannerDialogComponent } from './components/admin/banners/banner-dialog/banner-dialog.component';
 import { PromoBannersComponent } from './components/promo-banners/promo-banners.component';
+import { ProductDetailsComponent } from './pages/product-details/product-details.component';
 
 @NgModule({
   declarations: [
@@ -88,7 +84,8 @@ import { PromoBannersComponent } from './components/promo-banners/promo-banners.
     ServizComponent,
     BannersComponent,
     BannerDialogComponent,
-    PromoBannersComponent
+    PromoBannersComponent,
+    ProductDetailsComponent
    ],
   imports: [
     BrowserModule,
@@ -98,8 +95,7 @@ import { PromoBannersComponent } from './components/promo-banners/promo-banners.
     ReactiveFormsModule,
     AppRoutingModule,
     
-    // Material Modules
-    MatButtonModule,
+    // Material Modules (only those not in SharedModule)
     MatCardModule,
     MatInputModule,
     MatFormFieldModule,
@@ -113,16 +109,14 @@ import { PromoBannersComponent } from './components/promo-banners/promo-banners.
     MatExpansionModule,
     MatSliderModule,
     MatDividerModule,
-         MatMenuModule,
-     MatTableModule,
-     MatPaginatorModule,
-     MatSortModule,
-     MatDialogModule,
-    MatSelectModule,
+    MatTableModule,
+    MatSortModule,
     MatCheckboxModule,
     MatChipsModule,
     MatSlideToggleModule,
     MatTooltipModule,
+    
+    // SharedModule (contains common Material modules)
     SharedModule,
    ],
   providers: [

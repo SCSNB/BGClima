@@ -17,6 +17,7 @@ import { ServizComponent } from './components/serviz/serviz.component';
 import { ProductListComponent } from './components/admin/product-list.component';
 import { DashboardHomeComponent } from './components/admin/dashboard-home.component';
 import { BannersComponent } from './components/admin/banners/banners.component';
+import { ProductDetailsComponent } from './pages/product-details/product-details.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -42,6 +43,7 @@ const routes: Routes = [
   { path: 'installation', component: InstallationComponent },
   { path: 'profilaktika', component: ProfilaktikaComponent },
   { path: 'serviz', component: ServizComponent },
+  { path: 'product/:id', component: ProductDetailsComponent },
   // Redirect empty path to home
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   // Catch-all route for any undefined routes
