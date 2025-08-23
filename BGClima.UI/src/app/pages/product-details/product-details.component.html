@@ -16,25 +16,26 @@
       <div class="main-image">
         <div *ngIf="!selectedImage" class="no-image">
           <p>Няма налична снимка</p>
-          <p>Очакван път: {{ 'assets/no-image.png' }}</p>
         </div>
         <img 
           *ngIf="selectedImage" 
           [src]="selectedImage" 
           [alt]="product.name" 
-          (error)="handleImageError($event)" />
-        <div *ngIf="selectedImage" class="debug-info">
-          <p>URL: {{ selectedImage }}</p>
-          <p>Валиден URL: {{ isUrlValid(selectedImage) ? 'Да' : 'Не' }}</p>
-        </div>
+          (error)="handleImageError($event)"
+          class="main-product-image" />
       </div>
-      <div class="thumbnail-container">
+      
+      <!-- Thumbnail Gallery -->
+      <div class="thumbnail-gallery" *ngIf="product.images && product.images.length > 1">
         <div 
-          *ngFor="let image of product.images" 
-          class="thumbnail" 
-          [class.active]="selectedImage === image.url"
-          (click)="selectImage(image.url)">
-          <img [src]="getImageUrl(image.url)" [alt]="product.name + ' thumbnail'" />
+          *ngFor="let img of product.images" 
+          class="thumbnail-item"
+          [class.active]="selectedImage === getImageUrl(img.url || img.imageUrl || img.path || img)"
+          (click)="selectImage(img)">
+          <img 
+            [src]="getImageUrl(img.url || img.imageUrl || img.path || img)" 
+            [alt]="product.name + ' thumbnail'"
+            (error)="handleImageError($event)" />
         </div>
       </div>
     </div>
@@ -43,7 +44,7 @@
     <div class="product-info">
       <h1 class="product-title">{{product.name}}</h1>
       
-      <!-- Brand and Availability -->
+<!-- Brand and Availability -->
       <div class="product-meta">
         <span class="brand" *ngIf="product.brand">
           <strong>Марка:</strong> {{product.brand.name}}
@@ -64,11 +65,24 @@
           <span class="price-eur">/ {{(product.oldPrice / 1.9558) | number:'1.2-2'}} €</span>
         </div>
       </div>
+      
+      <div class="price-vat-info">
+        Цените са с включен ДДС. Цените са обозначени в лева и евро по официалния валутен курс на БНБ: 1 EUR = 1.95583 BGN
+      </div>
 
-      <!-- Short Description -->
-      <div class="short-description" *ngIf="product.description">
-        <h3>Кратко описание</h3>
-        <p>{{product.description | slice:0:200}}...</p>
+      <!-- Product Specifications Icons -->
+      <div class="specs-container">
+        <div class="product-specs">
+          <div *ngFor="let spec of getProductSpecs()" class="spec-item" [class.no-border]="!spec.value">
+            <div class="spec-icon" [ngClass]="spec.icon">
+              <mat-icon>{{spec.icon}}</mat-icon>
+            </div>
+            <div class="spec-details">
+              <div class="spec-value">{{spec.value || 'N/A'}}</div>
+              <div class="spec-label">{{spec.label}}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Product actions removed as per request -->
@@ -79,9 +93,12 @@
           <span class="meta-label">Код на продукта:</span>
           <span class="meta-value">{{product.sku}}</span>
         </div>
-        <div class="meta-item">
-          <span class="meta-label">Категория:</span>
-          <span class="meta-value">{{product.productType?.name || 'N/A'}}</span>
+        <div class="accent-attributes" *ngIf="getAccentAttributes().length > 0">
+          <ng-container *ngFor="let attr of getAccentAttributes()">
+            <div class="accent-attribute">
+              {{attr.attributeValue}}
+            </div>
+          </ng-container>
         </div>
       </div>
     </div>
@@ -90,20 +107,57 @@
   <!-- Tabs -->
   <div class="product-tabs">
     <div class="tabs-header">
-      <button 
-        *ngFor="let tab of tabs; let i = index"
-        [class.active]="activeTab === i"
-        (click)="setActiveTab(i)"
-        class="tab-button">
-        {{tab}}
-      </button>
+      <ng-container *ngFor="let tab of tabs; let i = index">
+        <button 
+          *ngIf="tab !== 'Доставка' && tab !== 'Гаранция'"
+          [class.active]="activeTab === i"
+          (click)="setActiveTab(i)"
+          class="tab-button">
+          {{tab}}
+        </button>
+      </ng-container>
     </div>
 
     <div class="tab-content">
       <!-- Description Tab -->
       <div *ngIf="activeTab === 0" class="tab-pane">
         <h3>Описание на продукта</h3>
-        <div [innerHTML]="product.description"></div>
+        <div class="product-description" [class.expanded]="isDescriptionExpanded">
+          <div [innerHTML]="product.description"></div>
+          <button *ngIf="shouldShowReadMore(product.description)" 
+                  class="read-more-btn" 
+                  (click)="toggleDescription()">
+            {{ isDescriptionExpanded ? 'По-малко' : 'Прочети още' }}
+          </button>
+        </div>
+        
+        <!-- Product Attributes -->
+        <div class="product-attributes" *ngIf="product.attributes && product.attributes.length > 0">
+          <h3>Основни характеристики</h3>
+          <div class="attributes-grid">
+            <div class="attribute-item" *ngFor="let attr of getMainFeatures()">
+              <span class="attribute-label">{{attr.attributeKey}}:</span>
+              <span class="attribute-value" [innerHTML]="formatAttributeValue(attr)"></span>
+            </div>
+          </div>
+          
+          <div class="attribute-groups" *ngIf="getAttributeGroups().length > 0">
+            <div class="attribute-group" *ngFor="let group of getAttributeGroups()">
+              <h4 class="group-header" (click)="toggleGroup(group)">
+                {{group}}
+                <span class="toggle-icon">{{isGroupExpanded(group) ? '−' : '+'}}</span>
+              </h4>
+              <div class="group-content" [class.expanded]="isGroupExpanded(group)">
+                <div class="attributes-grid">
+                  <div class="attribute-item" *ngFor="let attr of getAttributesByGroup(group)">
+                    <span class="attribute-label">{{attr.attributeKey}}:</span>
+                    <span class="attribute-value" [innerHTML]="formatAttributeValue(attr)"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Specifications Tab -->
@@ -117,21 +171,6 @@
         </div>
       </div>
 
-      <!-- Delivery Tab -->
-      <div *ngIf="activeTab === 2" class="tab-pane">
-        <h3>Доставка и плащане</h3>
-        <p>Доставката се извършва чрез куриерска фирма до адрес на територията на България.</p>
-        <p>Срок за доставка: 1-3 работни дни след потвърждение на поръчката.</p>
-        <p>Начини на плащане: Наложен платеж, банков превод, кредитна/дебитна карта.</p>
-      </div>
-
-      <!-- Warranty Tab -->
-      <div *ngIf="activeTab === 3" class="tab-pane">
-        <h3>Гаранционни условия</h3>
-        <p>Всички продукти се доставят с пълна гаранция от производителя.</p>
-        <p>Гаранционният срок е 24 месеца от датата на покупка.</p>
-        <p>При необходимост от гаранционно обслужване, моля свържете се с нашия екип.</p>
-      </div>
     </div>
   </div>
 

@@ -49,9 +49,11 @@ export interface ProductDto {
   imageUrl?: string;
   brand?: BrandDto;
   btu?: BTUDto;
-  productType?: ProductTypeDto;
   energyClass?: EnergyClassDto;
+  coolingCapacity?: string;
+  heatingCapacity?: string;
   attributes?: ProductAttributeDto[];
+  productType?: ProductTypeDto;
   images?: any[]; // TODO: Define proper type for images
   
   // Backward compatibility

@@ -28,10 +28,85 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   error: string | null = null;
   quantity = 1;
   selectedImage: string | null = null;
+  isDescriptionExpanded = false;
+  descriptionMaxLength = 300; // Maximum characters to show when collapsed
   activeTab = 0;
   relatedProducts: any[] = [];
   expandedGroups = new Set<string>();
-  tabs = ['Описание', 'Спецификации', 'Доставка и плащане', 'Гаранция'];
+  tabs = ['Описание', 'Спецификации'];
+  
+  // Toggle description expansion
+  toggleDescription(): void {
+    this.isDescriptionExpanded = !this.isDescriptionExpanded;
+  }
+  
+  // Get short description with ellipsis if needed
+  getShortDescription(description: string): string {
+    if (!description) return '';
+    if (this.isDescriptionExpanded || description.length <= this.descriptionMaxLength) {
+      return description;
+    }
+    return description.substring(0, this.descriptionMaxLength) + '...';
+  }
+  
+  // Check if description should show read more button
+  shouldShowReadMore(description: string | undefined): boolean {
+    return !!description && (description as string).length > this.descriptionMaxLength;
+  }
+
+  // Define a custom type for specification keys
+  private getSpecificationValue(key: 'power' | 'class' | 'cooling' | 'heating'): string | null {
+    if (!this.product) return null;
+    
+    // Direct property access for known properties
+    switch(key) {
+      case 'power':
+        return this.product.btu?.value?.toString() || null;
+      case 'class':
+        return this.product.energyClass?.class || null;
+      case 'cooling':
+        return this.product.coolingCapacity || null;
+      case 'heating':
+        return this.product.heatingCapacity || null;
+      default:
+        return null;
+    }
+  }
+
+  // Get product specifications in the same format as the offers component
+  getProductSpecs() {
+    if (!this.product) return [];
+    
+    const getAttr = (key: string): string => {
+      const found = (this.product?.attributes || []).find(a => 
+        (a.attributeKey || '').trim().toLowerCase() === key.toLowerCase()
+      );
+      return (found?.attributeValue || '').toString();
+    };
+
+    return [
+      { 
+        label: 'Мощност', 
+        value: this.product.btu?.value?.toString() || getAttr('Мощност') || '0', 
+        icon: 'bolt' 
+      },
+      { 
+        label: 'Клас', 
+        value: this.product.energyClass?.class || getAttr('Клас') || 'A+', 
+        icon: 'eco' 
+      },
+      { 
+        label: 'Охлаждане', 
+        value: this.product.coolingCapacity || getAttr('Охлаждане') || '0', 
+        icon: 'ac_unit' 
+      },
+      { 
+        label: 'Отопление', 
+        value: this.product.heatingCapacity || getAttr('Отопление') || '0', 
+        icon: 'wb_sunny' 
+      }
+    ];
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -138,6 +213,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   private handleProductLoadSuccess(product: any): void {
     try {
       this.product = product;
+      console.log('Product attributes:', product.attributes); // Debug log
       this.setupProductImage(product);
       
       // Зареждане на свързани продукти, ако има product.id
@@ -301,6 +377,34 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Връща всички атрибути с ключ "АКЦЕНТИ"
+  getAccentAttributes(): any[] {
+    if (!this.product?.attributes?.length) return [];
+    
+    console.log('Всички атрибути:', this.product.attributes);
+    
+    const accentAttributes = this.product.attributes.filter(attr => {
+      const isAccent = attr.attributeKey && 
+                      (attr.attributeKey.toUpperCase() === 'АКЦЕНТИ' || 
+                       attr.attributeKey.toUpperCase().includes('АКЦЕНТ'));
+      return isAccent && attr.attributeValue;
+    });
+    
+    console.log('Намерени акцентни атрибути:', accentAttributes);
+    return accentAttributes;
+  }
+  
+  // Връща стойност на атрибут по ключ
+  getAttributeValue(key: string): string | null {
+    if (!this.product?.attributes) return null;
+    
+    const attribute = this.product.attributes.find(attr => 
+      attr.attributeKey?.toLowerCase() === key.toLowerCase()
+    );
+    
+    return attribute?.attributeValue || null;
+  }
+  
   // Връща групите от атрибути
   getAttributeGroups(): string[] {
     if (!this.product?.attributes) return [];
