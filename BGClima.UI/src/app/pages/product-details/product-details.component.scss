@@ -503,77 +503,117 @@
       font-weight: 600;
     }
 
-    .specs-grid {
-      display: table;
+    .specs-table {
       width: 100%;
-      border-collapse: collapse;
-
-      .spec-row {
-        display: table-row;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 1.5rem 0;
+      
+      .specs-header {
+        display: flex;
+        background-color: #f5f5f5;
+        font-weight: 600;
+        padding: 12px 15px;
+        border-bottom: 1px solid #e0e0e0;
         
-        &:nth-child(odd) {
-          background-color: #f9f9f9;
-        }
-        
-        &:nth-child(even) {
-          background-color: #fff;
-        }
-
         .spec-name, .spec-value {
-          display: table-cell;
-          padding: 0.75rem 1rem;
-          border-bottom: 1px solid #e0e0e0;
-          vertical-align: middle;
-        }
-
-        .spec-name {
-          font-weight: 500;
-          color: #555;
-          width: 40%;
-          border-right: 1px solid #e0e0e0;
-          background-color: #f5f5f5;
-        }
-
-        .spec-value {
-          color: #2c3e50;
-          width: 60%;
-          
-          &:empty:after {
-            content: "-";
-            color: #999;
-            font-style: italic;
-          }
+          flex: 1;
+          color: #333;
         }
         
-        &:last-child {
-          .spec-name, .spec-value {
+        .spec-value {
+          padding-left: 15px;
+        }
+      }
+      
+      .specs-body {
+        .spec-row {
+          display: flex;
+          padding: 12px 15px;
+          border-bottom: 1px solid #f0f0f0;
+          
+          &:nth-child(odd) {
+            background-color: #fafafa;
+          }
+          
+          &:last-child {
             border-bottom: none;
+          }
+          
+          .spec-name, .spec-value {
+            flex: 1;
+          }
+          
+          .spec-name {
+            color: #555;
+            font-weight: 500;
+          }
+          
+          .spec-value {
+            padding-left: 15px;
+            color: #333;
+            
+            &:empty:after {
+              content: "-";
+              color: #999;
+              font-style: italic;
+            }
           }
         }
       }
     }
     
     @media (max-width: 600px) {
-      .specs-grid {
-        display: block;
-        
-        .spec-row {
+      .specs-table {
+        .specs-header {
           display: flex;
-          flex-direction: column;
-          padding: 0.75rem 1rem;
+          background-color: #f5f5f5;
+          font-weight: 600;
+          padding: 10px 15px;
+          border-bottom: 1px solid #e0e0e0;
           
           .spec-name, .spec-value {
-            display: block;
-            width: 100%;
-            border: none;
-            padding: 0.25rem 0;
-            background: none;
+            flex: 1;
+            color: #333;
           }
           
-          .spec-name {
-            font-weight: 600;
-            color: #444;
-            padding-bottom: 0.25rem;
+          .spec-value {
+            padding-left: 15px;
+          }
+        }
+        
+        .specs-body {
+          .spec-row {
+            display: flex;
+            padding: 10px 15px;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+            
+            &:nth-child(odd) {
+              background-color: #fafafa;
+            }
+            
+            .spec-name {
+              flex: 1;
+              padding: 8px 0;
+              padding-right: 10px;
+              border-right: 1px solid #f0f0f0;
+              font-weight: 500;
+              color: #555;
+            }
+            
+            .spec-value {
+              flex: 1;
+              padding: 8px 15px;
+              color: #333;
+              
+              &:empty:after {
+                content: "-";
+                color: #999;
+                font-style: italic;
+              }
+            }
           }
         }
       }

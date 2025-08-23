@@ -130,43 +130,23 @@
             {{ isDescriptionExpanded ? 'По-малко' : 'Прочети още' }}
           </button>
         </div>
-        
-        <!-- Product Attributes -->
-        <div class="product-attributes" *ngIf="product.attributes && product.attributes.length > 0">
-          <h3>Основни характеристики</h3>
-          <div class="attributes-grid">
-            <div class="attribute-item" *ngFor="let attr of getMainFeatures()">
-              <span class="attribute-label">{{attr.attributeKey}}:</span>
-              <span class="attribute-value" [innerHTML]="formatAttributeValue(attr)"></span>
-            </div>
-          </div>
-          
-          <div class="attribute-groups" *ngIf="getAttributeGroups().length > 0">
-            <div class="attribute-group" *ngFor="let group of getAttributeGroups()">
-              <h4 class="group-header" (click)="toggleGroup(group)">
-                {{group}}
-                <span class="toggle-icon">{{isGroupExpanded(group) ? '−' : '+'}}</span>
-              </h4>
-              <div class="group-content" [class.expanded]="isGroupExpanded(group)">
-                <div class="attributes-grid">
-                  <div class="attribute-item" *ngFor="let attr of getAttributesByGroup(group)">
-                    <span class="attribute-label">{{attr.attributeKey}}:</span>
-                    <span class="attribute-value" [innerHTML]="formatAttributeValue(attr)"></span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- Specifications Tab -->
       <div *ngIf="activeTab === 1" class="tab-pane">
         <h3>Технически характеристики</h3>
-        <div class="specs-grid">
-          <div class="spec-row" *ngFor="let attr of product.attributes">
-            <div class="spec-name">{{attr.attributeKey}}</div>
-            <div class="spec-value">{{attr.attributeValue || 'N/A'}}</div>
+        <div class="main-specs">
+          <div class="specs-table">
+          <div class="specs-header">
+            <div class="spec-name">Модел</div>
+            <div class="spec-value">{{product.name}}</div>
+          </div>
+          <div class="specs-body">
+            <div class="spec-row" *ngFor="let attr of product.attributes">
+              <div class="spec-name">{{attr.attributeKey}}</div>
+              <div class="spec-value">{{attr.attributeValue || '-'}}</div>
+            </div>
+          </div>
           </div>
         </div>
       </div>
