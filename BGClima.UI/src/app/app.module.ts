@@ -84,8 +84,7 @@ import { ProductDetailsComponent } from './pages/product-details/product-details
     ServizComponent,
     BannersComponent,
     BannerDialogComponent,
-    PromoBannersComponent,
-    ProductDetailsComponent
+    PromoBannersComponent
    ],
   imports: [
     BrowserModule,
@@ -116,8 +115,11 @@ import { ProductDetailsComponent } from './pages/product-details/product-details
     MatSlideToggleModule,
     MatTooltipModule,
     
-    // SharedModule (contains common Material modules)
+    // Shared Module
     SharedModule,
+    
+    // Standalone Components
+    ProductDetailsComponent
    ],
   providers: [
     AuthService,

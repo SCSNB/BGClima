@@ -87,13 +87,13 @@
           </ng-container>
           
           <!-- Wi-Fi Module -->
-          <div class="spec-item" *ngIf="getAttributeValue('Wi-Fi модул в комплекта')">
+          <div class="spec-item" *ngIf="hasWifiModule()">
             <div class="spec-icon">
               <mat-icon>wifi</mat-icon>
             </div>
             <div class="spec-details">
               <div class="spec-label">Wi-Fi модул</div>
-              <div class="spec-value">{{ getAttributeValue('Wi-Fi модул в комплекта') || '-' }}</div>
+              <div class="spec-value">Да</div>
             </div>
           </div>
         </div>
@@ -154,12 +154,12 @@
           <div class="specs-section">
             <h4>Основни характеристики</h4>
             <div class="specs-body">
-              <div class="spec-row" *ngFor="let spec of getTechnicalSpecifications()">
+              <ng-container *ngFor="let spec of getTechnicalSpecifications()">
                 <div *ngIf="spec.section === 'Основни характеристики'" class="spec-row">
-                  <div class="spec-name">{{spec.label}}:</div>
-                  <div class="spec-value">{{spec.value}}</div>
+                  <div class="spec-name" [innerHTML]="spec.label | formatLabel"></div>
+                  <div class="spec-value">{{spec.value || '-'}}</div>
                 </div>
-              </div>
+              </ng-container>
             </div>
           </div>
 
@@ -167,12 +167,12 @@
           <div class="specs-section">
             <h4>Вътрешно тяло</h4>
             <div class="specs-body">
-              <div class="spec-row" *ngFor="let spec of getTechnicalSpecifications()">
+              <ng-container *ngFor="let spec of getTechnicalSpecifications()">
                 <div *ngIf="spec.section === 'Вътрешно тяло'" class="spec-row">
-                  <div class="spec-name">{{spec.label.replace('(вътрешно тяло)', '').trim()}}:</div>
-                  <div class="spec-value">{{spec.value}}</div>
+                  <div class="spec-name" [innerHTML]="spec.label | formatLabel"></div>
+                  <div class="spec-value">{{spec.value || '-'}}</div>
                 </div>
-              </div>
+              </ng-container>
             </div>
           </div>
 
@@ -180,12 +180,12 @@
           <div class="specs-section">
             <h4>Външно тяло</h4>
             <div class="specs-body">
-              <div class="spec-row" *ngFor="let spec of getTechnicalSpecifications()">
+              <ng-container *ngFor="let spec of getTechnicalSpecifications()">
                 <div *ngIf="spec.section === 'Външно тяло'" class="spec-row">
-                  <div class="spec-name">{{spec.label.replace('(външно тяло)', '').trim()}}:</div>
-                  <div class="spec-value">{{spec.value}}</div>
+                  <div class="spec-name" [innerHTML]="spec.label | formatLabel"></div>
+                  <div class="spec-value">{{spec.value || '-'}}</div>
                 </div>
-              </div>
+              </ng-container>
             </div>
           </div>
         </div>

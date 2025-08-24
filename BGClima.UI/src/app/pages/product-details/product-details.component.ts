@@ -1,15 +1,28 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { CommonModule, ViewportScroller } from '@angular/common';
+import { ActivatedRoute, NavigationEnd, Router, RouterModule } from '@angular/router';
 import { ProductService, ProductDto } from '../../services/product.service';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { ViewportScroller } from '@angular/common';
 import { trigger, state, style, animate, transition } from '@angular/animations';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { FormatLabelPipe } from '../../shared/pipes/format-label.pipe';
 
 @Component({
   selector: 'app-product-details',
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    MatIconModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+    FormatLabelPipe
+  ],
   animations: [
     trigger('expandCollapse', [
       state('collapsed', style({ height: '0px', minHeight: '0', overflow: 'hidden' })),
@@ -34,6 +47,23 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   relatedProducts: any[] = [];
   expandedGroups = new Set<string>();
   tabs = ['Описание', 'Спецификации'];
+  
+  // Check if product has Wi-Fi module
+  hasWifiModule(): boolean {
+    if (!this.product?.attributes) return false;
+    
+    // Check for Wi-Fi module in different possible attribute names
+    const wifiAttr = this.product.attributes.find(attr => {
+      const key = attr.attributeKey?.toLowerCase() || '';
+      return key.includes('wi-fi') || key.includes('wifi') || key.includes('wireless');
+    });
+    
+    if (!wifiAttr) return false;
+    
+    // Check if the value indicates Wi-Fi is present
+    const value = String(wifiAttr.attributeValue || '').toLowerCase().trim();
+    return value === 'wifi_yes' || value === 'да' || value === 'yes' || value === 'true';
+  }
   
   // Toggle description expansion
   toggleDescription(): void {
@@ -155,11 +185,11 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       // Main Specifications
       {
         label: 'Wi-Fi модул в комплекта',
-        key: 'Wi-Fi модул в комплекта:',
+        key: 'Wi-Fi модул в комплекта',
         getValue: () => {
           // Намираме точния атрибут по ключ
           const wifiAttr = this.product?.attributes?.find(a => 
-            a.attributeKey && a.attributeKey.trim() === 'Wi-Fi модул в комплекта:'
+            a.attributeKey && a.attributeKey.trim() === 'Wi-Fi модул в комплекта'
           );
           
           // Ако намерим атрибута, връщаме неговата стойност
@@ -191,34 +221,34 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       { label: 'Консумирана мощност на отопление (Мин./Ном./Макс)', key: 'Консумирана мощност на отопление (Мин./Ном./Макс)' },
       { 
         label: 'Мощност (BTU)', 
-        key: 'Мощност (BTU):',
-        getValue: () => this.product?.btu?.value?.toString() || this.getAttributeValue('Мощност (BTU):')
+        key: 'Мощност (BTU)',
+        getValue: () => this.product?.btu?.value?.toString() || this.getAttributeValue('Мощност (BTU)')
       },
-      { label: 'EER (хладилен коефициент на охлаждане)', key: 'EER:' },
-      { label: 'SEER (сезонен коефициент на охлаждане)', key: 'SEER:' },
-      { label: 'COP (коефициент на трансф. отопление)', key: 'COP:' },
-      { label: 'SCOP (сезонен коефициент на трансф. отопление)', key: 'SCOP:' },
-      { label: 'Годишен разход на електроенергия (охлаждане / отопление)', key: 'Годишен разход на електроенергия (Охлаждане / Отопление):' },
-      { label: 'Енергиен клас на охлаждане / отопление (умерена зона)', key: 'Енергиен клас:' },
-      { label: 'Работна температура на охлаждане', key: 'Работна температура на охлаждане:' },
-      { label: 'Работна температура на отопление', key: 'Работна температура на отопление:' },
-      { label: 'Подходящ за помещения до', key: 'Подходящ за помещения до:' },
-      { label: 'Гаранция', key: 'Гаранция:' },
-      { label: 'Хладилен агент', key: 'Хладилен агент:' },
-      { label: 'Захранване (Фаза/Честота/Напрежение)', key: 'Захранване (Фаза/Честота/Напрежение):' },
+      { label: 'EER (хладилен коефициент на охлаждане)', key: 'EER (хладилен коефициент на охлаждане)' },
+      { label: 'SEER (сезонен коефициент на охлаждане)', key: 'SEER (сезонен коефициент на охлаждане)' },
+      { label: 'COP (коефициент на трансф. отопление)', key: 'COP (коефициент на трансф. отопление)' },
+      { label: 'SCOP (сезонен коефициент на трансф. отопление)', key: 'SCOP (сезонен коефициент на трансф. отопление)' },
+      { label: 'Годишен разход на електроенергия (охлаждане / отопление)', key: 'Годишен разход на електроенергия (Охлаждане / Отопление)' },
+      { label: 'Енергиен клас на охлаждане / отопление (умерена зона)', key: 'Енергиен клас на охлаждане / отопление (умерена зона)' },
+      { label: 'Работна температура на охлаждане', key: 'Работна температура на охлаждане' },
+      { label: 'Работна температура на отопление', key: 'Работна температура на отопление' },
+      { label: 'Подходящ за помещения до', key: 'Подходящ за помещения до' },
+      { label: 'Гаранция', key: 'Гаранция' },
+      { label: 'Хладилен агент', key: 'Хладилен агент' },
+      { label: 'Захранване (Фаза/Честота/Напрежение)', key: 'Захранване (Фаза/Честота/Напрежение)' },
       
       // Indoor Unit
-      { label: 'Размери (вътрешно тяло)', key: 'Размери (вътрешно тяло):' },
-      { label: 'Тегло (вътрешно тяло)', key: 'Тегло (вътрешно тяло):' },
-      { label: 'Ниво на шум на охлаждане (вътрешно)', key: 'Ниво на шум на охлаждане (вътрешно):' },
-      { label: 'Ниво на шум на отопление (вътрешно)', key: 'Ниво на шум на отопление (вътрешно):' },
+      { label: 'Размери (вътрешно тяло)', key: 'Размери вътрешно тяло' },
+      { label: 'Тегло (вътрешно тяло)', key: 'Тегло вътрешно тяло' },
+      { label: 'Ниво на шум при охлаждане (вътрешно тяло) (Високо/Ном./Ниско/Безшумно)', key: 'Ниво на шум при охлаждане вътрешно тяло (Високо/Ном./Ниско/Безшумно)' },
+      { label: 'Ниво на шум при отопление (вътрешно тяло) (Високо/Ном./Ниско/Безшумно)', key: 'Ниво на шум при отопление вътрешно тяло (Високо/Ном./Ниско/Безшумно)' },
       
       // Outdoor Unit
-      { label: 'Размери (външно тяло)', key: 'Размери (външно тяло):' },
-      { label: 'Тегло (външно тяло)', key: 'Тегло (външно тяло):' },
-      { label: 'Тръбни връзки - течна / газообразна фаза', key: 'Тръбни връзки - течна / газообразна фаза:' },
-      { label: 'Ниво на шум на охлаждане (външно)', key: 'Ниво на шум на охлаждане (външно):' },
-      { label: 'Ниво на шум на отопление (външно)', key: 'Ниво на шум на отопление (външно):' }
+      { label: 'Размери (външно тяло)', key: 'Размери външно тяло' },
+      { label: 'Тегло (външно тяло)', key: 'Тегло външно тяло' },
+      { label: 'Тръбни връзки - течна / газообразна фаза', key: 'Тръбни връзки - течна / газообразна фаза' },
+      { label: 'Ниво на шум при охлаждане (външно тяло) (Високо/Ном./Ниско/Безшумно)', key: 'Ниво на шум при охлаждане външно тяло (Високо/Ном./Ниско/Безшумно)' },
+      { label: 'Ниво на шум при отопление (външно тяло) (Високо/Ном./Ниско/Безшумно)', key: 'Ниво на шум при отопление външно тяло (Високо/Ном./Ниско/Безшумно)' }
     ];
 
     // Map through the specs and get the values
