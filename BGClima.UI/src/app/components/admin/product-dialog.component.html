@@ -98,7 +98,10 @@
         <div class="attribute-item" *ngFor="let attr of attributes; let i = index">
           <span class="attribute-key">{{ attr.attributeKey }}:</span>
           <span class="attribute-value">{{ attr.attributeValue }}</span>
-          <button mat-icon-button color="warn" (click)="removeAttribute(i)">
+          <button mat-icon-button color="primary" (click)="editAttribute(i)" matTooltip="Редактирай">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="removeAttribute(i)" matTooltip="Изтрий">
             <mat-icon>delete</mat-icon>
           </button>
         </div>

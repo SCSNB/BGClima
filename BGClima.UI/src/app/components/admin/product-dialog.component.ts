@@ -126,6 +126,7 @@ export class ProductDialogComponent implements OnInit {
   btu: BTUDto[] = [];
   energyClasses: EnergyClassDto[] = [];
   attributes: CreateProductAttributeDto[] = [];
+  editingAttributeIndex: number | null = null;
   title = '';
   images: { url: string, isPrimary: boolean }[] = [];
   newImageUrl: string = '';
@@ -227,11 +228,31 @@ export class ProductDialogComponent implements OnInit {
     this.dialogRef.close({ action: this.data.mode, dto: productData });
   }
 
+  editAttribute(index: number): void {
+    const attribute = this.attributes[index];
+    this.editingAttributeIndex = index;
+    this.form.patchValue({
+      attributeKey: attribute.attributeKey,
+      attributeValue: attribute.attributeValue
+    });
+  }
+
   addAttribute(): void {
-    const key = this.form.get('attributeKey')?.value;
-    const value = this.form.get('attributeValue')?.value;
+    const key = this.form.get('attributeKey')?.value?.trim();
+    const value = this.form.get('attributeValue')?.value?.trim();
     
-    if (key && value) {
+    if (!key || !value) return;
+
+    if (this.editingAttributeIndex !== null) {
+      // Update existing attribute
+      this.attributes[this.editingAttributeIndex] = {
+        ...this.attributes[this.editingAttributeIndex],
+        attributeKey: key,
+        attributeValue: value
+      };
+      this.editingAttributeIndex = null;
+    } else {
+      // Add new attribute
       this.attributes.push({
         attributeKey: key,
         attributeValue: value,
@@ -239,12 +260,24 @@ export class ProductDialogComponent implements OnInit {
         displayOrder: this.attributes.length,
         isVisible: true
       });
-      this.form.get('attributeKey')?.setValue('');
-      this.form.get('attributeValue')?.setValue('');
     }
+    
+    this.form.patchValue({
+      attributeKey: '',
+      attributeValue: ''
+    });
   }
 
   removeAttribute(index: number): void {
+    if (this.editingAttributeIndex === index) {
+      this.editingAttributeIndex = null;
+      this.form.patchValue({
+        attributeKey: '',
+        attributeValue: ''
+      });
+    } else if (this.editingAttributeIndex !== null && this.editingAttributeIndex > index) {
+      this.editingAttributeIndex--;
+    }
     this.attributes.splice(index, 1);
   }
 
