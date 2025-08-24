@@ -73,6 +73,26 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Extract maximum value from a string in format "Min/Nom/Max"
+  private getMaxValue(valueString: string | undefined | null): string {
+    if (!valueString) return '0';
+    
+    try {
+      // Match numbers in the format "Min/Nom/Max" or "Min - Nom - Max"
+      const matches = valueString.match(/(\d+[\.,]?\d*)/g);
+      if (matches && matches.length >= 3) {
+        // Convert to numbers, handle both comma and dot as decimal separator
+        const values = matches.map(v => parseFloat(v.replace(',', '.')));
+        const max = Math.max(...values);
+        // Format the number with comma as decimal separator
+        return max.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+      }
+    } catch (e) {
+      console.error('Error parsing value:', valueString, e);
+    }
+    return valueString; // Return original if parsing fails
+  }
+
   // Get product specifications in the same format as the offers component
   getProductSpecs() {
     if (!this.product) return [];
@@ -84,7 +104,8 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       return (found?.attributeValue || '').toString();
     };
 
-    return [
+    // Get the 4 main specifications
+    const specs = [
       { 
         label: 'Мощност', 
         value: this.product.btu?.value?.toString() || getAttr('Мощност') || '0', 
@@ -97,15 +118,23 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       },
       { 
         label: 'Охлаждане', 
-        value: this.product.coolingCapacity || getAttr('Охлаждане') || '0', 
+        value: this.getMaxValue(getAttr('Отдавана мощност на охлаждане (Мин./Ном./Макс):')) || 
+               this.product.coolingCapacity || 
+               getAttr('Охлаждане') || 
+               '0', 
         icon: 'ac_unit' 
       },
       { 
         label: 'Отопление', 
-        value: this.product.heatingCapacity || getAttr('Отопление') || '0', 
+        value: this.getMaxValue(getAttr('Отдавана мощност на отопление (Мин./Ном./Макс):')) || 
+               this.product.heatingCapacity || 
+               getAttr('Отопление') || 
+               '0', 
         icon: 'wb_sunny' 
       }
     ];
+
+    return specs;
   }
 
   // Get technical specifications with mapped attributes

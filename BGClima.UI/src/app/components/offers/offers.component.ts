@@ -65,12 +65,47 @@ export class OffersComponent implements OnInit {
         return '';
       }
       
+      // Handle cooling and heating values with Min/Nom/Max format
+      if (normalizedKey === 'охлаждане' || normalizedKey === 'отопление') {
+        const attrKey = normalizedKey === 'охлаждане' 
+          ? 'Отдавана мощност на охлаждане (Мин./Ном./Макс):' 
+          : 'Отдавана мощност на отопление (Мин./Ном./Макс):';
+        
+        // Try to find the attribute with the full key first
+        const found = (p.attributes || []).find(a => 
+          (a.attributeKey || '').trim() === attrKey
+        );
+        
+        if (found?.attributeValue) {
+          const value = found.attributeValue.toString();
+          // Try to extract max value from Min/Nom/Max format
+          const matches = value.match(/(\d+[\.,]?\d*)/g);
+          if (matches && matches.length >= 3) {
+            const values = matches.map(v => parseFloat(v.replace(',', '.')));
+            const max = Math.max(...values);
+            // Format with comma as decimal separator and remove trailing .0 if any
+            return max.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+          }
+          return value; // Return original if parsing fails
+        }
+      }
+      
       // Default attribute lookup for other keys
       const found = (p.attributes || []).find(a => (a.attributeKey || '').trim().toLowerCase() === normalizedKey);
       return (found?.attributeValue || '').toString();
     };
 
-    const hasWifi = (p.attributes || []).some(a => (a.attributeKey + ' ' + a.attributeValue).toLowerCase().includes('wifi'));
+    // Check for Wi-Fi module with flexible matching
+    const hasWifi = (p.attributes || []).some(a => {
+      const key = (a.attributeKey || '').toLowerCase();
+      const value = (a.attributeValue || '').toString().toLowerCase().trim();
+      
+      // Check if this is a Wi-Fi module attribute and the value is 'да' (case insensitive)
+      return (key.includes('wi-fi') || key.includes('wifi') || key.includes('wi fi')) && 
+             key.includes('модул') && 
+             (value === 'да' || value === 'da' || value === 'yes' || value === 'true');
+    });
+    
     const badges: { text: string; bg: string; color: string }[] = [];
     if (p.isNew) badges.push({ text: 'НОВО', bg: '#F54387', color: '#fff' });
     if (p.isOnSale) badges.push({ text: 'ПРОМО', bg: '#E6003E', color: '#fff' });

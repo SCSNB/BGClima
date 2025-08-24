@@ -73,18 +73,27 @@
       <!-- Product Specifications Icons -->
       <div class="specs-container">
         <div class="product-specs">
-          <div *ngFor="let spec of getProductSpecs()" class="spec-item" [class.no-border]="!spec.value">
-            <div class="spec-icon" [ngClass]="spec.icon">
-              <mat-icon>{{spec.icon}}</mat-icon>
+          <!-- Main 4 Icons -->
+          <ng-container *ngFor="let spec of getProductSpecs()">
+            <div class="spec-item" [class.no-border]="!spec.value">
+              <div class="spec-icon" [ngClass]="spec.icon">
+                <mat-icon>{{spec.icon}}</mat-icon>
+              </div>
+              <div class="spec-details">
+                <div class="spec-label">{{spec.label}}</div>
+                <div class="spec-value">{{spec.value || '-'}}</div>
+              </div>
+            </div>
+          </ng-container>
+          
+          <!-- Wi-Fi Module -->
+          <div class="spec-item" *ngIf="getAttributeValue('Wi-Fi модул в комплекта')">
+            <div class="spec-icon">
+              <mat-icon>wifi</mat-icon>
             </div>
             <div class="spec-details">
-              <div class="spec-label">{{spec.label}}</div>
-              <div class="spec-value" *ngIf="!spec.icon && spec.label !== 'Wi-Fi модул в комплекта'">
-              {{spec.value || '-'}}
-            </div>
-            <div class="spec-value" *ngIf="spec.label === 'Wi-Fi модул в комплекта'">
-              {{ spec.value || '-' }}
-            </div>
+              <div class="spec-label">Wi-Fi модул</div>
+              <div class="spec-value">{{ getAttributeValue('Wi-Fi модул в комплекта') || '-' }}</div>
             </div>
           </div>
         </div>
