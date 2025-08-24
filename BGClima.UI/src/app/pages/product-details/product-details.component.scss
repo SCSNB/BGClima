@@ -485,13 +485,103 @@
     }
   }
   
-    // Main Specifications
+  // Wi-Fi Value
+  .wifi-value {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 24px; // Match the height of text lines
+    
+    .wifi-check {
+      color: #4CAF50 !important; // Force green color with important
+      font-size: 18px !important;
+      height: 18px !important;
+      width: 18px !important;
+      line-height: 1 !important;
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      margin-left: 4px;
+      
+      // Ensure the icon is visible
+      ::ng-deep svg {
+        fill: #4CAF50 !important;
+      }
+    }
+    
+    .wifi-text {
+      line-height: 1.5;
+      margin-right: 4px;
+      display: inline-flex;
+      align-items: center;
+    }
+  }
+
+  // Product Specifications
   .main-specs {
     margin: 1.5rem 0;
     background: #fff;
     border: 1px solid #e0e0e0;
     border-radius: 4px;
     overflow: hidden;
+    
+    .specs-section {
+      border-bottom: 1px solid #e0e0e0;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      h4 {
+        background-color: #f8f9fa;
+        margin: 0;
+        padding: 12px 20px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 1px solid #e0e0e0;
+      }
+      
+      .specs-body {
+        padding: 0 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 15px;
+        
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+        }
+      }
+      
+      .spec-row {
+        display: flex;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+        
+        &:last-child {
+          border-bottom: none;
+        }
+        
+        .spec-name {
+          flex: 0 0 60%;
+          padding-right: 15px;
+          font-weight: 500;
+          color: #555;
+          
+          @media (max-width: 768px) {
+            flex: 1;
+            padding-right: 10px;
+          }
+        }
+        
+        .spec-value {
+          flex: 1;
+          color: #222;
+          font-weight: 400;
+          word-break: break-word;
+        }
+      }
+    }
 
     h3 {
       font-size: 1.1rem;

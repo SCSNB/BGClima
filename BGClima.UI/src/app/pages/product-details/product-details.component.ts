@@ -108,6 +108,124 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     ];
   }
 
+  // Get technical specifications with mapped attributes
+  getTechnicalSpecifications() {
+    if (!this.product) {
+      console.log('Няма зареден продукт');
+      return [];
+    }
+    
+    console.log('Всички атрибути на продукта:', this.product.attributes);
+    
+    // Debug Wi-Fi module value
+    const wifiAttr = this.product.attributes?.find(a => a.attributeKey && a.attributeKey.toLowerCase().includes('wi-fi'));
+    console.log('Wi-Fi атрибут:', wifiAttr);
+    
+    // Използваме точните ключове от данните
+    const specs = [
+      // Main Specifications
+      {
+        label: 'Wi-Fi модул в комплекта',
+        key: 'Wi-Fi модул в комплекта:',
+        getValue: () => {
+          // Намираме точния атрибут по ключ
+          const wifiAttr = this.product?.attributes?.find(a => 
+            a.attributeKey && a.attributeKey.trim() === 'Wi-Fi модул в комплекта:'
+          );
+          
+          // Ако намерим атрибута, връщаме неговата стойност
+          if (wifiAttr) {
+            console.log('Намерен Wi-Fi атрибут:', wifiAttr);
+            return wifiAttr.attributeValue?.toString() || null;
+          }
+          
+          // Ако не намерим по точен ключ, опитваме с по-обхватен търсене
+          const anyWifiAttr = this.product?.attributes?.find(a => 
+            a.attributeKey && (
+              a.attributeKey.toLowerCase().includes('wi-fi') ||
+              a.attributeKey.includes('WiFi') ||
+              a.attributeKey.includes('WLAN')
+            )
+          );
+          
+          if (anyWifiAttr) {
+            console.log('Намерен Wi-Fi атрибут чрез обхватно търсене:', anyWifiAttr);
+            return anyWifiAttr.attributeValue?.toString() || null;
+          }
+          
+          return null;
+        }
+      },
+      { label: 'Отдавана мощност на охлаждане (Мин./Ном./Макс)', key: 'Отдавана мощност на охлаждане (Мин./Ном./Макс):' },
+      { label: 'Отдавана мощност на отопление (Мин./Ном./Макс)', key: 'Отдавана мощност на отопление (Мин./Ном./Макс):' },
+      { label: 'Консумирана мощност на охлаждане (Мин./Ном./Макс)', key: 'Консумирана мощност на охлаждане (Мин./Ном./Макс):' },
+      { label: 'Консумирана мощност на отопление (Мин./Ном./Макс)', key: 'Консумирана мощност на отопление (Мин./Ном./Макс):' },
+      { 
+        label: 'Мощност (BTU)', 
+        key: 'Мощност (BTU):',
+        getValue: () => this.product?.btu?.value?.toString() || this.getAttributeValue('Мощност (BTU):')
+      },
+      { label: 'EER (хладилен коефициент на охлаждане)', key: 'EER:' },
+      { label: 'SEER (сезонен коефициент на охлаждане)', key: 'SEER:' },
+      { label: 'COP (коефициент на трансф. отопление)', key: 'COP:' },
+      { label: 'SCOP (сезонен коефициент на трансф. отопление)', key: 'SCOP:' },
+      { label: 'Годишен разход на електроенергия (охлаждане / отопление)', key: 'Годишен разход на електроенергия (Охлаждане / Отопление):' },
+      { label: 'Енергиен клас на охлаждане / отопление (умерена зона)', key: 'Енергиен клас:' },
+      { label: 'Работна температура на охлаждане', key: 'Работна температура на охлаждане:' },
+      { label: 'Работна температура на отопление', key: 'Работна температура на отопление:' },
+      { label: 'Подходящ за помещения до', key: 'Подходящ за помещения до:' },
+      { label: 'Гаранция', key: 'Гаранция:' },
+      { label: 'Хладилен агент', key: 'Хладилен агент:' },
+      { label: 'Захранване (Фаза/Честота/Напрежение)', key: 'Захранване (Фаза/Честота/Напрежение):' },
+      
+      // Indoor Unit
+      { label: 'Размери (вътрешно тяло)', key: 'Размери (вътрешно тяло):' },
+      { label: 'Тегло (вътрешно тяло)', key: 'Тегло (вътрешно тяло):' },
+      { label: 'Ниво на шум на охлаждане (вътрешно)', key: 'Ниво на шум на охлаждане (вътрешно):' },
+      { label: 'Ниво на шум на отопление (вътрешно)', key: 'Ниво на шум на отопление (вътрешно):' },
+      
+      // Outdoor Unit
+      { label: 'Размери (външно тяло)', key: 'Размери (външно тяло):' },
+      { label: 'Тегло (външно тяло)', key: 'Тегло (външно тяло):' },
+      { label: 'Тръбни връзки - течна / газообразна фаза', key: 'Тръбни връзки - течна / газообразна фаза:' },
+      { label: 'Ниво на шум на охлаждане (външно)', key: 'Ниво на шум на охлаждане (външно):' },
+      { label: 'Ниво на шум на отопление (външно)', key: 'Ниво на шум на отопление (външно):' }
+    ];
+
+    // Map through the specs and get the values
+    return specs.map(spec => {
+      console.log(`\nТърся атрибут с ключ: "${spec.key}" или етикет: "${spec.label}"`);
+      
+      // Use custom getter if available, otherwise get by key or label
+      let value = spec.getValue ? spec.getValue() : this.getAttributeValue(spec.key);
+      
+      // If not found, try to get it using the label (only if no custom getter)
+      if ((!value || value === '-') && !spec.getValue) {
+        console.log(`Не е намерен по ключ, опитвам с етикет: "${spec.label}"`);
+        value = this.getAttributeValue(spec.label) || '-';
+      } else if (value) {
+        console.log(`Намерена стойност: ${value}`);
+      }
+      
+      return {
+        label: spec.label,
+        value: value,
+        section: this.getSpecSection(spec.label)
+      };
+    });
+  }
+
+  private getSpecSection(label: string): string {
+    if (label.includes('(външно') || label.includes('Тръбни връзки') || 
+        label.includes('външно)')) {
+      return 'Външно тяло';
+    }
+    if (label.includes('(вътрешно') || label.includes('вътрешно)')) {
+      return 'Вътрешно тяло';
+    }
+    return 'Основни характеристики';
+  }
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -220,6 +338,9 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       if (product?.id) {
         this.loadRelatedProducts(product.id);
       }
+      
+      // Debug Wi-Fi attribute
+      this.logWifiAttribute();
       
       this.loading = false;
       setTimeout(() => this.scrollToTop(), 100);
@@ -377,6 +498,26 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Debug function to log Wi-Fi attribute
+  private logWifiAttribute() {
+    if (!this.product?.attributes) return;
+    
+    const wifiAttr = this.product.attributes.find(a => 
+      a.attributeKey && (
+        a.attributeKey.toLowerCase().includes('wi-fi') ||
+        a.attributeKey.includes('Wi-Fi модул')
+      )
+    );
+    
+    console.log('Wi-Fi атрибут (debug):', {
+      allAttributes: this.product.attributes,
+      foundWifiAttr: wifiAttr,
+      value: wifiAttr?.attributeValue,
+      valueType: typeof wifiAttr?.attributeValue,
+      stringValue: String(wifiAttr?.attributeValue)
+    });
+  }
+
   // Връща всички атрибути с ключ "АКЦЕНТИ"
   getAccentAttributes(): any[] {
     if (!this.product?.attributes?.length) return [];
@@ -394,15 +535,71 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     return accentAttributes;
   }
   
+  // Проверява дали Wi-Fi модулът е активиран
+  isWifiEnabled(value: any): boolean {
+    if (!value) return false;
+    const strValue = String(value).toLowerCase().trim();
+    return strValue === 'wifi_yes' || strValue === 'да' || value === 'WIFI_YES';
+  }
+
   // Връща стойност на атрибут по ключ
   getAttributeValue(key: string): string | null {
-    if (!this.product?.attributes) return null;
+    if (!this.product?.attributes) {
+      return null;
+    }
     
-    const attribute = this.product.attributes.find(attr => 
-      attr.attributeKey?.toLowerCase() === key.toLowerCase()
+    const isWifiKey = key.toLowerCase().includes('wi-fi') || key.includes('Wi-Fi модул');
+    
+    if (isWifiKey) {
+      console.log('Търся Wi-Fi атрибут с ключ:', key);
+      console.log('Налични атрибути:', this.product.attributes);
+      
+      // Специален случай за Wi-Fi модула
+      // Първо търсим по точен ключ
+      const exactMatch = this.product.attributes.find(a => 
+        a.attributeKey && a.attributeKey.trim() === key.trim()
+      );
+      
+      if (exactMatch) {
+        console.log('Намерен Wi-Fi атрибут по точен ключ:', exactMatch);
+        const value = exactMatch.attributeValue?.toString().trim();
+        return value?.toLowerCase() === 'да' ? 'WIFI_YES' : value;
+      }
+      
+      // Ако няма точно съвпадение, търсим по по-гъвкав начин
+      const wifiAttr = this.product.attributes.find(a => 
+        a.attributeKey && (
+          a.attributeKey.toLowerCase().includes('wi-fi') ||
+          a.attributeKey.includes('Wi-Fi модул') ||
+          a.attributeKey.includes('WiFi') ||
+          a.attributeKey.includes('WLAN')
+        )
+      );
+      
+      if (wifiAttr) {
+        console.log('Намерен Wi-Fi атрибут по гъвкаво търсене:', wifiAttr);
+        return wifiAttr.attributeValue?.toString() || null;
+      }
+      
+      return null;
+    }
+    
+    // За всички останали атрибути - стандартна логика
+    const attr = this.product.attributes.find(a => 
+      a.attributeKey && a.attributeKey.trim() === key.trim()
     );
     
-    return attribute?.attributeValue || null;
+    if (attr) {
+      return attr.attributeValue?.toString() || null;
+    }
+    
+    // Ако не намерим по пълен ключ, опитваме да намерим частично съвпадение
+    const trimmedKey = key.trim();
+    const partialMatch = this.product.attributes.find(a => 
+      a.attributeKey && a.attributeKey.trim().includes(trimmedKey)
+    );
+    
+    return partialMatch?.attributeValue?.toString() || null;
   }
   
   // Връща групите от атрибути
