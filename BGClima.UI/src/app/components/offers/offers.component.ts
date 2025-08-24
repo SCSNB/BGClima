@@ -68,8 +68,8 @@ export class OffersComponent implements OnInit {
       // Handle cooling and heating values with Min/Nom/Max format
       if (normalizedKey === 'охлаждане' || normalizedKey === 'отопление') {
         const attrKey = normalizedKey === 'охлаждане' 
-          ? 'Отдавана мощност на охлаждане (Мин./Ном./Макс):' 
-          : 'Отдавана мощност на отопление (Мин./Ном./Макс):';
+          ? 'Отдавана мощност на охлаждане (Мин./Ном./Макс)' 
+          : 'Отдавана мощност на отопление (Мин./Ном./Макс)';
         
         // Try to find the attribute with the full key first
         const found = (p.attributes || []).find(a => 
