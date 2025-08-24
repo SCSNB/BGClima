@@ -37,8 +37,37 @@ export class OffersComponent implements OnInit {
     const oldEur = oldBgn != null ? this.toEur(oldBgn) : null;
 
     const getAttr = (key: string): string => {
-      const found = (p.attributes || []).find(a => (a.attributeKey || '').trim().toLowerCase() === key.toLowerCase());
-      return (found?.attributeValue ?? '0').toString();
+      const normalizedKey = key.trim().toLowerCase();
+      
+      // Special handling for BTU to check btu.value first
+      if (normalizedKey === 'btu') {
+        // First check if we have btu value directly on the product
+        if (p.btu?.value) {
+          // Convert to number, divide by 1000 and remove decimal part if it's .0
+          const numValue = Number(p.btu.value) / 1000;
+          return Number.isInteger(numValue) ? numValue.toString() : numValue.toFixed(1);
+        }
+        
+        // Fallback to attributes if btu is not set directly
+        const btuAttr = (p.attributes || []).find(a => {
+          const attrKey = (a.attributeKey || '').trim().toLowerCase();
+          return attrKey === 'btu' || attrKey === 'btu/h' || attrKey === 'btu\/h' || attrKey.includes('btu');
+        });
+        
+        if (btuAttr?.attributeValue) {
+          // Try to parse the attribute value as number and divide by 1000
+          const numValue = parseFloat(btuAttr.attributeValue.toString()) / 1000;
+          if (!isNaN(numValue)) {
+            return Number.isInteger(numValue) ? numValue.toString() : numValue.toFixed(1);
+          }
+          return btuAttr.attributeValue.toString();
+        }
+        return '';
+      }
+      
+      // Default attribute lookup for other keys
+      const found = (p.attributes || []).find(a => (a.attributeKey || '').trim().toLowerCase() === normalizedKey);
+      return (found?.attributeValue || '').toString();
     };
 
     const hasWifi = (p.attributes || []).some(a => (a.attributeKey + ' ' + a.attributeValue).toLowerCase().includes('wifi'));
@@ -58,7 +87,7 @@ export class OffersComponent implements OnInit {
       brandText: p.brand?.name || '',
       badges,
       specs: [
-        { label: 'Мощност', value: getAttr('Мощност'), icon: 'bolt' },
+        { label: 'Мощност', value: getAttr('BTU'), icon: 'bolt' },
         { label: 'Клас', value: p.energyClass?.class || getAttr('Клас') || 'A+', icon: 'eco' },
         { label: 'Охлаждане', value: getAttr('Охлаждане'), icon: 'ac_unit' },
         { label: 'Отопление', value: getAttr('Отопление'), icon: 'wb_sunny' }
