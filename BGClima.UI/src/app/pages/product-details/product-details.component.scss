@@ -398,6 +398,7 @@
 
   // Product Description
   .product-description {
+    white-space: pre-wrap; // Preserve text formatting
     // Remove height restrictions and overflow
     overflow: visible;
     position: relative;
