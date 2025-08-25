@@ -19,6 +19,7 @@ namespace BGClima.Infrastructure.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductAttribute> ProductAttributes { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
+        public DbSet<ProductDescriptionImage> ProductDescriptionImages { get; set; }
         public DbSet<Banner> Banners { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

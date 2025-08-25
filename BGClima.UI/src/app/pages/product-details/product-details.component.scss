@@ -741,34 +741,6 @@
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 1rem;
       margin-bottom: 1.5rem;
-      
-      .attribute-item {
-        display: flex;
-        padding: 0.75rem 0;
-        border-bottom: 1px dashed #eee;
-        
-        .attribute-label {
-          font-weight: 600;
-          color: #555;
-          min-width: 180px;
-          padding-right: 1rem;
-        }
-        
-        .attribute-value {
-          flex: 1;
-          color: #2c3e50;
-          word-break: break-word;
-          
-          ::ng-deep a {
-            color: #3f51b5;
-            text-decoration: none;
-            
-            &:hover {
-              text-decoration: underline;
-            }
-          }
-        }
-      }
     }
     
     .attribute-groups {
@@ -891,6 +863,22 @@
             font-size: 20px;
             margin-bottom: 15px;
             color: #222;
+          }
+
+          .description-images-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+
+            .description-image-item {
+              img {
+                width: 100%;
+                height: auto;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+              }
+            }
           }
   
           p {

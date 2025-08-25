@@ -34,6 +34,13 @@ export interface ProductAttributeDto {
   productId: number;
 }
 
+export interface ProductDescriptionImageDto {
+  id: number;
+  imageUrl: string;
+  altText: string;
+  displayOrder: number;
+}
+
 export interface ProductDto {
   id: number;
   name: string;
@@ -55,6 +62,7 @@ export interface ProductDto {
   attributes?: ProductAttributeDto[];
   productType?: ProductTypeDto;
   images?: any[]; // TODO: Define proper type for images
+  descriptionImages?: ProductDescriptionImageDto[];
   
   // Backward compatibility
   brandId?: number;
@@ -69,6 +77,12 @@ export interface CreateProductAttributeDto {
   groupName?: string;
   displayOrder?: number;
   isVisible?: boolean;
+}
+
+export interface CreateProductDescriptionImageDto {
+  imageUrl: string;
+  altText?: string;
+  displayOrder?: number;
 }
 
 export interface CreateProductDto {
@@ -88,6 +102,7 @@ export interface CreateProductDto {
   isNew?: boolean;
   sku?: string;
   imageUrl?: string;
+  descriptionImages?: CreateProductDescriptionImageDto[];
 }
 
 @Injectable({ providedIn: 'root' })

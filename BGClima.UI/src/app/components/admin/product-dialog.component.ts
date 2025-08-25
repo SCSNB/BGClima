@@ -130,6 +130,8 @@ export class ProductDialogComponent implements OnInit {
   title = '';
   images: { url: string, isPrimary: boolean }[] = [];
   newImageUrl: string = '';
+  descriptionImages: { id?: number, imageUrl: string }[] = [];
+  newDescriptionImageUrl: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -191,6 +193,14 @@ export class ProductDialogComponent implements OnInit {
           isPrimary: true
         }];
       }
+
+      // Load existing description images
+      if (this.data.product.descriptionImages && this.data.product.descriptionImages.length > 0) {
+        this.descriptionImages = this.data.product.descriptionImages.map(img => ({
+          id: img.id,
+          imageUrl: img.imageUrl
+        }));
+      }
     } else {
       this.title = 'Добавяне на нов продукт';
     }
@@ -221,6 +231,12 @@ export class ProductDialogComponent implements OnInit {
         altText: `Снимка на ${this.form.get('name')?.value || 'продукт'}`,
         displayOrder: index,
         isPrimary: img.isPrimary
+      })),
+      descriptionImages: this.descriptionImages.map((img, index) => ({
+        id: img.id || 0,
+        imageUrl: img.imageUrl,
+        altText: `Снимка към описание на ${this.form.get('name')?.value || 'продукт'}`,
+        displayOrder: index
       }))
     };
 
@@ -307,6 +323,20 @@ export class ProductDialogComponent implements OnInit {
     this.images.forEach(img => img.isPrimary = false);
     // Set the selected image as primary
     this.images[index].isPrimary = true;
+  }
+
+  // Description Image management methods
+  addDescriptionImage(): void {
+    if (this.newDescriptionImageUrl && !this.descriptionImages.some(img => img.imageUrl === this.newDescriptionImageUrl)) {
+      this.descriptionImages.push({
+        imageUrl: this.newDescriptionImageUrl
+      });
+      this.newDescriptionImageUrl = '';
+    }
+  }
+
+  removeDescriptionImage(index: number): void {
+    this.descriptionImages.splice(index, 1);
   }
 
   cancel(): void {
