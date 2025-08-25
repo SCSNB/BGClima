@@ -25,9 +25,6 @@ namespace BGClima.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Задаване на схема по подразбиране
-            modelBuilder.HasDefaultSchema("bgclima");
-
             // Конфигурация на Brand
             modelBuilder.Entity<Brand>(entity =>
             {

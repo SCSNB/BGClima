@@ -134,11 +134,24 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       return (found?.attributeValue || '').toString();
     };
 
+    // Helper function to format BTU value - shows only whole numbers
+    const formatBtuValue = (btuValue: string | undefined): string => {
+      if (!btuValue) return '0';
+      
+      // Extract numeric value from string (e.g., '9000 BTU' -> '9000')
+      const btuMatch = btuValue.toString().match(/(\d+(\.\d+)?)/);
+      if (!btuMatch) return btuValue;
+      
+      const btuNum = parseFloat(btuMatch[0]);
+      // Always show as whole number (e.g., 9000 -> 9, 12000 -> 12)
+      return Math.round(btuNum / 1000).toString();
+    };
+
     // Get the 4 main specifications
     const specs = [
       { 
         label: 'Мощност', 
-        value: this.product.btu?.value?.toString() || getAttr('Мощност') || '0', 
+        value: this.product.btu?.value ? formatBtuValue(this.product.btu.value) : formatBtuValue(getAttr('Мощност')), 
         icon: 'bolt' 
       },
       { 

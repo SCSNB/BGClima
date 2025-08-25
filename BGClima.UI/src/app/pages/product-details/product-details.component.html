@@ -136,13 +136,8 @@
       <!-- Description Tab -->
       <div *ngIf="activeTab === 0" class="tab-pane">
         <h3>Описание на продукта</h3>
-        <div class="product-description" [class.expanded]="isDescriptionExpanded">
+        <div class="product-description">
           <div [innerHTML]="product.description"></div>
-          <button *ngIf="shouldShowReadMore(product.description)" 
-                  class="read-more-btn" 
-                  (click)="toggleDescription()">
-            {{ isDescriptionExpanded ? 'По-малко' : 'Прочети още' }}
-          </button>
         </div>
       </div>
 

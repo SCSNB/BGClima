@@ -23,6 +23,62 @@ namespace BGClima.API.Data
                 await context.Database.MigrateAsync();
             }
 
+            // Seed Banners
+            if (!await context.Banners.AnyAsync())
+            {
+                var banners = new List<Banner>
+                {
+                    new Banner 
+                    { 
+                        Name = "Daikin FTXB-E/RXB-E Намаление", 
+                        ImageUrl = "https://bgclima.com/cms/slides2/daikin-promo.jpg", 
+                        TargetUrl = "/products/daikin-ftxbe-rxbe",
+                        DisplayOrder = 1,
+                        IsActive = true,
+                        Type = BannerType.HeroSlider
+                    },
+                    new Banner 
+                    { 
+                        Name = "Безплатна доставка и монтаж", 
+                        ImageUrl = "https://bgclima.com/cms/slides2/free-installation.jpg", 
+                        TargetUrl = "/promotions/free-installation",
+                        DisplayOrder = 2,
+                        IsActive = true,
+                        Type = BannerType.TopRight
+                    },
+                    new Banner 
+                    { 
+                        Name = "Daikin - Инверторна технология", 
+                        ImageUrl = "https://bgclima.com/cms/slides2/daikin-technology.jpg", 
+                        TargetUrl = "/brands/daikin",
+                        DisplayOrder = 3,
+                        IsActive = true,
+                        Type = BannerType.HeroSlider
+                    },
+                    new Banner 
+                    { 
+                        Name = "Гаранция до 5 години", 
+                        ImageUrl = "https://bgclima.com/cms/slides2/warranty.jpg", 
+                        TargetUrl = "/warranty",
+                        DisplayOrder = 4,
+                        IsActive = true,
+                        Type = BannerType.MiddleRight
+                    },
+                    new Banner 
+                    { 
+                        Name = "Специални оферти", 
+                        ImageUrl = "https://bgclima.com/cms/slides2/special-offers.jpg", 
+                        TargetUrl = "/special-offers",
+                        DisplayOrder = 5,
+                        IsActive = true,
+                        Type = BannerType.BottomRight
+                    }
+                };
+
+                await context.Banners.AddRangeAsync(banners);
+                await context.SaveChangesAsync();
+            }
+
             // Seed Brands
             if (!await context.Brands.AnyAsync())
             {

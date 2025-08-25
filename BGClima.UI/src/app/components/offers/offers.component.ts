@@ -43,9 +43,14 @@ export class OffersComponent implements OnInit {
       if (normalizedKey === 'btu') {
         // First check if we have btu value directly on the product
         if (p.btu?.value) {
-          // Convert to number, divide by 1000 and remove decimal part if it's .0
-          const numValue = Number(p.btu.value) / 1000;
-          return Number.isInteger(numValue) ? numValue.toString() : numValue.toFixed(1);
+          // Extract the numeric part from the BTU string (e.g., '9000 BTU' -> '9000')
+          const btuMatch = p.btu.value.toString().match(/(\d+(\.\d+)?)/);
+          if (btuMatch) {
+            const btuValue = parseFloat(btuMatch[0]);
+            // Always show as whole number (e.g., 9000 -> 9, 12000 -> 12)
+            return Math.round(btuValue / 1000).toString();
+          }
+          return p.btu.value; // Return as is if we can't parse the number
         }
         
         // Fallback to attributes if btu is not set directly
@@ -55,12 +60,15 @@ export class OffersComponent implements OnInit {
         });
         
         if (btuAttr?.attributeValue) {
-          // Try to parse the attribute value as number and divide by 1000
-          const numValue = parseFloat(btuAttr.attributeValue.toString()) / 1000;
-          if (!isNaN(numValue)) {
-            return Number.isInteger(numValue) ? numValue.toString() : numValue.toFixed(1);
+          const attrValue = btuAttr.attributeValue.toString();
+          // Try to extract numeric value from the attribute (e.g., '9000 BTU' -> '9000')
+          const btuMatch = attrValue.match(/(\d+(\.\d+)?)/);
+          if (btuMatch) {
+            const btuValue = parseFloat(btuMatch[0]);
+            // Always show as whole number (e.g., 9000 -> 9, 12000 -> 12)
+            return Math.round(btuValue / 1000).toString();
           }
-          return btuAttr.attributeValue.toString();
+          return attrValue; // Return as is if we can't parse the number
         }
         return '';
       }
