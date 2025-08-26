@@ -110,24 +110,18 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Apply pending migrations on startup
-try
+using var scope = app.Services.CreateScope();
+var dbContext = scope.ServiceProvider.GetRequiredService<BGClimaContext>();
+dbContext.Database.Migrate();
+// Apply migrations and seed sample data
+if (app.Environment.IsDevelopment())
 {
-    using var scope = app.Services.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<BGClimaContext>();
-    dbContext.Database.Migrate();
-    // Apply migrations and seed sample data
-    if (app.Environment.IsDevelopment())
-        {
-            //SeedTestData(db);
-            await SeedData.SeedIdentityDataAsync(scope.ServiceProvider);
-            await SeedData.SeedAsync(dbContext);
-        }
+    //SeedTestData(db);
+    // Optimized seeding with performance improvements
+    await SeedData.SeedIdentityDataAsync(scope.ServiceProvider);
+    await SeedData.SeedAsync(dbContext);
 }
-catch (Exception ex)
-{
-    var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "An error occurred while migrating or initializing the database.");
-}
+
 
 
 // Configure the HTTP request pipeline.
@@ -135,7 +129,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    
+
     // Don't use HTTPS redirection in development
     // app.UseHttpsRedirection();
 }
@@ -153,13 +147,13 @@ app.UseCors("AllowAngularDev");
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers(); 
+app.MapControllers();
 
 // Log all registered routes
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
-    
+
     // Log all registered routes
     var logger = app.Services.GetRequiredService<ILogger<Program>>();
     var source = endpoints.DataSources.First();
