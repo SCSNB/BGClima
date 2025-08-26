@@ -543,6 +543,11 @@
     overflow: hidden;
     border: 1px solid #e0e0e0;
     
+    @media (min-width: 1024px) {
+      margin: 2rem auto;
+      max-width: 70%;
+    }
+    
     .specs-section {
       width: 100%;
       margin-bottom: 24px;
@@ -558,6 +563,7 @@
         font-size: 1.1rem;
         font-weight: 600;
         color: #333;
+        text-align: center;
         border-bottom: 1px solid #e0e0e0;
       }
       
@@ -901,8 +907,10 @@
   
       .tabs-header {
         display: flex;
+        justify-content: center; /* Center the tabs */
         border-bottom: 1px solid #ddd;
-        margin-bottom: 20px;
+        margin: 0 auto 20px;
+        max-width: 70%;
         overflow-x: auto;
   
         &::-webkit-scrollbar {
@@ -915,9 +923,10 @@
         }
   
         .tab-button {
-          padding: 12px 20px;
+          padding: 12px 24px;
           background: none;
           border: none;
+          white-space: nowrap; /* Prevent text wrapping */
           border-bottom: 3px solid transparent;
           font-size: 16px;
           font-weight: 500;
@@ -1124,6 +1133,18 @@
   
   // Responsive adjustments
   @media (max-width: 768px) {
+    .product-tabs {
+      .tabs-header {
+        max-width: 90%;
+        justify-content: flex-start; /* Allow horizontal scrolling on mobile */
+        
+        .tab-button {
+          padding: 10px 15px;
+          font-size: 14px;
+        }
+      }
+    }
+    
     .main-specs {
       border: none;
       
