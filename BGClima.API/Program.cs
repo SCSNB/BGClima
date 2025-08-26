@@ -114,9 +114,9 @@ try
 {
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<BGClimaContext>();
-
-            // Apply migrations and seed sample data
-        if (app.Environment.IsDevelopment())
+    dbContext.Database.Migrate();
+    // Apply migrations and seed sample data
+    if (app.Environment.IsDevelopment())
         {
             //SeedTestData(db);
             await SeedData.SeedIdentityDataAsync(scope.ServiceProvider);
