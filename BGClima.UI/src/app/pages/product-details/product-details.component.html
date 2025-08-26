@@ -135,14 +135,16 @@
     <div class="tab-content">
       <!-- Description Tab -->
       <div *ngIf="activeTab === 0" class="tab-pane">
-        <h3>Описание на продукта</h3>
-        <div class="description-images-gallery" *ngIf="product.descriptionImages && product.descriptionImages.length > 0">
-          <div *ngFor="let img of product.descriptionImages" class="description-image-item">
-            <img [src]="img.imageUrl" [alt]="img.altText || product.name">
+        <h3 class="description-title">Описание на продукта</h3>
+        <div class="description-container">
+          <div class="description-images-gallery" *ngIf="product.descriptionImages && product.descriptionImages.length > 0">
+            <div *ngFor="let img of product.descriptionImages" class="description-image-item">
+              <img [src]="img.imageUrl" [alt]="img.altText || product.name">
+            </div>
           </div>
-        </div>
-        <div class="product-description">
-          <div [innerHTML]="product.description"></div>
+          <div class="product-description">
+            <pre style="font-family: inherit; white-space: pre-wrap; word-wrap: break-word; margin: 0; padding: 0; border: none; background: none;">{{product.description}}</pre>
+          </div>
         </div>
       </div>
 

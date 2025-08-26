@@ -6,7 +6,7 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;
     background: #fff;
-    border-radius: 8px;
+    border-radius: 0;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     margin-top: 20px;
   
@@ -58,7 +58,7 @@
         text-align: center;
         padding: 20px;
         background: #fff;
-        border-radius: 4px;
+        border-radius: 0;
         min-height: 300px;
         display: flex;
         flex-direction: column;
@@ -70,7 +70,7 @@
           color: #d32f2f;
           padding: 20px;
           background: #ffebee;
-          border-radius: 4px;
+          border-radius: 0;
           margin: 10px 0;
           width: 100%;
           
@@ -80,7 +80,7 @@
             background: #d32f2f;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 0;
             cursor: pointer;
           }
         }
@@ -128,14 +128,14 @@
         
         &::-webkit-scrollbar-thumb {
           background-color: #ccc;
-          border-radius: 3px;
+          border-radius: 0;
         }
         
         .thumbnail-item {
           width: 80px;
           height: 80px;
           border: 2px solid #e0e0e0;
-          border-radius: 6px;
+          border-radius: 0;
           overflow: hidden;
           cursor: pointer;
           flex-shrink: 0;
@@ -255,7 +255,7 @@
             gap: 8px;
             padding: 8px;
             background: #fff;
-            border-radius: 8px;
+            border-radius: 0;
             transition: all 0.2s ease;
             min-width: 0;
             
@@ -266,7 +266,7 @@
             .spec-icon {
               width: 40px;
               height: 40px;
-              border-radius: 8px;
+              border-radius: 0;
               display: flex;
               align-items: center;
               justify-content: center;
@@ -396,13 +396,39 @@
     }
   }
 
+  // Description Title - Specific selector to ensure it takes precedence
+  .tab-pane .description-title {
+    text-align: center !important;
+    margin: 0 auto 20px !important;
+    max-width: 80%;
+    position: relative;
+    display: block !important;
+    font-size: 24px !important;
+    color: #222 !important;
+    font-weight: 500 !important;
+    padding-bottom: 15px;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background-color: #0066cc;
+    }
+  }
+
   // Product Description
   .product-description {
     white-space: pre-wrap; // Preserve text formatting
-    // Remove height restrictions and overflow
-    overflow: visible;
-    position: relative;
-    transition: max-height 0.3s ease;
+    max-width: 100%;
+    margin: 20px 0;
+    padding: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #333;
     
     &.expanded {
       max-height: none;
@@ -755,7 +781,7 @@
       .attribute-group {
         margin-bottom: 1.5rem;
         border: 1px solid #e0e0e0;
-        border-radius: 4px;
+        border-radius: 0;
         overflow: hidden;
         
         .group-header {
@@ -817,8 +843,58 @@
     }
   }
   
-    // Tabs
-    .product-tabs {
+    // Description Images and Text Container
+  .description-container {
+    max-width: 70%;
+    margin: 0 auto;
+    
+    // Ensure all child elements respect the container width
+    & > * {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .description-images-gallery {
+      margin: 30px 0;
+      
+      .description-image-item {
+        text-align: center;
+        margin-bottom: 40px;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+        
+        img {
+          max-width: 100%;
+          height: auto;
+          margin: 0 auto;
+          display: block;
+          border-radius: 0;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+      }
+    }
+    
+    
+    // Mobile styles
+    @media (max-width: 768px) {
+      max-width: 90%;
+      
+      .description-image-item {
+        margin-bottom: 30px;
+        
+        img {
+          max-width: 100%;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+      }
+    }
+  }
+  
+  // Tabs
+  .product-tabs {
       margin-top: 40px;
       border-top: 1px solid #eee;
       padding-top: 20px;
@@ -835,7 +911,7 @@
         
         &::-webkit-scrollbar-thumb {
           background: #ddd;
-          border-radius: 2px;
+          border-radius: 0;
         }
   
         .tab-button {
@@ -872,16 +948,13 @@
           }
 
           .description-images-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
             margin-bottom: 1.5rem;
 
             .description-image-item {
               img {
                 width: 100%;
                 height: auto;
-                border-radius: 8px;
+                border-radius: 0;
                 box-shadow: 0 4px 8px rgba(0,0,0,0.1);
               }
             }
@@ -957,7 +1030,7 @@
   
         .related-product {
           background: #fff;
-          border-radius: 8px;
+          border-radius: 0;
           overflow: hidden;
           box-shadow: 0 2px 8px rgba(0,0,0,0.1);
           transition: transform 0.2s;
@@ -1009,7 +1082,7 @@
       text-align: center;
       padding: 50px 20px;
       background: #fff;
-      border-radius: 8px;
+      border-radius: 0;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       margin: 20px 0;
   
@@ -1031,7 +1104,7 @@
         background: #E6003E;
         color: white;
         border: none;
-        border-radius: 4px;
+        border-radius: 0;
         cursor: pointer;
         font-weight: 500;
         transition: background-color 0.2s;
@@ -1057,7 +1130,7 @@
       .specs-section {
         margin-bottom: 20px;
         border: 1px solid #e0e0e0;
-        border-radius: 4px;
+        border-radius: 0;
         overflow: hidden;
         
         h4 {
