@@ -41,6 +41,47 @@ export class ProductCategoryComponent implements OnInit {
   }
 
   loadProducts(category: string): void {
+    // Ако категорията е от термопомпените секции, филтрираме клиентски по атрибути
+    const heatPumpCategories = new Set<string>([
+      'termopompeni-sistemi',
+      'multisplit-sistemi',
+      'bgclima-toploobmennici'
+    ]);
+
+    if (heatPumpCategories.has(category)) {
+      this.productService.getProducts().subscribe(data => {
+        const tokens = this.getHeatPumpTokens(category);
+        const filtered = data.filter(p => {
+          const attrs = p?.attributes || [];
+          return attrs.some(a => {
+            const key = (a.attributeKey || '').toLowerCase();
+            const val = (a.attributeValue || '').toString().toLowerCase();
+            return tokens.some(t => key.includes(t) || val.includes(t));
+          });
+        });
+
+        const withCardData: ProductCard[] = filtered.map((p: ProductDto) => {
+          const priceEur = this.toEur(p.price);
+          const oldPriceEur = this.toEur(p.oldPrice ?? undefined);
+          const badges: Badge[] = [];
+          if (p.isNew) badges.push({ text: 'НОВО', bg: '#FF4D8D', color: '#fff' });
+          if (p.isOnSale) badges.push({ text: 'ПРОМО', bg: '#E6003E', color: '#fff' });
+          if (this.hasWifi(p)) badges.push({ text: 'WiFi', bg: '#3B82F6', color: '#fff' });
+          const specs: Spec[] = [
+            { icon: 'bolt', label: 'Мощност', value: String(this.getBtuInThousands(p) || '0') },
+            { icon: 'eco', label: 'Енергиен клас', value: p.energyClass?.class || '-' },
+            { icon: 'ac_unit', label: 'Охлаждане', value: this.getMaxMinNomMax(p, 'Отдавана мощност на охлаждане (Мин./Ном./Макс)') || p.coolingCapacity || '0' },
+            { icon: 'wb_sunny', label: 'Отопление', value: this.getMaxMinNomMax(p, 'Отдавана мощност на отопление (Мин./Ном./Макс)') || p.heatingCapacity || '0' },
+          ];
+          return { ...p, badges, specs, priceEur, oldPriceEur } as ProductCard;
+        });
+
+        this.allProducts = withCardData;
+        this.filteredProducts = [...withCardData];
+      });
+      return;
+    }
+
     // Вземаме всички продукти и филтрираме клиентски по атрибута "Тип на инсталация" според категорията
     this.productService.getProducts().subscribe(data => {
       const keyNeedle = 'тип на инстала';
@@ -188,9 +229,26 @@ export class ProductCategoryComponent implements OnInit {
       'podov-tip': 'Климатици подов тип',
       'podovo-tavanen-tip': 'Климатици подово - таванен тип',
       'vrf-vrv': 'VRF / VRV',
-      'mobilni-prenosimi': 'Мобилни / преносими климатици'
+      'mobilni-prenosimi': 'Мобилни / преносими климатици',
+      'termopompeni-sistemi': 'Термопомпени системи',
+      'multisplit-sistemi': 'Мултисплит системи',
+      'bgclima-toploobmennici': 'БГКЛИМА тръбни топлообменници'
     };
 
     this.categoryTitle = categoryMap[category] || 'Продукти';
+  }
+
+  // Токени за филтриране по термопомпени/мултисплит/топлообменни системи
+  private getHeatPumpTokens(category: string): string[] {
+    switch (category) {
+      case 'termopompeni-sistemi':
+        return ['термопомпен', 'термопомпена', 'термопомпи', 'heat pump', 'heat-pump'];
+      case 'multisplit-sistemi':
+        return ['мултисплит', 'multi split', 'multi-split', 'multisplit'];
+      case 'bgclima-toploobmennici':
+        return ['топлообмен', 'топлообменник', 'топлообменници', 'heat exchanger'];
+      default:
+        return [];
+    }
   }
 }
