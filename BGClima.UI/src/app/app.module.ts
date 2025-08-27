@@ -16,6 +16,7 @@ import { HomeComponent } from './components/home/home.component';
 import { ProductListComponent } from './components/admin/product-list.component';
 import { ProductDialogComponent } from './components/admin/product-dialog.component';
 import { DashboardHomeComponent } from './components/admin/dashboard-home.component';
+import { VentilationDesignComponent } from './components/ventilation-design/ventilation-design.component';
 
 // Material Imports (only those not in SharedModule)
 import { MatCardModule } from '@angular/material/card';
@@ -59,6 +60,7 @@ import { BannersComponent } from './components/admin/banners/banners.component';
 import { BannerDialogComponent } from './components/admin/banners/banner-dialog/banner-dialog.component';
 import { PromoBannersComponent } from './components/promo-banners/promo-banners.component';
 import { ProductDetailsComponent } from './pages/product-details/product-details.component';
+import { VentilationInstallationComponent } from './components/ventilation-installation/ventilation-installation.component';
 
 @NgModule({
   declarations: [
@@ -84,7 +86,9 @@ import { ProductDetailsComponent } from './pages/product-details/product-details
     ServizComponent,
     BannersComponent,
     BannerDialogComponent,
-    PromoBannersComponent
+    PromoBannersComponent,
+    VentilationDesignComponent,
+    VentilationInstallationComponent
    ],
   imports: [
     BrowserModule,
