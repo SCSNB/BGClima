@@ -7,6 +7,7 @@ import { environment } from '../../environments/environment';
 export interface BrandDto {
   id: number;
   name: string;
+  country?: string;
 }
 
 export interface ProductTypeDto {
@@ -41,10 +42,17 @@ export interface ProductDescriptionImageDto {
   displayOrder: number;
 }
 
+export interface ProductSpec {
+  icon: string;
+  label: string;
+  value: string;
+}
+
 export interface ProductDto {
   id: number;
   name: string;
   description?: string;
+  specs?: ProductSpec[];
   price: number;
   oldPrice?: number | null;
   isOnSale?: boolean;
@@ -185,6 +193,15 @@ export class ProductService {
         error: (err) => {
           console.error('Error fetching related products:', err);
         }
+      })
+    );
+  }
+
+  getProductsByCategory(category: string): Observable<ProductDto[]> {
+    return this.http.get<ProductDto[]>(`${this.baseUrl}/category/${category}`).pipe(
+      tap({
+        next: (products) => console.log(`Fetched ${products.length} products for category ${category}`),
+        error: (err) => console.error(`Error fetching products for category ${category}:`, err)
       })
     );
   }

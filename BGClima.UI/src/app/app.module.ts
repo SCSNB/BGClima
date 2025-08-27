@@ -61,6 +61,8 @@ import { BannerDialogComponent } from './components/admin/banners/banner-dialog/
 import { PromoBannersComponent } from './components/promo-banners/promo-banners.component';
 import { ProductDetailsComponent } from './pages/product-details/product-details.component';
 import { VentilationInstallationComponent } from './components/ventilation-installation/ventilation-installation.component';
+import { ProductCategoryComponent } from './components/product-category/product-category.component';
+import { ProductFiltersComponent } from './components/product-filters/product-filters.component';
 
 @NgModule({
   declarations: [
@@ -88,7 +90,9 @@ import { VentilationInstallationComponent } from './components/ventilation-insta
     BannerDialogComponent,
     PromoBannersComponent,
     VentilationDesignComponent,
-    VentilationInstallationComponent
+    VentilationInstallationComponent,
+    ProductCategoryComponent,
+    ProductFiltersComponent
    ],
   imports: [
     BrowserModule,

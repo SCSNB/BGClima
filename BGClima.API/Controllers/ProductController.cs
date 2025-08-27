@@ -2,6 +2,7 @@ using AutoMapper;
 using BGClima.API.DTOs;
 using BGClima.Domain.Entities;
 using BGClima.Infrastructure.Data;
+using BGClima.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,11 +14,13 @@ namespace BGClima.API.Controllers
     {
         private readonly BGClimaContext _context;
         private readonly IMapper _mapper;
+        private readonly IProductService _productService;
 
-        public ProductController(BGClimaContext context, IMapper mapper)
+        public ProductController(BGClimaContext context, IMapper mapper, IProductService productService)
         {
             _context = context;
             _mapper = mapper;
+            _productService = productService;
         }
 
         // GET: api/products
@@ -178,6 +181,15 @@ namespace BGClima.API.Controllers
             {
                 return StatusCode(500, new { Message = "Възникна грешка при извличане на продуктите за администрация.", Error = ex.Message });
             }
+        }
+
+        // GET: api/products/category/stenen-tip
+        [HttpGet("category/{categoryName}")]
+        public async Task<IActionResult> GetProductsByCategory(string categoryName)
+        {
+            var products = await _productService.GetProductsByCategoryAsync(categoryName);
+            var productDtos = _mapper.Map<IEnumerable<ProductDto>>(products);
+            return Ok(productDtos);
         }
 
         // GET: api/products/5

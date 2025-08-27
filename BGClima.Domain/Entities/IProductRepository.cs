@@ -6,5 +6,6 @@ namespace BGClima.Domain.Entities
     {
         // Add product-specific methods here if needed
         Task<Product?> GetProductWithDetailsAsync(int id);
+        Task<IEnumerable<Product>> GetProductsByCategoryAsync(string categoryName);
     }
 } 
