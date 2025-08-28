@@ -71,14 +71,14 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
         <div class="submenu-items">
-          <a mat-list-item>Климатици стенен тип</a>
-          <a mat-list-item>Климатици колонен тип</a>
-          <a mat-list-item>Климатици канален тип</a>
-          <a mat-list-item>Климатици касетъчен тип</a>
-          <a mat-list-item>Климатици подов тип</a>
-          <a mat-list-item>Климатици подово - таванен тип</a>
-          <a mat-list-item>VRF / VRV</a>
-          <a mat-list-item>Мобилни / преносими климатици</a>
+          <a mat-list-item routerLink="/products/stenen-tip" (click)="sidenav.close()">Климатици стенен тип</a>
+          <a mat-list-item routerLink="/products/kolonen-tip" (click)="sidenav.close()">Климатици колонен тип</a>
+          <a mat-list-item routerLink="/products/kanalen-tip" (click)="sidenav.close()">Климатици канален тип</a>
+          <a mat-list-item routerLink="/products/kasetachen-tip" (click)="sidenav.close()">Климатици касетъчен тип</a>
+          <a mat-list-item routerLink="/products/podov-tip" (click)="sidenav.close()">Климатици подов тип</a>
+          <a mat-list-item routerLink="/products/podovo-tavanen-tip" (click)="sidenav.close()">Климатици подово - таванен тип</a>
+          <a mat-list-item routerLink="/products/vrf-vrv" (click)="sidenav.close()">VRF / VRV</a>
+          <a mat-list-item routerLink="/products/mobilni-prenosimi" (click)="sidenav.close()">Мобилни / преносими климатици</a>
         </div>
       </mat-expansion-panel>
 
@@ -92,9 +92,9 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
         <div class="submenu-items">
-          <a mat-list-item>Термопомпени системи</a>
-          <a mat-list-item>Мултисплит системи</a>
-          <a mat-list-item>БГКЛИМА тръбни топлообменници</a>
+          <a mat-list-item routerLink="/products/termopompeni-sistemi" (click)="sidenav.close()">Термопомпени системи</a>
+          <a mat-list-item routerLink="/products/multisplit-sistemi" (click)="sidenav.close()">Мултисплит системи</a>
+          <a mat-list-item routerLink="/products/bgclima-toploobmennici" (click)="sidenav.close()">БГКЛИМА тръбни топлообменници</a>
         </div>
       </mat-expansion-panel>
 
@@ -108,9 +108,9 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
         <div class="submenu-items">
-          <a mat-list-item>Проектиране на вентилационни системи</a>
-          <a mat-list-item>Монтаж на вентилационни системи</a>
-          <a mat-list-item>Профилактика и сервиз</a>
+          <a mat-list-item routerLink="/ventilation-design" (click)="sidenav.close()">Проектиране на вентилационни системи</a>
+          <a mat-list-item routerLink="/ventilation-installation" (click)="sidenav.close()">Монтаж на вентилационни системи</a>
+          <a mat-list-item routerLink="/serviz" (click)="sidenav.close()">Профилактика и сервиз</a>
         </div>
       </mat-expansion-panel>
 
@@ -152,7 +152,7 @@
         </mat-expansion-panel-header>
       </mat-expansion-panel>
 
-      <mat-expansion-panel class="menu-item" hideToggle="true" routerLink="/service">
+      <mat-expansion-panel class="menu-item" hideToggle="true" routerLink="/serviz">
         <mat-expansion-panel-header>
           <mat-panel-title>
             <img src="assets/product-icons/services.png" class="menu-icon" alt="Сервиз">

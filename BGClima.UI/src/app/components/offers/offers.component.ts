@@ -129,12 +129,16 @@ export class OffersComponent implements OnInit {
       oldPriceEur: oldEur,
       brandText: p.brand?.name || '',
       badges,
-      specs: [
-        { label: 'Мощност', value: getAttr('BTU'), icon: 'bolt' },
-        { label: 'Клас', value: p.energyClass?.class || getAttr('Клас') || 'A+', icon: 'eco' },
-        { label: 'Охлаждане', value: getAttr('Охлаждане'), icon: 'ac_unit' },
-        { label: 'Отопление', value: getAttr('Отопление'), icon: 'wb_sunny' }
-      ]
+      specs: (() => {
+        const btuStr = (getAttr('BTU') || '').toString();
+        const btuThousands = parseInt(btuStr.replace(/\D+/g, ''), 10) || 0;
+        return [
+          { label: 'Мощност', value: btuThousands > 0 ? String(btuThousands) : '', icon: 'bolt' },
+          { label: 'Клас', value: p.energyClass?.class || getAttr('Клас') || 'A+', icon: 'eco' },
+          { label: 'Охлаждане', value: getAttr('Охлаждане') || '', icon: 'ac_unit' },
+          { label: 'Отопление', value: getAttr('Отопление') || '', icon: 'wb_sunny' }
+        ];
+      })()
     };
   }
 

@@ -50,6 +50,7 @@ const routes: Routes = [
   { path: 'ventilation-installation', component: VentilationInstallationComponent },
   { path: 'product/:id', component: ProductDetailsComponent },
   { path: 'products/:category', component: ProductCategoryComponent },
+  { path: 'promo', loadComponent: () => import('./pages/promo-products/promo-products.component').then(m => m.PromoProductsComponent) },
   // Redirect empty path to home
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   // Catch-all route for any undefined routes

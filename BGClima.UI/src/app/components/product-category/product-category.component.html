@@ -34,15 +34,17 @@
               <button class="compare-btn" type="button">Сравни</button>
             </div>
             <div class="offer-card-specs">
-              <div class="spec" *ngFor="let spec of product.specs">
-                <div class="spec-icon" [ngClass]="spec.icon">
-                  <span class="material-icons">{{ spec.icon }}</span>
+              <ng-container *ngFor="let spec of product.specs">
+                <div class="spec" *ngIf="spec?.value">
+                  <div class="spec-icon" [ngClass]="spec.icon">
+                    <span class="material-icons">{{ spec.icon }}</span>
+                  </div>
+                  <div class="spec-details">
+                    <div class="spec-label">{{ spec.label }}</div>
+                    <div class="spec-value">{{ spec.value }}</div>
+                  </div>
                 </div>
-                <div class="spec-details">
-                  <div class="spec-label">{{ spec.label }}</div>
-                  <div class="spec-value">{{ spec.value || '0' }}</div>
-                </div>
-              </div>
+              </ng-container>
             </div>
           </div>
         </a>

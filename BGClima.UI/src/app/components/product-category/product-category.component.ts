@@ -67,11 +67,16 @@ export class ProductCategoryComponent implements OnInit {
           if (p.isNew) badges.push({ text: 'НОВО', bg: '#FF4D8D', color: '#fff' });
           if (p.isOnSale) badges.push({ text: 'ПРОМО', bg: '#E6003E', color: '#fff' });
           if (this.hasWifi(p)) badges.push({ text: 'WiFi', bg: '#3B82F6', color: '#fff' });
+
+          const btuThousands = this.getBtuInThousands(p);
+          const cooling = this.getMaxMinNomMax(p, 'Отдавана мощност на охлаждане (Мин./Ном./Макс)') || p.coolingCapacity || '';
+          const heating = this.getMaxMinNomMax(p, 'Отдавана мощност на отопление (Мин./Ном./Макс)') || p.heatingCapacity || '';
+
           const specs: Spec[] = [
-            { icon: 'bolt', label: 'Мощност', value: String(this.getBtuInThousands(p) || '0') },
+            { icon: 'bolt', label: 'Мощност', value: btuThousands > 0 ? String(btuThousands) : '' },
             { icon: 'eco', label: 'Енергиен клас', value: p.energyClass?.class || '-' },
-            { icon: 'ac_unit', label: 'Охлаждане', value: this.getMaxMinNomMax(p, 'Отдавана мощност на охлаждане (Мин./Ном./Макс)') || p.coolingCapacity || '0' },
-            { icon: 'wb_sunny', label: 'Отопление', value: this.getMaxMinNomMax(p, 'Отдавана мощност на отопление (Мин./Ном./Макс)') || p.heatingCapacity || '0' },
+            { icon: 'ac_unit', label: 'Охлаждане', value: cooling },
+            { icon: 'wb_sunny', label: 'Отопление', value: heating },
           ];
           return { ...p, badges, specs, priceEur, oldPriceEur } as ProductCard;
         });
@@ -106,11 +111,15 @@ export class ProductCategoryComponent implements OnInit {
         if (p.isOnSale) badges.push({ text: 'ПРОМО', bg: '#E6003E', color: '#fff' });
         if (this.hasWifi(p)) badges.push({ text: 'WiFi', bg: '#3B82F6', color: '#fff' });
 
+        const btuThousands = this.getBtuInThousands(p);
+        const cooling = this.getMaxMinNomMax(p, 'Отдавана мощност на охлаждане (Мин./Ном./Макс)') || p.coolingCapacity || '';
+        const heating = this.getMaxMinNomMax(p, 'Отдавана мощност на отопление (Мин./Ном./Макс)') || p.heatingCapacity || '';
+
         const specs: Spec[] = [
-          { icon: 'bolt', label: 'Мощност', value: String(this.getBtuInThousands(p) || '0') },
+          { icon: 'bolt', label: 'Мощност', value: btuThousands > 0 ? String(btuThousands) : '' },
           { icon: 'eco', label: 'Енергиен клас', value: p.energyClass?.class || '-' },
-          { icon: 'ac_unit', label: 'Охлаждане', value: this.getMaxMinNomMax(p, 'Отдавана мощност на охлаждане (Мин./Ном./Макс)') || p.coolingCapacity || '0' },
-          { icon: 'wb_sunny', label: 'Отопление', value: this.getMaxMinNomMax(p, 'Отдавана мощност на отопление (Мин./Ном./Макс)') || p.heatingCapacity || '0' },
+          { icon: 'ac_unit', label: 'Охлаждане', value: cooling },
+          { icon: 'wb_sunny', label: 'Отопление', value: heating },
         ];
 
         return { ...p, badges, specs, priceEur, oldPriceEur } as ProductCard;
