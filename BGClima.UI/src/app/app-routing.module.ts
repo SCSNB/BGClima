@@ -12,7 +12,7 @@ import { CertificatesComponent } from './components/certificates/certificates.co
 import { ProjectsComponent } from './components/projects/projects.component';
 import { ConsultingComponent } from './components/consulting/consulting.component';
 import { InstallationComponent } from './components/installation/installation.component';
-import { ProfilaktikaComponent } from './components/profilaktika/profilaktika.component';
+import { MaintenanceComponent } from './components/maintenance/maintenance.component';
 import { ServizComponent } from './components/serviz/serviz.component';
 import { ProductListComponent } from './components/admin/product-list.component';
 import { DashboardHomeComponent } from './components/admin/dashboard-home.component';
@@ -44,7 +44,7 @@ const routes: Routes = [
   { path: 'projects', component: ProjectsComponent },
   { path: 'consulting', component: ConsultingComponent },
   { path: 'installation', component: InstallationComponent },
-  { path: 'profilaktika', component: ProfilaktikaComponent },
+  { path: 'maintenance', component: MaintenanceComponent },
   { path: 'serviz', component: ServizComponent },
   { path: 'ventilation-design', component: VentilationDesignComponent },
   { path: 'ventilation-installation', component: VentilationInstallationComponent },

@@ -81,10 +81,7 @@ builder.Services.AddScoped<BGClima.Application.Services.IAuthService, BGClima.Ap
 //builder.Services.AddScoped<BGClima.Application.Services.IProductService, BGClima.Application.Services.ProductService>();
 
 // Register AutoMapper
-builder.Services.AddAutoMapper(
-    typeof(Program).Assembly,
-    typeof(BGClima.API.Mapping.BannerProfile).Assembly
-);
+builder.Services.AddAutoMapper(typeof(BGClima.API.Mapping.BannerProfile).Assembly);
 
 // Enable detailed errors and sensitive data logging in development
 // Note: Removed AddDatabaseDeveloperPageExceptionFilter as it's not available in the current context

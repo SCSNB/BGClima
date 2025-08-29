@@ -54,7 +54,6 @@ import { CertificatesComponent } from './components/certificates/certificates.co
 import { ProjectsComponent } from './components/projects/projects.component';
 import { ConsultingComponent } from './components/consulting/consulting.component';
 import { InstallationComponent } from './components/installation/installation.component';
-import { ProfilaktikaComponent } from './components/profilaktika/profilaktika.component';
 import { ServizComponent } from './components/serviz/serviz.component';
 import { BannersComponent } from './components/admin/banners/banners.component';
 import { BannerDialogComponent } from './components/admin/banners/banner-dialog/banner-dialog.component';
@@ -63,6 +62,7 @@ import { ProductDetailsComponent } from './pages/product-details/product-details
 import { VentilationInstallationComponent } from './components/ventilation-installation/ventilation-installation.component';
 import { ProductCategoryComponent } from './components/product-category/product-category.component';
 import { ProductFiltersComponent } from './components/product-filters/product-filters.component';
+import { MaintenanceComponent } from './components/maintenance/maintenance.component';
 
 @NgModule({
   declarations: [
@@ -84,7 +84,6 @@ import { ProductFiltersComponent } from './components/product-filters/product-fi
     ProductListComponent,
     ProductDialogComponent,
     DashboardHomeComponent,
-    ProfilaktikaComponent,
     ServizComponent,
     BannersComponent,
     BannerDialogComponent,
@@ -92,7 +91,8 @@ import { ProductFiltersComponent } from './components/product-filters/product-fi
     VentilationDesignComponent,
     VentilationInstallationComponent,
     ProductCategoryComponent,
-    ProductFiltersComponent
+    ProductFiltersComponent,
+    MaintenanceComponent
    ],
   imports: [
     BrowserModule,
