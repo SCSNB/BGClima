@@ -3,6 +3,7 @@ using BGClima.Domain.Entities;
 using BGClima.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using BGClima.Infrastructure.Repositories;
+using BGClima.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -23,9 +24,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
-// Register DbContext with PostgreSQL
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
-                      "Host=localhost;Port=5432;Database=bgclima;Username=postgres;Password=;";
+// Register BGClimaContext with PostgreSQL
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // Register BGClimaContext
 builder.Services.AddDbContext<BGClimaContext>(options =>
@@ -35,7 +35,6 @@ builder.Services.AddDbContext<BGClimaContext>(options =>
             maxRetryCount: 5,
             maxRetryDelay: TimeSpan.FromSeconds(30),
             errorCodesToAdd: null);
-        npgsqlOptions.MigrationsAssembly("BGClima.Infrastructure");
     }));
 
 // Configure Identity
@@ -72,6 +71,7 @@ builder.Services.AddAuthentication(options =>
 // Register repositories and services
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IBannerRepository, BannerRepository>();
 builder.Services.AddScoped<BGClima.Application.Services.IProductService, BGClima.Application.Services.ProductService>();
 builder.Services.AddScoped<BGClima.Application.Services.IAuthService, BGClima.Application.Services.AuthService>();
 //// Register repositories
@@ -81,7 +81,7 @@ builder.Services.AddScoped<BGClima.Application.Services.IAuthService, BGClima.Ap
 //builder.Services.AddScoped<BGClima.Application.Services.IProductService, BGClima.Application.Services.ProductService>();
 
 // Register AutoMapper
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddAutoMapper(typeof(BGClima.API.Mapping.BannerProfile).Assembly);
 
 // Enable detailed errors and sensitive data logging in development
 // Note: Removed AddDatabaseDeveloperPageExceptionFilter as it's not available in the current context
@@ -91,11 +91,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularDev",
         policy => policy
-            .WithOrigins(
-                "http://localhost:4200" // Angular dev server (default port)
-            )
-            .AllowAnyHeader()
+            .WithOrigins("http://localhost:4200")
             .AllowAnyMethod()
+            .AllowAnyHeader()
             .AllowCredentials());
 });
 
@@ -163,6 +161,28 @@ app.UseEndpoints(endpoints =>
     }
 });
 
+// Initialize database with seed data
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try 
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogInformation("Starting to seed the database...");
+        
+        var context = services.GetRequiredService<BGClima.Infrastructure.Data.BGClimaContext>();
+        await SeedData.SeedAsync(context);
+        
+        logger.LogInformation("Database seeding completed successfully.");
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database.");
+        throw; // Re-throw to ensure we see the error
+    }
+}
+
 app.MapFallbackToFile("index.html");
 
-app.Run();
+await app.RunAsync();

@@ -1,29 +1,49 @@
 <section class="offers-section">
   <h2 class="offers-title">Актуални оферти</h2>
   <div class="offers-cards-wrapper">
-    <div class="offer-card" *ngFor="let offer of offers">
-      <div class="offer-card-image-badges">
-        <img [src]="offer.image" alt="Климатик" class="offer-card-image" />
-        <div class="offer-badges">
-          <span *ngFor="let badge of offer.badges" class="badge" [ngStyle]="{'background': badge.bg, 'color': badge.color}">{{ badge.text }}</span>
+    <ng-container *ngFor="let item of featured; index as i">
+      <a [routerLink]="['/product', item.id]" class="offer-card-link">
+        <div class="offer-card">
+          <div class="offer-card-image-badges">
+            <img [src]="item.image" alt="Климатик" class="offer-card-image" />
+            <div class="offer-badges">
+              <span class="badge" *ngFor="let b of item.badges" [ngStyle]="{background: b.bg, color: b.color}">{{ b.text }}</span>
+            </div>
+          </div>
+          <div class="offer-card-title">{{ item.title }}</div>
+          <div class="offer-card-prices">
+            <div class="price-container">
+              <div class="current-prices">
+                <span class="current-price">{{ item.priceBgn | number:'1.2-2' }} лв.</span>
+                <span class="current-price-eur">/ {{ item.priceEur | number:'1.2-2' }} €</span>
+              </div>
+              <div class="old-prices" *ngIf="item.oldPriceBgn">
+                <span class="old-price">{{ item.oldPriceBgn | number:'1.2-2' }} лв.</span>
+                <span class="old-price-eur" *ngIf="item.oldPriceEur">/ {{ item.oldPriceEur | number:'1.2-2' }} €</span>
+              </div>
+            </div>
+          </div>
+          <div class="offer-card-brand-row">
+            <div class="brand-text-container">
+              <span class="brand-text">{{ item.brandText }}</span>
+            </div>
+            <button class="compare-btn" type="button">Сравни</button>
+          </div>
+          <div class="offer-card-specs">
+            <ng-container *ngFor="let spec of item.specs">
+              <div class="spec" *ngIf="spec?.value">
+                <div class="spec-icon" [ngClass]="spec.icon">
+                  <span class="material-icons">{{ spec.icon }}</span>
+                </div>
+                <div class="spec-details">
+                  <div class="spec-label">{{ spec.label }}</div>
+                  <div class="spec-value">{{ spec.value }}</div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
         </div>
-      </div>
-      <div class="offer-card-title">{{ offer.title }}</div>
-      <div class="offer-card-prices">
-        <span class="current-price">{{ offer.price.current }}</span>
-        <span class="old-price">{{ offer.price.old }}</span>
-      </div>
-      <div class="offer-card-brand-row">
-        <img [src]="offer.brand.logo" alt="General" class="brand-logo" />
-        <span class="brand-text">{{ offer.brand.text }}</span>
-        <button class="compare-btn">Сравни</button>
-      </div>
-      <div class="offer-card-specs">
-        <div class="spec" *ngFor="let spec of offer.specs; let i = index" [ngStyle]="{'color': spec.color}">
-          <img [src]="spec.icon" [alt]="spec.label" />
-          <span>{{ spec.value }}</span>
-        </div>
-      </div>
-    </div>
+      </a>
+    </ng-container>
   </div>
 </section>

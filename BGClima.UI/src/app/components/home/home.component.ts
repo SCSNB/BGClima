@@ -1,34 +1,58 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { BannerService } from '../../services/banner.service';
+import { Banner } from '../../models/banner.model';
+import { PromoBannersComponent } from '../promo-banners/promo-banners.component';
+
+interface Slide {
+  title: string;
+  image: string | null;
+  link?: string;
+}
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent {
-  slides = [
-    {
-      title: 'Ново предложение 1',
-      image: 'assets/hero/7-slide.jpg',
-      link: '#'
-    },
-    {
-      title: 'Ново предложение 2',
-      image: 'assets/hero/8-slide.jpg',
-      link: '#'
-    },
-    {
-      title: 'Ново предложение 3',
-      image: 'assets/hero/9-slide.jpg',
-      link: '#'
-    }
-  ];
-
+export class HomeComponent implements OnInit, OnDestroy {
+  slides: Slide[] = [];
   currentSlide = 0;
   slideInterval: any;
+  loading = true;
+
+  constructor(private bannerService: BannerService) {}
 
   ngOnInit() {
-    this.startAutoSlide();
+    this.loadBanners();
+  }
+
+  ngOnDestroy() {
+    this.stopAutoSlide();
+  }
+
+  loadBanners() {
+    this.bannerService.getBanners().subscribe({
+      next: (banners) => {
+        // Filter only active HeroSlider banners and map to slides
+        this.slides = banners
+          .filter(banner => banner.isActive && banner.type === 0) // 0 is the value of BannerType.HeroSlider
+          .sort((a, b) => a.displayOrder - b.displayOrder) // Sort by displayOrder
+          .map(banner => ({
+            title: banner.name,
+            image: banner.imageUrl,
+            link: banner.targetUrl || '#'
+          }));
+        
+        this.loading = false;
+        if (this.slides.length > 0) {
+          this.startAutoSlide();
+        }
+      },
+      error: (error) => {
+        console.error('Error loading banners:', error);
+        this.loading = false;
+      }
+    });
   }
 
   startAutoSlide() {
@@ -48,7 +72,22 @@ export class HomeComponent {
   }
 
   selectSlide(index: number) {
-    this.currentSlide = index;
+    if (this.slides.length === 0) return;
+    
+    // Handle wrap-around for previous/next buttons
+    if (index < 0) {
+      this.currentSlide = this.slides.length - 1;
+    } else if (index >= this.slides.length) {
+      this.currentSlide = 0;
+    } else {
+      this.currentSlide = index;
+    }
+    
+    // Reset the auto-slide timer when manually changing slides
+    this.resetAutoSlide();
+  }
+  
+  private resetAutoSlide() {
     this.stopAutoSlide();
     this.startAutoSlide();
   }

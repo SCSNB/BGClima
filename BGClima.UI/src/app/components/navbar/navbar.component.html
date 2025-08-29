@@ -5,7 +5,7 @@
         ПРОДУКТИ <mat-icon>expand_more</mat-icon>
       </button>
     </li>
-    <li><a mat-button class="navbar-link promo-link">ПРОМО</a></li>
+    <li><a mat-button class="navbar-link promo-link" routerLink="/promo">ПРОМО</a></li>
     <li>
       <button mat-button [matMenuTriggerFor]="servicesMenu" class="navbar-link">
         Услуги <mat-icon>expand_more</mat-icon>
@@ -35,26 +35,27 @@
 </mat-menu>
 
 <mat-menu #acTypesMenu="matMenu">
-  <button mat-menu-item>Климатици стенен тип</button>
-  <button mat-menu-item>Климатици колонен тип</button>
-  <button mat-menu-item>Климатици канален тип</button>
-  <button mat-menu-item>Климатици касетъчен тип</button>
-  <button mat-menu-item>Климатици подов тип</button>
-  <button mat-menu-item>Климатици подово - таванен тип</button>
-  <button mat-menu-item>VRF / VRV</button>
-  <button mat-menu-item>Мобилни / преносими климатици</button>
+  <button mat-menu-item routerLink="/products/stenen-tip">Климатици стенен тип</button>
+  <button mat-menu-item routerLink="/products/kolonen-tip">Климатици колонен тип</button>
+  <button mat-menu-item routerLink="/products/kanalen-tip">Климатици канален тип</button>
+  <button mat-menu-item routerLink="/products/kasetachen-tip">Климатици касетъчен тип</button>
+  <button mat-menu-item routerLink="/products/podov-tip">Климатици подов тип</button>
+  <button mat-menu-item routerLink="/products/podovo-tavanen-tip">Климатици подово - таванен тип</button>
+  <button mat-menu-item routerLink="/products/vrf-vrv">VRF / VRV</button>
+  <button mat-menu-item routerLink="/products/mobilni-prenosimi">Мобилни / преносими климатици</button>
 </mat-menu>
 
 <mat-menu #heatPumpsMenu="matMenu">
-  <button mat-menu-item>Термопомпени системи</button>
-  <button mat-menu-item>Мултисплит системи</button>
-  <button mat-menu-item>БГКЛИMA тръбни топлообменници</button>
+  <button mat-menu-item routerLink="/products/termopompeni-sistemi">Термопомпени системи</button>
+  <button mat-menu-item routerLink="/products/multisplit-sistemi">Мултисплит системи</button>
+  <button mat-menu-item routerLink="/products/bgclima-toploobmennici">БГКЛИMA тръбни топлообменници</button>
 </mat-menu>
 
 <mat-menu #ventilationMenu="matMenu">
-  <button mat-menu-item>Проектиране на вентилационни системи</button>
-  <button mat-menu-item>Монтаж на вентилационни системи</button>
-  <button mat-menu-item>Профилактика и сервиз</button>
+  <button mat-menu-item routerLink="/ventilation-design">
+    Проектиране на вентилационни системи
+  </button>
+  <button mat-menu-item routerLink="/ventilation-installation">Монтаж на вентилационни системи</button>
 </mat-menu>
 
 
@@ -63,7 +64,7 @@
     <img src="assets/product-icons/tools.png" class="menu-icon" alt="Монтаж">
     <span>Монтаж</span>
   </button>
-  <button mat-menu-item routerLink="/profilaktika">
+  <button mat-menu-item routerLink="/maintenance">
     <img src="assets/product-icons/rpa.png" class="menu-icon" alt="Профилактика">
     <span>Профилактика</span>
   </button>

@@ -1,0 +1,30 @@
+// Премахва излишния padding от тялото на панела, за да изглежда по-добре
+::ng-deep .mat-expansion-panel-body {
+    padding: 0 16px 16px !important;
+  }
+  
+  // Стилизира контейнерите с чекбоксове
+  .filter-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  // Стилизира филтъра за цена
+  .price-filter {
+    .price-inputs {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-top: 8px;
+  
+      mat-form-field {
+        width: 100%;
+      }
+    }
+  }
+  
+  // Добавя малко отстояние на превключвателя за наличност
+  mat-slide-toggle {
+    margin-left: 8px;
+  }

@@ -27,5 +27,6 @@ namespace BGClima.API.DTOs
         // Collections
         public ICollection<ProductAttributeDto> Attributes { get; set; } = new List<ProductAttributeDto>();
         public ICollection<ProductImageDto> Images { get; set; } = new List<ProductImageDto>();
+        public ICollection<ProductDescriptionImageDto> DescriptionImages { get; set; } = new List<ProductDescriptionImageDto>();
     }
 }

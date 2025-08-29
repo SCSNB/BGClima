@@ -12,10 +12,15 @@ import { CertificatesComponent } from './components/certificates/certificates.co
 import { ProjectsComponent } from './components/projects/projects.component';
 import { ConsultingComponent } from './components/consulting/consulting.component';
 import { InstallationComponent } from './components/installation/installation.component';
-import { ProfilaktikaComponent } from './components/profilaktika/profilaktika.component';
+import { MaintenanceComponent } from './components/maintenance/maintenance.component';
 import { ServizComponent } from './components/serviz/serviz.component';
 import { ProductListComponent } from './components/admin/product-list.component';
 import { DashboardHomeComponent } from './components/admin/dashboard-home.component';
+import { BannersComponent } from './components/admin/banners/banners.component';
+import { ProductDetailsComponent } from './pages/product-details/product-details.component';
+import { VentilationDesignComponent } from './components/ventilation-design/ventilation-design.component';
+import { VentilationInstallationComponent } from './components/ventilation-installation/ventilation-installation.component';
+import { ProductCategoryComponent } from './components/product-category/product-category.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -26,7 +31,8 @@ const routes: Routes = [
     data: { roles: ['ADMIN'] },
     children: [
       { path: '', component: DashboardHomeComponent },
-      { path: 'product', component: ProductListComponent }
+      { path: 'product', component: ProductListComponent },
+      { path: 'banners', component: BannersComponent }
     ]
   },
   { path: 'contacts', component: ContactsComponent },
@@ -38,8 +44,13 @@ const routes: Routes = [
   { path: 'projects', component: ProjectsComponent },
   { path: 'consulting', component: ConsultingComponent },
   { path: 'installation', component: InstallationComponent },
-  { path: 'profilaktika', component: ProfilaktikaComponent },
+  { path: 'maintenance', component: MaintenanceComponent },
   { path: 'serviz', component: ServizComponent },
+  { path: 'ventilation-design', component: VentilationDesignComponent },
+  { path: 'ventilation-installation', component: VentilationInstallationComponent },
+  { path: 'product/:id', component: ProductDetailsComponent },
+  { path: 'products/:category', component: ProductCategoryComponent },
+  { path: 'promo', loadComponent: () => import('./pages/promo-products/promo-products.component').then(m => m.PromoProductsComponent) },
   // Redirect empty path to home
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   // Catch-all route for any undefined routes
@@ -47,7 +58,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { scrollPositionRestoration: 'enabled' })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

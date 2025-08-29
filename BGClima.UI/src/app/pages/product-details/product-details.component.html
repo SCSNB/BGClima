@@ -1,0 +1,224 @@
+<!-- Top anchor for scrolling -->
+<div #topElement></div>
+
+<div class="product-details-container" *ngIf="product">
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumbs">
+    <a routerLink="/">Начало</a> > 
+    <a [routerLink]="['/products']">Продукти</a> > 
+    <span>{{product.name}}</span>
+  </nav>
+
+  <!-- Main Product Section -->
+  <div class="product-main">
+    <!-- Product Images -->
+    <div class="product-gallery">
+      <div class="main-image">
+        <div *ngIf="!selectedImage" class="no-image">
+          <p>Няма налична снимка</p>
+        </div>
+        <img 
+          *ngIf="selectedImage" 
+          [src]="selectedImage" 
+          [alt]="product.name" 
+          (error)="handleImageError($event)"
+          class="main-product-image" />
+      </div>
+      
+      <!-- Thumbnail Gallery -->
+      <div class="thumbnail-gallery" *ngIf="product.images && product.images.length > 1">
+        <div 
+          *ngFor="let img of product.images" 
+          class="thumbnail-item"
+          [class.active]="selectedImage === getImageUrl(img.url || img.imageUrl || img.path || img)"
+          (click)="selectImage(img)">
+          <img 
+            [src]="getImageUrl(img.url || img.imageUrl || img.path || img)" 
+            [alt]="product.name + ' thumbnail'"
+            (error)="handleImageError($event)" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Info -->
+    <div class="product-info">
+      <h1 class="product-title">{{product.name}}</h1>
+      
+<!-- Brand and Availability -->
+      <div class="product-meta">
+        <span class="brand" *ngIf="product.brand">
+          <strong>Марка:</strong> {{product.brand.name}}
+        </span>
+        <span class="availability" [class.in-stock]="product.stockQuantity > 0" [class.out-of-stock]="product.stockQuantity <= 0">
+          {{product.stockQuantity > 0 ? 'В наличност' : 'Не е наличен'}}
+        </span>
+      </div>
+
+      <!-- Price -->
+      <div class="price-section">
+        <div class="current-price">
+          <span class="price">{{product.price | number:'1.2-2'}} лв.</span>
+          <span class="price-eur">/ {{(product.price / 1.9558) | number:'1.2-2'}} €</span>
+        </div>
+        <div class="old-price" *ngIf="product.oldPrice">
+          <span class="price">{{product.oldPrice | number:'1.2-2'}} лв.</span>
+          <span class="price-eur">/ {{(product.oldPrice / 1.9558) | number:'1.2-2'}} €</span>
+        </div>
+      </div>
+      
+      <div class="price-vat-info">
+        Цените са с включен ДДС. Цените са обозначени в лева и евро по официалния валутен курс на БНБ: 1 EUR = 1.95583 BGN
+      </div>
+
+      <!-- Product Specifications Icons -->
+      <div class="specs-container">
+        <div class="product-specs">
+          <!-- Main 4 Icons -->
+          <ng-container *ngFor="let spec of getProductSpecs()">
+            <div class="spec-item" [class.no-border]="!spec.value">
+              <div class="spec-icon" [ngClass]="spec.icon">
+                <mat-icon>{{spec.icon}}</mat-icon>
+              </div>
+              <div class="spec-details">
+                <div class="spec-label">{{spec.label}}</div>
+                <div class="spec-value">{{spec.value || '-'}}</div>
+              </div>
+            </div>
+          </ng-container>
+          
+          <!-- Wi-Fi Module -->
+          <div class="spec-item" *ngIf="hasWifiModule()">
+            <div class="spec-icon">
+              <mat-icon>wifi</mat-icon>
+            </div>
+            <div class="spec-details">
+              <div class="spec-label">Wi-Fi модул</div>
+              <div class="spec-value">Да</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product actions removed as per request -->
+
+      <!-- Product Meta -->
+      <div class="product-meta-details">
+        <div class="meta-item" *ngIf="product.sku">
+          <span class="meta-label">Код на продукта:</span>
+          <span class="meta-value">{{product.sku}}</span>
+        </div>
+        <div class="accent-attributes" *ngIf="getAccentAttributes().length > 0">
+          <ng-container *ngFor="let attr of getAccentAttributes()">
+            <div class="accent-attribute">
+              {{attr.attributeValue}}
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="product-tabs">
+    <div class="tabs-header">
+      <ng-container *ngFor="let tab of tabs; let i = index">
+        <button 
+          *ngIf="tab !== 'Доставка' && tab !== 'Гаранция'"
+          [class.active]="activeTab === i"
+          (click)="setActiveTab(i)"
+          class="tab-button">
+          {{tab}}
+        </button>
+      </ng-container>
+    </div>
+
+    <div class="tab-content">
+      <!-- Description Tab -->
+      <div *ngIf="activeTab === 0" class="tab-pane">
+        <h3 class="description-title">Описание на продукта</h3>
+        <div class="description-container">
+          <div class="description-images-gallery" *ngIf="product.descriptionImages && product.descriptionImages.length > 0">
+            <div *ngFor="let img of product.descriptionImages" class="description-image-item">
+              <img [src]="img.imageUrl" [alt]="img.altText || product.name">
+            </div>
+          </div>
+          <div class="product-description">
+            <pre style="font-family: inherit; white-space: pre-wrap; word-wrap: break-word; margin: 0; padding: 0; border: none; background: none;">{{product.description}}</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Specifications Tab -->
+      <div *ngIf="activeTab === 1" class="tab-pane">
+        <div class="main-specs">
+          <!-- Main Specifications -->
+          <div class="specs-section">
+            <h4>Основни характеристики</h4>
+            <div class="specs-body">
+              <ng-container *ngFor="let spec of getTechnicalSpecifications()">
+                <div *ngIf="spec.section === 'Основни характеристики'" class="spec-row">
+                  <div class="spec-name" [innerHTML]="spec.label | formatLabel"></div>
+                  <div class="spec-value">{{spec.value || '-'}}</div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+
+          <!-- Indoor Unit -->
+          <div class="specs-section">
+            <h4>Вътрешно тяло</h4>
+            <div class="specs-body">
+              <ng-container *ngFor="let spec of getTechnicalSpecifications()">
+                <div *ngIf="spec.section === 'Вътрешно тяло'" class="spec-row">
+                  <div class="spec-name" [innerHTML]="spec.label | formatLabel"></div>
+                  <div class="spec-value">{{spec.value || '-'}}</div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+
+          <!-- Outdoor Unit -->
+          <div class="specs-section">
+            <h4>Външно тяло</h4>
+            <div class="specs-body">
+              <ng-container *ngFor="let spec of getTechnicalSpecifications()">
+                <div *ngIf="spec.section === 'Външно тяло'" class="spec-row">
+                  <div class="spec-name" [innerHTML]="spec.label | formatLabel"></div>
+                  <div class="spec-value">{{spec.value || '-'}}</div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Related Products -->
+  <div class="related-products" *ngIf="relatedProducts.length > 0">
+    <h2>Свързани продукти</h2>
+    <div class="related-products-grid">
+      <div class="related-product" *ngFor="let related of relatedProducts">
+        <a [routerLink]="['/product', related.id]">
+          <img [src]="related.imageUrl || 'assets/no-image.png'" [alt]="related.name" />
+          <h3>{{related.name}}</h3>
+          <div class="price">{{related.price | number:'1.2-2'}} лв.</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div *ngIf="loading" class="loading-state">
+  <mat-spinner></mat-spinner>
+  <p>Зареждане на детайли за продукта...</p>
+</div>
+
+<!-- Error State -->
+<div *ngIf="error" class="error-state">
+  <mat-icon>error_outline</mat-icon>
+  <p>{{error}}</p>
+  <button mat-button color="primary" (click)="loadProduct()">Опитайте отново</button>
+</div>

@@ -80,6 +80,18 @@ export class AppComponent implements OnInit {
     ).subscribe((event: NavigationEnd) => {
       this.currentUrl = event.url;
       console.log('Current URL:', this.currentUrl);
+      // Ensure page scrolls to top on every navigation (desktop and mobile)
+      try {
+        // Scroll window
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        // Scroll Angular Material content container if it handles its own scrolling
+        const content = document.querySelector('.mat-sidenav-content') as HTMLElement | null;
+        if (content) {
+          content.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        }
+      } catch (_) {
+        // no-op
+      }
     });
   }
 

@@ -10,5 +10,6 @@ namespace BGClima.Application.Services
         Task<Product> CreateAsync(Product product);
         Task UpdateAsync(Product product);
         Task DeleteAsync(int id);
+        Task<IEnumerable<Product>> GetProductsByCategoryAsync(string categoryName);
     }
 } 

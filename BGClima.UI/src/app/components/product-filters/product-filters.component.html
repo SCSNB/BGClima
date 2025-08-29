@@ -1,0 +1,83 @@
+<mat-accordion multi>
+  
+
+  <!-- Brand Filter -->
+  <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Марка
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div class="filter-options">
+      <mat-checkbox [checked]="isSelected(filters.brands, 'Daikin')" (change)="toggleFilter(filters.brands, 'Daikin')">Daikin</mat-checkbox>
+      <mat-checkbox [checked]="isSelected(filters.brands, 'Mitsubishi')" (change)="toggleFilter(filters.brands, 'Mitsubishi')">Mitsubishi</mat-checkbox>
+      <mat-checkbox [checked]="isSelected(filters.brands, 'Fuji Electric')" (change)="toggleFilter(filters.brands, 'Fuji Electric')">Fuji Electric</mat-checkbox>
+      <mat-checkbox [checked]="isSelected(filters.brands, 'Gree')" (change)="toggleFilter(filters.brands, 'Gree')">Gree</mat-checkbox>
+    </div>
+  </mat-expansion-panel>
+
+  <mat-divider></mat-divider>
+
+  <!-- Price Filter -->
+  <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Цена
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div class="price-filter">
+      <mat-slider min="100" max="5000" step="100">
+        <input matSliderStartThumb type="range"
+               [(ngModel)]="filters.price.lower" name="priceLowerThumb"
+               (ngModelChange)="onFiltersChanged()">
+        <input matSliderEndThumb type="range"
+               [(ngModel)]="filters.price.upper" name="priceUpperThumb"
+               (ngModelChange)="onFiltersChanged()">
+      </mat-slider>
+      <div class="price-inputs">
+        <mat-form-field appearance="outline">
+          <mat-label>От</mat-label>
+          <input matInput type="number" [(ngModel)]="filters.price.lower" (change)="onFiltersChanged()" name="priceLower">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>До</mat-label>
+          <input matInput type="number" [(ngModel)]="filters.price.upper" (change)="onFiltersChanged()" name="priceUpper">
+        </mat-form-field>
+      </div>
+    </div>
+  </mat-expansion-panel>
+
+  <mat-divider></mat-divider>
+
+  <!-- Energy Class Filter -->
+  <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Енергиен клас
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div class="filter-options">
+      <mat-checkbox [checked]="isSelected(filters.energyClasses, 'A+++')" (change)="toggleFilter(filters.energyClasses, 'A+++')">A+++</mat-checkbox>
+      <mat-checkbox [checked]="isSelected(filters.energyClasses, 'A++')" (change)="toggleFilter(filters.energyClasses, 'A++')">A++</mat-checkbox>
+      <mat-checkbox [checked]="isSelected(filters.energyClasses, 'A+')" (change)="toggleFilter(filters.energyClasses, 'A+')">A+</mat-checkbox>
+      <mat-checkbox [checked]="isSelected(filters.energyClasses, 'A')" (change)="toggleFilter(filters.energyClasses, 'A')">A</mat-checkbox>
+    </div>
+  </mat-expansion-panel>
+
+  <mat-divider></mat-divider>
+
+  <!-- BTU Filter -->
+  <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        BTU
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div class="filter-options">
+      <mat-checkbox [checked]="isSelected(filters.btus, '9000')" (change)="toggleFilter(filters.btus, '9000')">9000 BTU</mat-checkbox>
+      <mat-checkbox [checked]="isSelected(filters.btus, '12000')" (change)="toggleFilter(filters.btus, '12000')">12000 BTU</mat-checkbox>
+      <mat-checkbox [checked]="isSelected(filters.btus, '18000')" (change)="toggleFilter(filters.btus, '18000')">18000 BTU</mat-checkbox>
+      <mat-checkbox [checked]="isSelected(filters.btus, '24000')" (change)="toggleFilter(filters.btus, '24000')">24000 BTU</mat-checkbox>
+    </div>
+  </mat-expansion-panel>
+</mat-accordion>
