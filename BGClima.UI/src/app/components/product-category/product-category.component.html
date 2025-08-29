@@ -1,11 +1,9 @@
 <div class="category-container">
   <h1 class="category-title">{{ categoryTitle }}</h1>
   <div class="content-wrapper">
-    <!-- Временно скрит панел с филтри
     <aside class="filters-sidebar">
-      <app-product-filters (filtersChanged)="applyFilters($event)"></app-product-filters>
+      <app-product-filters [currentCategory]="currentCategory" [minPrice]="100" [maxPrice]="maxPrice" (filtersChanged)="applyFilters($event)"></app-product-filters>
     </aside>
-    -->
     <div class="product-grid">
       <ng-container *ngIf="filteredProducts.length > 0; else noProducts">
         <a *ngFor="let product of filteredProducts" [routerLink]="['/product', product.id]" class="offer-card-link">

@@ -21,6 +21,8 @@ export class ProductCategoryComponent implements OnInit {
   categoryTitle: string = '';
   allProducts: ProductCard[] = []; // Store all products for the category
   filteredProducts: ProductCard[] = []; // Products to display after filtering
+  currentCategory: string = '';
+  maxPrice: number = 0;
 
   constructor(private route: ActivatedRoute, private productService: ProductService) { }
 
@@ -28,10 +30,17 @@ export class ProductCategoryComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       const category = params.get('category');
       if (category) {
+        this.currentCategory = category;
         this.setCategoryTitle(category);
         this.loadProducts(category);
       }
     });
+  }
+
+  private computeMaxPrice(products: ProductCard[]): number {
+    const prices = products.map(p => Number(p.price ?? 0)).filter(n => !isNaN(n));
+    if (!prices.length) return 0;
+    return Math.max(...prices);
   }
 
   private toEur(bgn?: number | null): number | null {
@@ -83,6 +92,7 @@ export class ProductCategoryComponent implements OnInit {
 
         this.allProducts = withCardData;
         this.filteredProducts = [...withCardData];
+        this.maxPrice = this.computeMaxPrice(withCardData);
       });
       return;
     }
@@ -127,6 +137,7 @@ export class ProductCategoryComponent implements OnInit {
 
       this.allProducts = withCardData;
       this.filteredProducts = [...withCardData];
+      this.maxPrice = this.computeMaxPrice(withCardData);
     });
   }
 
@@ -225,8 +236,42 @@ export class ProductCategoryComponent implements OnInit {
   }
 
   applyFilters(filters: any): void {
-    // Временно изключено филтриране: показваме всички продукти върнати от бекенда
-    this.filteredProducts = [...this.allProducts];
+    // Филтриране по марка, цена, енергиен клас и BTU (в хиляди)
+    const selectedBrands: string[] = filters?.brands || [];
+    const selectedEnergy: string[] = filters?.energyClasses || [];
+    const selectedBtus: string[] = filters?.btus || [];
+    const priceLower: number = Number(filters?.price?.lower ?? 0);
+    const priceUpper: number = Number(filters?.price?.upper ?? Number.MAX_SAFE_INTEGER);
+
+    const selectedBtusNum = new Set<number>(
+      (selectedBtus || []).map((b: string) => parseInt(String(b).replace(/\D+/g, ''), 10) / 1000).filter((n: number) => !isNaN(n))
+    );
+
+    this.filteredProducts = this.allProducts.filter(p => {
+      // Цена в лева
+      const price = Number(p.price ?? 0);
+      if (!(price >= priceLower && price <= priceUpper)) return false;
+
+      // Марка
+      if (selectedBrands.length) {
+        const brandName = (p.brand?.name || '').toString();
+        if (!selectedBrands.includes(brandName)) return false;
+      }
+
+      // Енергиен клас
+      if (selectedEnergy.length) {
+        const cls = (p.energyClass?.class || '').toString();
+        if (!selectedEnergy.includes(cls)) return false;
+      }
+
+      // BTU (в хиляди)
+      if (selectedBtusNum.size > 0) {
+        const btuK = this.getBtuInThousands(p);
+        if (!selectedBtusNum.has(btuK)) return false;
+      }
+
+      return true;
+    });
   }
 
   private setCategoryTitle(category: string): void {

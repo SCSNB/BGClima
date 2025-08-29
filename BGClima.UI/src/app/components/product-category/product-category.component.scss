@@ -21,31 +21,43 @@
   
     .content-wrapper {
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr; /* Mobile default: stack */
       gap: 2rem;
+
+      /* Desktop: show left sidebar + content */
+      @media (min-width: 992px) {
+        grid-template-columns: 280px 1fr;
+        align-items: start;
+      }
   
       .filters-sidebar {
         border-right: 1px solid #e0e0e0;
         padding-right: 2rem;
+        /* Няма sticky или вътрешен скрол — скролира цялата страница */
+        position: static;
+        overflow: visible;
       }
   
       .product-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
         width: 100%;
         align-items: stretch;
 
-        @media (max-width: 1200px) {
+        /* Desktop: по 3 продукта на ред за по-добър баланс при лява колона */
+        @media (min-width: 992px) {
           grid-template-columns: repeat(3, 1fr);
         }
+
+        /* На по-тесни екрани позволяваме по-малка минимална ширина */
         @media (max-width: 991px) {
-          grid-template-columns: repeat(2, 1fr);
-          gap: 10px;
+          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+          gap: 12px;
         }
         @media (max-width: 768px) {
           grid-template-columns: repeat(2, 1fr);
-          gap: 8px;
+          gap: 10px;
         }
         @media (max-width: 576px) {
           grid-template-columns: 1fr;
