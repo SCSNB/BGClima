@@ -1,56 +1,70 @@
-<section class="offers-section">
-  <h2 class="offers-title">{{ title }}</h2>
+<section class="promo-layout">
+  <h2 class="offers-title layout-header">{{ title }}</h2>
 
-  <div class="loader" *ngIf="loading">
-    <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
-  </div>
+  <aside class="sidebar desktop-only">
+    <app-product-filters
+      [currentCategory]="currentCategory"
+      [minPrice]="minPrice"
+      [maxPrice]="maxPrice"
+      [allowedBrands]="allowedBrandNames"
+      [showCategoriesNav]="false"
+      (filtersChanged)="onFiltersChanged($event)"
+      (sortChanged)="onSortChanged($event)">
+    </app-product-filters>
+  </aside>
 
-  <div class="offers-cards-wrapper" *ngIf="!loading && products.length">
-    <ng-container *ngFor="let p of products">
-      <a [routerLink]="['/product', p.id]" class="offer-card-link">
-        <div class="offer-card">
-          <div class="offer-card-image-badges">
-            <img [src]="p.imageUrl || 'assets/solar-panel-placeholder.jpg'" [alt]="p.name" class="offer-card-image" />
-            <div class="offer-badges">
-              <span class="badge" *ngFor="let b of p.badges" [ngStyle]="{background: b.bg, color: b.color}">{{ b.text }}</span>
-            </div>
-          </div>
-          <div class="offer-card-title">{{ p.name }}</div>
-          <div class="offer-card-prices">
-            <div class="price-container">
-              <div class="current-prices">
-                <span class="current-price">{{ p.price | number:'1.2-2' }} лв.</span>
-                <span class="current-price-eur" *ngIf="p.priceEur">/ {{ p.priceEur | number:'1.2-2' }} €</span>
-              </div>
-              <div class="old-prices" *ngIf="p.oldPrice">
-                <span class="old-price">{{ p.oldPrice | number:'1.2-2' }} лв.</span>
-                <span class="old-price-eur" *ngIf="p.oldPriceEur">/ {{ p.oldPriceEur | number:'1.2-2' }} €</span>
+  <div class="content">
+    <div class="loader" *ngIf="loading">
+      <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+    </div>
+
+    <div class="offers-cards-wrapper" *ngIf="!loading && products.length">
+      <ng-container *ngFor="let p of products">
+        <a [routerLink]="['/product', p.id]" class="offer-card-link">
+          <div class="offer-card">
+            <div class="offer-card-image-badges">
+              <img [src]="p.imageUrl || 'assets/solar-panel-placeholder.jpg'" [alt]="p.name" class="offer-card-image" />
+              <div class="offer-badges">
+                <span class="badge" *ngFor="let b of p.badges" [ngStyle]="{background: b.bg, color: b.color}">{{ b.text }}</span>
               </div>
             </div>
-          </div>
-          <div class="offer-card-brand-row">
-            <span class="brand-text">{{ p.brand?.name || '' }}</span>
-            <button class="compare-btn" type="button">Сравни</button>
-          </div>
-          <div class="offer-card-specs">
-            <ng-container *ngFor="let spec of p.specs">
-              <div class="spec" *ngIf="spec?.value">
-                <div class="spec-icon" [ngClass]="spec.icon">
-                  <span class="material-icons">{{ spec.icon }}</span>
+            <div class="offer-card-title">{{ p.name }}</div>
+            <div class="offer-card-prices">
+              <div class="price-container">
+                <div class="current-prices">
+                  <span class="current-price">{{ p.price | number:'1.2-2' }} лв.</span>
+                  <span class="current-price-eur" *ngIf="p.priceEur">/ {{ p.priceEur | number:'1.2-2' }} €</span>
                 </div>
-                <div class="spec-details">
-                  <div class="spec-label">{{ spec.label }}</div>
-                  <div class="spec-value">{{ spec.value }}</div>
+                <div class="old-prices" *ngIf="p.oldPrice">
+                  <span class="old-price">{{ p.oldPrice | number:'1.2-2' }} лв.</span>
+                  <span class="old-price-eur" *ngIf="p.oldPriceEur">/ {{ p.oldPriceEur | number:'1.2-2' }} €</span>
                 </div>
               </div>
-            </ng-container>
+            </div>
+            <div class="offer-card-brand-row">
+              <span class="brand-text">{{ p.brand?.name || '' }}</span>
+              <button class="compare-btn" type="button">Сравни</button>
+            </div>
+            <div class="offer-card-specs">
+              <ng-container *ngFor="let spec of p.specs">
+                <div class="spec" *ngIf="spec?.value">
+                  <div class="spec-icon" [ngClass]="spec.icon">
+                    <span class="material-icons">{{ spec.icon }}</span>
+                  </div>
+                  <div class="spec-details">
+                    <div class="spec-label">{{ spec.label }}</div>
+                    <div class="spec-value">{{ spec.value }}</div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
           </div>
-        </div>
-      </a>
-    </ng-container>
-  </div>
+        </a>
+      </ng-container>
+    </div>
 
-  <div class="empty" *ngIf="!loading && !products.length">
-    Няма активни промо продукти в момента.
+    <div class="empty" *ngIf="!loading && !products.length">
+      Няма активни промо продукти в момента.
+    </div>
   </div>
 </section>

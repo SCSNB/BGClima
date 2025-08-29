@@ -13,6 +13,10 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   @Input() currentCategory: string = '';
   @Input() minPrice: number = 100;
   @Input() maxPrice: number = 79900;
+  // Списък с позволени марки (например само тези, които имат промо продукти)
+  @Input() allowedBrands: string[] = [];
+  // Показва/скрива секцията с бързи връзки (категории)
+  @Input() showCategoriesNav: boolean = true;
 
   filters = {
     brands: [] as string[],
@@ -23,6 +27,8 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
 
   // Списък с марки от бекенда
   brands: BrandDto[] = [];
+  // Пълен списък за локално филтриране по allowedBrands
+  private allBrands: BrandDto[] = [];
   // Списък с BTU стойности от бекенда
   btuOptions: BTUDto[] = [];
 
@@ -138,11 +144,13 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     // Зареждане на всички марки от базата
     this.productService.getBrands().subscribe({
       next: (brands) => {
-        this.brands = brands ?? [];
+        this.allBrands = brands ?? [];
+        this.applyAllowedBrandsFilter();
       },
       error: (err) => {
         console.error('Грешка при зареждане на марки:', err);
-        this.brands = [];
+        this.allBrands = [];
+        this.applyAllowedBrandsFilter();
       }
     });
 
@@ -167,6 +175,9 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
       // емитни веднъж, за да синхронизираме списъка
       this.filtersChanged.emit(this.filters);
     }
+    if (changes['allowedBrands']) {
+      this.applyAllowedBrandsFilter();
+    }
   }
 
   private clampPrices(): void {
@@ -188,6 +199,24 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     }
     this.filters.price.lower = lower;
     this.filters.price.upper = upper;
+  }
+
+  // Прилага филтрация на списъка с марки според allowedBrands и чисти несъществуващи избори
+  private applyAllowedBrandsFilter(): void {
+    const allow = (this.allowedBrands || []).filter(Boolean);
+    if (allow.length > 0) {
+      this.brands = (this.allBrands || []).filter(b => !!b?.name && allow.includes(b.name));
+    } else {
+      this.brands = [...(this.allBrands || [])];
+    }
+    // Премахни от избора марки, които вече не се показват
+    const visibleNames = new Set(this.brands.map(b => b.name));
+    const before = this.filters.brands.length;
+    this.filters.brands = (this.filters.brands || []).filter(n => visibleNames.has(n));
+    if (this.filters.brands.length !== before) {
+      // ако има промяна – емитни, за да се актуализира списъкът с продукти
+      this.filtersChanged.emit(this.filters);
+    }
   }
 
   // Проценти за сивите зони извън избрания диапазон

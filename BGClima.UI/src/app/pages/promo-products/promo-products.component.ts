@@ -1,9 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { ProductDto, ProductService } from '../../services/product.service';
 
 interface Badge { bg: string; color: string; text: string }
@@ -19,20 +14,56 @@ type ProductCard = ProductDto & {
 @Component({
   selector: 'app-promo-products',
   templateUrl: './promo-products.component.html',
-  styleUrls: ['./promo-products.component.scss'],
-  standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule]
+  styleUrls: ['./promo-products.component.scss']
 })
 export class PromoProductsComponent implements OnInit {
   title = 'ПРОМО оферти';
   loading = true;
   products: ProductCard[] = [];
+  allPromoProducts: ProductCard[] = [];
+  // Марки, които реално присъстват сред промо продуктите (за филтрите)
+  allowedBrandNames: string[] = [];
+
+  // За колоната с филтри
+  minPrice = 0;
+  maxPrice = 0;
+  currentCategory = '';
 
   constructor(private productService: ProductService) {}
 
   ngOnInit(): void {
     this.loadPromoProducts();
   }
+
+  onFiltersChanged = (f: { brands: string[]; price: { lower: number; upper: number }; energyClasses: string[]; btus: string[]; }) => {
+    const byBrand = (p: ProductCard) => !f.brands.length || !!p.brand && f.brands.includes(p.brand.name);
+    const byPrice = (p: ProductCard) => {
+      const price = p.price || 0;
+      return price >= f.price.lower && price <= f.price.upper;
+    };
+    const byClass = (p: ProductCard) => !f.energyClasses.length || !!p.energyClass && f.energyClasses.includes(p.energyClass.class);
+    const byBTU = (p: ProductCard) => {
+      if (!f.btus.length) return true;
+      const btu = (p.btu?.value ?? '').toString();
+      const match = btu.match(/(\d+(?:\.\d+)?)/);
+      const k = match ? Math.round(parseFloat(match[1]) / 1000).toString() : '';
+      return f.btus.includes(k) || f.btus.includes((p.btu as any)?.value?.toString?.() ?? '');
+    };
+    this.products = this.allPromoProducts
+      .filter(p => byBrand(p) && byPrice(p) && byClass(p) && byBTU(p));
+  };
+
+  onSortChanged = (key: string) => {
+    const arr = [...this.products];
+    const by = (k: keyof ProductCard, dir: 1|-1 = 1) => arr.sort((a,b)=>((a[k]||0)>(b[k]||0)?dir:-dir));
+    switch (key) {
+      case 'name-asc': this.products = arr.sort((a,b)=> (a.name||'').localeCompare(b.name||'')); break;
+      case 'name-desc': this.products = arr.sort((a,b)=> (b.name||'').localeCompare(a.name||'')); break;
+      case 'price-asc': this.products = by('price', 1); break;
+      case 'price-desc': this.products = by('price', -1); break;
+      case 'newest': default: this.products = arr; break;
+    }
+  };
 
   private toEur(bgn?: number | null): number | null {
     if (bgn === undefined || bgn === null) return null;
@@ -44,7 +75,7 @@ export class PromoProductsComponent implements OnInit {
     this.productService.getProducts().subscribe({
       next: (all) => {
         const filtered = (all || []).filter(p => !!p.isOnSale);
-        this.products = filtered.map(p => {
+        this.allPromoProducts = filtered.map(p => {
           const priceEur = this.toEur(p.price);
           const oldPriceEur = this.toEur(p.oldPrice ?? undefined);
 
@@ -74,6 +105,16 @@ export class PromoProductsComponent implements OnInit {
 
           return { ...p, badges, specs, priceEur, oldPriceEur } as ProductCard;
         });
+        // Определи разрешените марки на база наличните промо продукти
+        const brandSet = new Set<string>();
+        this.allPromoProducts.forEach(p => { const n = p.brand?.name?.trim(); if (n) brandSet.add(n); });
+        this.allowedBrandNames = Array.from(brandSet).sort((a,b)=>a.localeCompare(b));
+        // Определи мин/макс цена
+        const prices = this.allPromoProducts.map(p => p.price || 0);
+        this.minPrice = prices.length ? Math.min(...prices) : 0;
+        this.maxPrice = prices.length ? Math.max(...prices) : 0;
+        // Първоначално показваме всички
+        this.products = [...this.allPromoProducts];
         this.loading = false;
       },
       error: () => {

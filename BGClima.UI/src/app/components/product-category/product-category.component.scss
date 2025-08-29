@@ -26,13 +26,13 @@
 
       /* Desktop: show left sidebar + content */
       @media (min-width: 992px) {
-        grid-template-columns: 280px 1fr;
+        grid-template-columns: 260px 1fr; /* по-тясна колона за филтрите -> по-широки карти */
         align-items: start;
       }
   
       .filters-sidebar {
-        border-right: 1px solid #e0e0e0;
-        padding-right: 2rem;
+        border-right: none; /* махаме вертикалната линия */
+        padding-right: 1rem; /* леко по-малък padding за повече ширина на продуктите */
         /* Няма sticky или вътрешен скрол — скролира цялата страница */
         position: static;
         overflow: visible;
@@ -40,7 +40,7 @@
   
       .product-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         gap: 16px;
         width: 100%;
         align-items: stretch;
@@ -52,7 +52,7 @@
 
         /* На по-тесни екрани позволяваме по-малка минимална ширина */
         @media (max-width: 991px) {
-          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
           gap: 12px;
         }
         @media (max-width: 768px) {

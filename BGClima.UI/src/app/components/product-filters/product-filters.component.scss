@@ -3,6 +3,26 @@
   padding: 0 16px 16px !important;
 }
 
+/* Премахване на "кутии" около секциите: фон, бордери и сенки */
+::ng-deep .mat-expansion-panel,
+::ng-deep .mat-expansion-panel.mat-elevation-z0 {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+::ng-deep .mat-expansion-panel-header,
+::ng-deep .mat-expansion-panel .mat-expansion-panel-header {
+  background: transparent !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 16px !important;
+}
+/* Премахване на долни бордери вътре в панела; оставяме само <mat-divider> между панелите */
+::ng-deep .mat-expansion-panel:not(:last-child) {
+  margin-bottom: 0 !important;
+}
+
 /* Секция „Климатици“ (бърза навигация) */
 .categories-nav {
   display: flex;

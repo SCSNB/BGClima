@@ -1,7 +1,7 @@
 <mat-accordion multi>
 
   <!-- Categories quick navigation (dynamic: Климатици / Термопомпи) -->
-  <mat-expansion-panel [expanded]="true">
+  <mat-expansion-panel *ngIf="showCategoriesNav" [expanded]="true">
     <mat-expansion-panel-header>
       <mat-panel-title>
         {{ sectionTitle }}
@@ -14,7 +14,7 @@
     </nav>
   </mat-expansion-panel>
 
-  <mat-divider></mat-divider>
+  <mat-divider *ngIf="showCategoriesNav"></mat-divider>
 
   <!-- Brand Filter -->
   <mat-expansion-panel [expanded]="true">
