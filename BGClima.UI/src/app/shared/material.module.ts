@@ -22,30 +22,35 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 const materialModules = [
-  MatButtonModule,
-  MatCardModule,
-  MatInputModule,
-  MatFormFieldModule,
-  MatToolbarModule,
-  MatSidenavModule,
-  MatIconModule,
-  MatListModule,
-  MatGridListModule,
-  MatProgressSpinnerModule,
-  MatSnackBarModule,
-  MatExpansionModule,
-  MatSliderModule,
-  MatDividerModule,
-  MatMenuModule,
-  MatTableModule,
-  MatPaginatorModule,
-  MatSortModule,
-  MatDialogModule,
-  MatSelectModule,
-  MatCheckboxModule,
-  MatProgressBarModule
+    MatCardModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatToolbarModule,
+    MatSidenavModule,
+    MatIconModule,
+    MatListModule,
+    MatGridListModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    MatExpansionModule,
+    MatSliderModule,
+    MatDividerModule,
+    MatMenuModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatDialogModule,
+    MatSelectModule,
+    MatCheckboxModule,
+    MatProgressBarModule,
+    MatChipsModule,
+    MatSlideToggleModule,
+    MatTooltipModule,
 ];
 
 @NgModule({
