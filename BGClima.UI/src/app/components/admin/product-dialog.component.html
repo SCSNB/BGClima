@@ -46,6 +46,33 @@
       </mat-select>
     </mat-form-field>
 
+    <div class="form-group full">
+      <h3>Снимки към описанието</h3>
+      <div class="add-image-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>URL на снимка за описание</mat-label>
+          <input matInput [(ngModel)]="newDescriptionImageUrl" [ngModelOptions]="{standalone: true}" placeholder="https://example.com/image.jpg" (keyup.enter)="addDescriptionImage()">
+          <button mat-icon-button matSuffix (click)="addDescriptionImage()" [disabled]="!newDescriptionImageUrl" matTooltip="Добави снимка">
+            <mat-icon>add_photo_alternate</mat-icon>
+          </button>
+        </mat-form-field>
+        <button mat-stroked-button color="primary" class="add-image-btn" (click)="addDescriptionImage()" [disabled]="!newDescriptionImageUrl">
+          <mat-icon>add</mat-icon>
+          Добави снимка
+        </button>
+      </div>
+      <div class="images-list">
+        <div *ngFor="let img of descriptionImages; let i = index" class="image-item">
+          <img [src]="img.imageUrl" [alt]="'Снимка към описание ' + (i + 1)">
+          <div class="image-actions">
+            <button mat-icon-button color="warn" (click)="removeDescriptionImage(i)" matTooltip="Изтрий">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <mat-form-field appearance="outline" class="full">
       <mat-label>Описание</mat-label>
       <textarea matInput rows="3" formControlName="description"></textarea>
@@ -106,7 +133,10 @@
         <div class="attribute-item" *ngFor="let attr of attributes; let i = index">
           <span class="attribute-key">{{ attr.attributeKey }}:</span>
           <span class="attribute-value">{{ attr.attributeValue }}</span>
-          <button mat-icon-button color="warn" (click)="removeAttribute(i)">
+          <button mat-icon-button color="primary" (click)="editAttribute(i)" matTooltip="Редактирай">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="removeAttribute(i)" matTooltip="Изтрий">
             <mat-icon>delete</mat-icon>
           </button>
         </div>

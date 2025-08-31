@@ -48,5 +48,27 @@ namespace BGClima.Application.Services
                 await _productRepository.SaveChangesAsync();
             }
         }
+
+        public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(string categoryName)
+        {
+            var dbCategoryName = MapCategoryNameToDbValue(categoryName);
+            return await _productRepository.GetProductsByCategoryAsync(dbCategoryName);
+        }
+
+        private string MapCategoryNameToDbValue(string categoryName)
+        {
+            return categoryName switch
+            {
+                "stenen-tip" => "Стенен тип",
+                "kolonen-tip" => "Колонен",
+                "kanalen-tip" => "Канален",
+                "kasetachen-tip" => "Касетъчен",
+                "podov-tip" => "Подов",
+                "podovo-tavanen-tip" => "Подово-таванен",
+                "vrf-vrv" => "VRF/VRV",
+                "mobilni-prenosimi" => "Мобилен",
+                _ => categoryName
+            };
+        }
     }
 } 

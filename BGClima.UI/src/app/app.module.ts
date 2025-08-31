@@ -16,6 +16,10 @@ import { HomeComponent } from './components/home/home.component';
 import { ProductListComponent } from './components/admin/product-list.component';
 import { ProductDialogComponent } from './components/admin/product-dialog.component';
 import { DashboardHomeComponent } from './components/admin/dashboard-home.component';
+import { VentilationDesignComponent } from './components/ventilation-design/ventilation-design.component';
+import { ProductDetailsComponent } from './pages/product-details/product-details.component';
+import { FormatLabelPipe } from './shared/pipes/format-label.pipe';
+import { RouterModule } from '@angular/router';
 
 // Material Module
 import { MaterialModule } from './shared/material.module';
@@ -32,8 +36,14 @@ import { CertificatesComponent } from './components/certificates/certificates.co
 import { ProjectsComponent } from './components/projects/projects.component';
 import { ConsultingComponent } from './components/consulting/consulting.component';
 import { InstallationComponent } from './components/installation/installation.component';
-import { ProfilaktikaComponent } from './components/profilaktika/profilaktika.component';
 import { ServizComponent } from './components/serviz/serviz.component';
+import { BannersComponent } from './components/admin/banners/banners.component';
+import { BannerDialogComponent } from './components/admin/banners/banner-dialog/banner-dialog.component';
+import { PromoBannersComponent } from './components/promo-banners/promo-banners.component';
+import { VentilationInstallationComponent } from './components/ventilation-installation/ventilation-installation.component';
+import { ProductCategoryComponent } from './components/product-category/product-category.component';
+import { ProductFiltersComponent } from './components/product-filters/product-filters.component';
+import { MaintenanceComponent } from './components/maintenance/maintenance.component';
 
 @NgModule({
   declarations: [
@@ -50,13 +60,22 @@ import { ServizComponent } from './components/serviz/serviz.component';
     MainActivityComponent,
     ResourceComponent,
     CertificatesComponent,
-         ProjectsComponent,
-     ConsultingComponent,
-     ProductListComponent,
-     ProductDialogComponent,
- 	DashboardHomeComponent,
- 	ProfilaktikaComponent,
- 	ServizComponent
+    ProjectsComponent,
+    ConsultingComponent,
+    ProductListComponent,
+    ProductDialogComponent,
+    DashboardHomeComponent,
+    ServizComponent,
+    BannersComponent,
+    BannerDialogComponent,
+    PromoBannersComponent,
+    VentilationDesignComponent,
+    VentilationInstallationComponent,
+    ProductCategoryComponent,
+    ProductFiltersComponent,
+    MaintenanceComponent,
+    ProductDetailsComponent,
+    FormatLabelPipe
    ],
   imports: [
     BrowserModule,
@@ -64,7 +83,9 @@ import { ServizComponent } from './components/serviz/serviz.component';
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
+    MaterialModule,
     AppRoutingModule,
+    RouterModule,
     MaterialModule
   ],
   providers: [
