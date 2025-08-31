@@ -57,22 +57,28 @@ if (connectionString.StartsWith("postgres://"))
 }
 
 // Mask sensitive information in logs
-var safeConnectionString = new string(connectionString.Select((c, i) => 
+var safeConnectionString = new string(connectionString.Select((c, i) =>
     i > 5 && i < connectionString.Length - 5 && c != ';' ? '*' : c).ToArray());
 Console.WriteLine($"Connection string: {safeConnectionString}");
+
+if (builder.Environment.IsProduction()) 
+{
+    connectionString = "Host=51.21.18.29;Port=5432;Username=postgres.puegihlkhohkkxnboavo;Password=PxoI!SDz^!4sNG1@;Database=postgres;Ssl Mode=Require;Trust Server Certificate=true;Timeout=30;Pooling=true;Maximum Pool Size=20;Minimum Pool Size=5;";
+}
+
 // Register BGClimaContext
 builder.Services.AddDbContext<BGClimaContext>(options =>
-    options.UseNpgsql(connectionString, npgsqlOptions =>
-    {
-        npgsqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 3,
-            maxRetryDelay: TimeSpan.FromSeconds(10),
-            errorCodesToAdd: null);
-        npgsqlOptions.MigrationsAssembly("BGClima.Infrastructure");
-        npgsqlOptions.CommandTimeout(60); // 60 seconds timeout
-    })
-    .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
-    .ConfigureWarnings(warnings => warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.MultipleCollectionIncludeWarning)));
+options.UseNpgsql(connectionString, npgsqlOptions =>
+{
+    npgsqlOptions.EnableRetryOnFailure(
+        maxRetryCount: 3,
+        maxRetryDelay: TimeSpan.FromSeconds(10),
+        errorCodesToAdd: null);
+    npgsqlOptions.MigrationsAssembly("BGClima.Infrastructure");
+    npgsqlOptions.CommandTimeout(60); // 60 seconds timeout
+})
+.EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
+.ConfigureWarnings(warnings => warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.MultipleCollectionIncludeWarning)));
 
 // Configure Identity
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
