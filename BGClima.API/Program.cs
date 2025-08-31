@@ -27,11 +27,24 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
-// Register DbContext with PostgreSQL
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
-                      "Host=localhost;Port=5432;Database=bgclima;Username=postgres;Password=;";
+// Get connection string from environment variable (for Fly.io) or fall back to appsettings.json
+var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") ??
+                     builder.Configuration.GetConnectionString("DefaultConnection") ??
+                     "Host=localhost;Port=5432;Database=bgclima;Username=postgres;Password=;";
 
-Console.WriteLine(connectionString);
+if (builder.Environment.IsProduction())
+{
+    Console.WriteLine("Running in production with environment-based configuration");
+}
+else
+{
+    Console.WriteLine($"Using connection string from {(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")) ? "appsettings.json" : "environment variable"}");
+}
+
+// Mask sensitive information in logs
+var safeConnectionString = new string(connectionString.Select((c, i) => 
+    i > 5 && i < connectionString.Length - 5 && c != ';' ? '*' : c).ToArray());
+Console.WriteLine($"Connection string: {safeConnectionString}");
 // Register BGClimaContext
 builder.Services.AddDbContext<BGClimaContext>(options =>
     options.UseNpgsql(connectionString, npgsqlOptions =>
