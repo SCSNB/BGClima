@@ -544,7 +544,7 @@ namespace BGClima.API.Data
             var existingAdmin = await userManager.FindByNameAsync("admin");
             if (existingAdmin != null)
             {
-                await userManager.DeleteAsync(existingAdmin);
+                return;
             }
 
             // Create roles in batch
