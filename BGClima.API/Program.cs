@@ -31,16 +31,20 @@ builder.Services.AddControllers();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                       "Host=localhost;Port=5432;Database=bgclima;Username=postgres;Password=;";
 
+Console.WriteLine(connectionString);
 // Register BGClimaContext
 builder.Services.AddDbContext<BGClimaContext>(options =>
     options.UseNpgsql(connectionString, npgsqlOptions =>
     {
         npgsqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 5,
-            maxRetryDelay: TimeSpan.FromSeconds(30),
+            maxRetryCount: 3,
+            maxRetryDelay: TimeSpan.FromSeconds(10),
             errorCodesToAdd: null);
         npgsqlOptions.MigrationsAssembly("BGClima.Infrastructure");
-    }));
+        npgsqlOptions.CommandTimeout(60); // 60 seconds timeout
+    })
+    .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
+    .ConfigureWarnings(warnings => warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.MultipleCollectionIncludeWarning)));
 
 // Configure Identity
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
@@ -100,7 +104,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAngularDev",
         policy => policy
             .WithOrigins(
-                "http://localhost:4200" // Angular dev server (default port)
+                "http://localhost:4200", // Angular dev server (default port)
+                "https://bgclima.fly.dev" // Production Fly.io URL (same origin)
             )
             .AllowAnyHeader()
             .AllowAnyMethod()
@@ -110,19 +115,17 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Apply pending migrations on startup
-using var scope = app.Services.CreateScope();
-var dbContext = scope.ServiceProvider.GetRequiredService<BGClimaContext>();
-dbContext.Database.Migrate();
+// using var scope = app.Services.CreateScope();
+// var dbContext = scope.ServiceProvider.GetRequiredService<BGClimaContext>();
+// dbContext.Database.Migrate();
 // Apply migrations and seed sample data
-if (app.Environment.IsDevelopment())
-{
-    //SeedTestData(db);
-    // Optimized seeding with performance improvements
-    await SeedData.SeedIdentityDataAsync(scope.ServiceProvider);
-    await SeedData.SeedAsync(dbContext);
-}
-
-
+//if (app.Environment.IsDevelopment())
+//{
+//    //SeedTestData(db);
+//    // Optimized seeding with performance improvements
+//    await SeedData.SeedIdentityDataAsync(scope.ServiceProvider);
+//    await SeedData.SeedAsync(dbContext);
+//}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

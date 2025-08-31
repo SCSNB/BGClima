@@ -17,32 +17,11 @@ import { ProductListComponent } from './components/admin/product-list.component'
 import { ProductDialogComponent } from './components/admin/product-dialog.component';
 import { DashboardHomeComponent } from './components/admin/dashboard-home.component';
 
-// Material Imports
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatSliderModule } from '@angular/material/slider';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatSortModule } from '@angular/material/sort';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatSelectModule } from '@angular/material/select';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
- 
- // Services and Interceptors
- import { AuthService } from './services/auth.service';
+// Material Module
+import { MaterialModule } from './shared/material.module';
+
+// Services and Interceptors
+import { AuthService } from './services/auth.service';
 import { AuthGuard } from './guards/auth.guard';
 import { JwtInterceptor, ErrorInterceptor } from './interceptors';
 import { ContactsComponent } from './components/contacts/contacts.component';
@@ -86,31 +65,8 @@ import { ServizComponent } from './components/serviz/serviz.component';
     FormsModule,
     ReactiveFormsModule,
     AppRoutingModule,
-    
-    // Material Modules
-    MatButtonModule,
-    MatCardModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatToolbarModule,
-    MatSidenavModule,
-    MatIconModule,
-    MatListModule,
-    MatGridListModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
-    MatExpansionModule,
-    MatSliderModule,
-    MatDividerModule,
-         MatMenuModule,
-     MatTableModule,
-     MatPaginatorModule,
-     MatSortModule,
-     MatDialogModule,
-     MatSelectModule,
-     MatCheckboxModule,
-     MatProgressBarModule
-   ],
+    MaterialModule
+  ],
   providers: [
     AuthService,
     AuthGuard,

@@ -484,11 +484,11 @@ namespace BGClima.API.Data
             var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            // Check if admin user already exists to avoid re-seeding
+            // Delete existing admin user if exists to ensure proper role assignment
             var existingAdmin = await userManager.FindByNameAsync("admin");
             if (existingAdmin != null)
             {
-                return; // Identity data already seeded
+                await userManager.DeleteAsync(existingAdmin);
             }
 
             // Create roles in batch

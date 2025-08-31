@@ -1,16 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormArray, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { 
-  ProductService, 
-  BrandDto, 
-  ProductTypeDto, 
-  CreateProductDto, 
-  ProductDto, 
-  BTUDto, 
-  EnergyClassDto,
-  CreateProductAttributeDto
-} from '../../services/product.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { ProductService, ProductDto, BrandDto, ProductTypeDto, BTUDto, EnergyClassDto, CreateProductDto, CreateProductAttributeDto } from '../../services/product.service';
+import { environment } from '../../../environments/environment';
 
 export interface ProductDialogData {
   mode: 'create' | 'edit';
@@ -362,7 +354,8 @@ export class ProductDialogComponent implements OnInit {
       };
 
       // Upload to the image controller endpoint
-      xhr.open('POST', 'http://localhost:5000/api/image/upload');
+      const uploadUrl = environment.production ? '/api/image/upload' : `${environment.apiUrl}/api/image/upload`;
+      xhr.open('POST', uploadUrl);
       
       // Add authentication header
       const token = localStorage.getItem('token');

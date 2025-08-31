@@ -19,8 +19,8 @@ export class AuthGuard implements CanActivate {
       // Check if route has data.roles and user has one of required roles
       if (route.data['roles'] && !this.checkRoles(route.data['roles'])) {
         console.log('User does not have required role');
-        // User doesn't have required role, redirect to home page
-        this.router.navigate(['/']);
+        // User doesn't have required role, redirect to login page
+        this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
         return false;
       }
 
