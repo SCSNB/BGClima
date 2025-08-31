@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - upload_images
   pull_request:
     branches:
       - main
@@ -51,9 +52,18 @@ jobs:
 
       - name: Build .NET API
         working-directory: ./BGClima.API
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --no-restore --configuration Release
 
       # 7️⃣ Publish .NET API
       - name: Publish .NET API
         working-directory: ./BGClima.API
-        run: dotnet publish --configuration Release --output ./publish
+        run: dotnet publish -c Release -o ${{ github.workspace }}/publish
+
+      # 8️⃣ Deploy to Fly.io
+      - name: Install Fly.io CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Fly.io
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
