@@ -81,17 +81,25 @@
     <div class="form-group full">
       <h3>Снимки на продукта</h3>
       <div class="add-image-form">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>URL на снимка</mat-label>
-          <input matInput [(ngModel)]="newImageUrl" [ngModelOptions]="{standalone: true}" placeholder="https://example.com/image.jpg" (keyup.enter)="addImage()">
-          <button mat-icon-button matSuffix (click)="addImage()" [disabled]="!newImageUrl" matTooltip="Добави снимка">
-            <mat-icon>add_photo_alternate</mat-icon>
+        <div class="upload-options">
+          <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" multiple style="display: none;">
+          <button mat-stroked-button color="primary" (click)="fileInput.click()" class="upload-btn">
+            <mat-icon>cloud_upload</mat-icon>
+            Качи снимки
           </button>
-        </mat-form-field>
-        <button mat-stroked-button color="primary" class="add-image-btn" (click)="addImage()" [disabled]="!newImageUrl">
-          <mat-icon>add</mat-icon>
-          Добави снимка
-        </button>
+          <span class="or-divider">или</span>
+          <mat-form-field appearance="outline" class="url-input">
+            <mat-label>URL на снимка</mat-label>
+            <input matInput [(ngModel)]="newImageUrl" [ngModelOptions]="{standalone: true}" placeholder="https://example.com/image.jpg" (keyup.enter)="addImageFromUrl()">
+            <button mat-icon-button matSuffix (click)="addImageFromUrl()" [disabled]="!newImageUrl" matTooltip="Добави снимка">
+              <mat-icon>add_photo_alternate</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+        <div *ngIf="uploadProgress > 0 && uploadProgress < 100" class="upload-progress">
+          <mat-progress-bar mode="determinate" [value]="uploadProgress"></mat-progress-bar>
+          <span>Качване: {{uploadProgress}}%</span>
+        </div>
       </div>
       <div class="images-list">
         <div *ngFor="let img of images; let i = index" class="image-item" [class.primary]="img.isPrimary">

@@ -1,9 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 @Pipe({
-  name: 'formatLabel',
-  standalone: true
+  name: 'formatLabel'
 })
 export class FormatLabelPipe implements PipeTransform {
   transform(value: string): string {

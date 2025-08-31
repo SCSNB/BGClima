@@ -13,15 +13,11 @@ namespace BGClima.API.Data
     {
         public static async Task SeedAsync(BGClimaContext context)
         {
-            // При InMemory използваме EnsureCreated, иначе Migrate
-            if (context.Database.IsInMemory())
-            {
-                await context.Database.EnsureCreatedAsync();
-            }
-            else
-            {
-                await context.Database.MigrateAsync();
-            }
+            // Batch seed all reference data in one transaction
+            var brands = new List<Brand>();
+            var energyClasses = new List<EnergyClass>();
+            var btus = new List<BTU>();
+            var productTypes = new List<ProductType>();
 
             // Seed Banners
             if (!await context.Banners.AnyAsync())
@@ -82,7 +78,7 @@ namespace BGClima.API.Data
             // Seed Brands
             if (!await context.Brands.AnyAsync())
             {
-                var brands = new List<Brand>
+                brands = new List<Brand>
                 {
                     new Brand { Name = "Daikin", Country = "Япония" },
                     new Brand { Name = "Mitsubishi Electric", Country = "Япония" },
@@ -95,15 +91,13 @@ namespace BGClima.API.Data
                     new Brand { Name = "Ballu", Country = "Русия" },
                     new Brand { Name = "Hyundai", Country = "Южна Корея" }
                 };
-
                 await context.Brands.AddRangeAsync(brands);
-                await context.SaveChangesAsync();
             }
 
             // Seed Energy Classes
             if (!await context.EnergyClasses.AnyAsync())
             {
-                var energyClasses = new List<EnergyClass>
+                energyClasses = new List<EnergyClass>
                 {
                     new EnergyClass { Class = "A+++" },
                     new EnergyClass { Class = "A++" },
@@ -113,15 +107,13 @@ namespace BGClima.API.Data
                     new EnergyClass { Class = "C" },
                     new EnergyClass { Class = "D" }
                 };
-
                 await context.EnergyClasses.AddRangeAsync(energyClasses);
-                await context.SaveChangesAsync();
             }
 
             // Seed BTU Values
             if (!await context.BTUs.AnyAsync())
             {
-                var btus = new List<BTU>
+                btus = new List<BTU>
                 {
                     new BTU { Value = "9000 BTU" },
                     new BTU { Value = "12000 BTU" },
@@ -130,15 +122,13 @@ namespace BGClima.API.Data
                     new BTU { Value = "30000 BTU" },
                     new BTU { Value = "36000 BTU" }
                 };
-
                 await context.BTUs.AddRangeAsync(btus);
-                await context.SaveChangesAsync();
             }
 
             // Seed Product Types
             if (!await context.ProductTypes.AnyAsync())
             {
-                var productTypes = new List<ProductType>
+                productTypes = new List<ProductType>
                 {
                     new ProductType { Name = "Стандартен климатик" },
                     new ProductType { Name = "Инверторен климатик" },
@@ -147,25 +137,25 @@ namespace BGClima.API.Data
                     new ProductType { Name = "Касетъчен климатик" },
                     new ProductType { Name = "Топлинна помпа" }
                 };
-
                 await context.ProductTypes.AddRangeAsync(productTypes);
-                await context.SaveChangesAsync();
             }
 
-            // Don't seed products if they already exist
-            if (await context.Products.AnyAsync())
-            {
-                return;
-            }
+            // Single SaveChanges for all reference data
+            await context.SaveChangesAsync();
 
-            // Get reference entities
-            var daikinBrand = await context.Brands.FirstAsync(b => b.Name == "Daikin");
-            var mitsubishiBrand = await context.Brands.FirstAsync(b => b.Name == "Mitsubishi Electric");
-            var btu9000 = await context.BTUs.FirstAsync(b => b.Value == "9000 BTU");
-            var btu12000 = await context.BTUs.FirstAsync(b => b.Value == "12000 BTU");
-            var energyClassAplusplus = await context.EnergyClasses.FirstAsync(e => e.Class == "A++");
-            var energyClassAplusplusplus = await context.EnergyClasses.FirstAsync(e => e.Class == "A+++");
-            var inverterType = await context.ProductTypes.FirstAsync(t => t.Name == "Инверторен климатик");
+            // Get reference entities in batch to avoid multiple queries
+            var allBrands = brands.Any() ? brands : await context.Brands.ToListAsync();
+            var allBtus = btus.Any() ? btus : await context.BTUs.ToListAsync();
+            var allEnergyClasses = energyClasses.Any() ? energyClasses : await context.EnergyClasses.ToListAsync();
+            var allProductTypes = productTypes.Any() ? productTypes : await context.ProductTypes.ToListAsync();
+
+            var daikinBrand = allBrands.First(b => b.Name == "Daikin");
+            var mitsubishiBrand = allBrands.First(b => b.Name == "Mitsubishi Electric");
+            var btu9000 = allBtus.First(b => b.Value == "9000 BTU");
+            var btu12000 = allBtus.First(b => b.Value == "12000 BTU");
+            var energyClassAplusplus = allEnergyClasses.First(e => e.Class == "A++");
+            var energyClassAplusplusplus = allEnergyClasses.First(e => e.Class == "A+++");
+            var inverterType = allProductTypes.First(t => t.Name == "Инверторен климатик");
 
             // Seed Products
             var products = new List<Product>
@@ -209,10 +199,10 @@ namespace BGClima.API.Data
             };
 
             // Add more products for variety
-            var greeBrand = await context.Brands.FirstAsync(b => b.Name == "Gree");
-            var btu18000 = await context.BTUs.FirstAsync(b => b.Value == "18000 BTU");
-            var energyClassAplus = await context.EnergyClasses.FirstAsync(e => e.Class == "A+");
-            var standardType = await context.ProductTypes.FirstAsync(t => t.Name == "Стандартен климатик");
+            var greeBrand = allBrands.First(b => b.Name == "Gree");
+            var btu18000 = allBtus.First(b => b.Value == "18000 BTU");
+            var energyClassAplus = allEnergyClasses.First(e => e.Class == "A+");
+            var standardType = allProductTypes.First(t => t.Name == "Стандартен климатик");
 
             products.Add(new Product
             {
@@ -229,16 +219,17 @@ namespace BGClima.API.Data
                 IsFeatured = false,
                 IsOnSale = true,
                 IsNew = false,
-                                    Sku = "GREE-BREEZE-18",
-                    ImageUrl = "/images/gree-breezeless-18.jpg"
+                Sku = "GREE-BREEZE-18",
+                ImageUrl = "/images/gree-breezeless-18.jpg"
             });
 
             await context.Products.AddRangeAsync(products);
             await context.SaveChangesAsync();
 
-            // Seed Product Images
+            // Prepare all related data in memory to minimize database calls
             var productImages = new List<ProductImage>();
-            
+            var productAttributes = new List<ProductAttribute>();
+
             // Images for Daikin product
             var daikinProduct = products[0];
             productImages.AddRange(new[]
@@ -305,12 +296,8 @@ namespace BGClima.API.Data
                 }
             });
 
-            await context.ProductImages.AddRangeAsync(productImages);
-            await context.SaveChangesAsync();
+            // Prepare product attributes in the same loop to avoid multiple iterations
 
-            // Seed Product Attributes
-            var productAttributes = new List<ProductAttribute>();
-            
             // Attributes for Daikin product
             productAttributes.AddRange(new[]
             {
@@ -542,6 +529,8 @@ namespace BGClima.API.Data
                 }
             });
 
+            // Single batch insert for all images and attributes
+            await context.ProductImages.AddRangeAsync(productImages);
             await context.ProductAttributes.AddRangeAsync(productAttributes);
             await context.SaveChangesAsync();
         }
@@ -551,32 +540,43 @@ namespace BGClima.API.Data
             var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            // Create roles if they don't exist
-            var roles = new[] { "ADMIN", "ContentManager", "USER" };
-            foreach (var role in roles)
+            // Delete existing admin user if exists to ensure proper role assignment
+            var existingAdmin = await userManager.FindByNameAsync("admin");
+            if (existingAdmin != null)
             {
-                if (!await roleManager.RoleExistsAsync(role))
+                return;
+            }
+
+            // Create roles in batch
+            var roles = new[] { "ADMIN", "ContentManager", "USER" };
+            var rolesToCreate = new List<IdentityRole>();
+            
+            foreach (var roleName in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(roleName))
                 {
-                    await roleManager.CreateAsync(new IdentityRole(role));
+                    rolesToCreate.Add(new IdentityRole(roleName));
                 }
             }
 
-            // Create admin user if it doesn't exist
-            var adminUser = await userManager.FindByNameAsync("admin");
-            if (adminUser == null)
+            // Create all roles
+            foreach (var role in rolesToCreate)
             {
-                adminUser = new IdentityUser
-                {
-                    UserName = "admin",
-                    Email = "admin@bgclima.com",
-                    EmailConfirmed = true
-                };
+                await roleManager.CreateAsync(role);
+            }
 
-                var result = await userManager.CreateAsync(adminUser, "Admin1!");
-                if (result.Succeeded)
-                {
-                    await userManager.AddToRoleAsync(adminUser, "ADMIN");
-                }
+            // Create admin user
+            var adminUser = new IdentityUser
+            {
+                UserName = "admin",
+                Email = "admin@bgclima.com",
+                EmailConfirmed = true
+            };
+
+            var result = await userManager.CreateAsync(adminUser, "Admin1!");
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(adminUser, "ADMIN");
             }
         }
     }
