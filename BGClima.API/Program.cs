@@ -61,10 +61,6 @@ var safeConnectionString = new string(connectionString.Select((c, i) =>
     i > 5 && i < connectionString.Length - 5 && c != ';' ? '*' : c).ToArray());
 Console.WriteLine($"Connection string: {safeConnectionString}");
 
-if (builder.Environment.IsProduction()) 
-{
-    connectionString = "Host=51.21.18.29;Port=5432;Username=postgres.puegihlkhohkkxnboavo;Password=PxoI!SDz^!4sNG1@;Database=postgres;Ssl Mode=Require;Trust Server Certificate=true;Timeout=30;Pooling=true;Maximum Pool Size=20;Minimum Pool Size=5;";
-}
 
 // Register BGClimaContext
 builder.Services.AddDbContext<BGClimaContext>(options =>
@@ -148,18 +144,18 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Apply pending migrations on startup
-// using var scope = app.Services.CreateScope();
-// var dbContext = scope.ServiceProvider.GetRequiredService<BGClimaContext>();
-// dbContext.Database.Migrate();
-// Apply migrations and seed sample data
-//if (app.Environment.IsDevelopment())
-//{
-//    //SeedTestData(db);
-//    // Optimized seeding with performance improvements
-//    await SeedData.SeedIdentityDataAsync(scope.ServiceProvider);
-//    await SeedData.SeedAsync(dbContext);
-//}
+//Apply pending migrations on startup
+ using var scope = app.Services.CreateScope();
+var dbContext = scope.ServiceProvider.GetRequiredService<BGClimaContext>();
+dbContext.Database.Migrate();
+//Apply migrations and seed sample data
+if (app.Environment.IsDevelopment())
+{
+    //SeedTestData(db);
+    // Optimized seeding with performance improvements
+    await SeedData.SeedIdentityDataAsync(scope.ServiceProvider);
+await SeedData.SeedAsync(dbContext);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
