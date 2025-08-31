@@ -8,6 +8,8 @@ import { Component } from '@angular/core';
 export class HeaderComponent {
   menuOpen = false;
 
+  constructor() {}
+
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
   }

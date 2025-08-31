@@ -61,13 +61,33 @@
         font-size: 0.95rem;
         margin-top: 1.2rem;
       }
-      button {
+      button, .icon-btn {
         color: #1E1F57;
         background: #F3F5FB;
         border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        position: relative;
+        transition: all 0.3s ease;
+        
         &:hover {
           background: #3A66FF;
           color: #fff;
+          
+          mat-icon {
+            color: #fff;
+          }
+        }
+        
+        mat-icon {
+          color: #1E1F57;
+          transition: color 0.3s ease;
         }
       }
       mat-icon {

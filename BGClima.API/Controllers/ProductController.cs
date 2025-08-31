@@ -2,6 +2,7 @@ using AutoMapper;
 using BGClima.API.DTOs;
 using BGClima.Domain.Entities;
 using BGClima.Infrastructure.Data;
+using BGClima.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,11 +14,13 @@ namespace BGClima.API.Controllers
     {
         private readonly BGClimaContext _context;
         private readonly IMapper _mapper;
+        private readonly IProductService _productService;
 
-        public ProductController(BGClimaContext context, IMapper mapper)
+        public ProductController(BGClimaContext context, IMapper mapper, IProductService productService)
         {
             _context = context;
             _mapper = mapper;
+            _productService = productService;
         }
 
         // GET: api/products
@@ -38,6 +41,7 @@ namespace BGClima.API.Controllers
                     .Include(p => p.ProductType)
                     .Include(p => p.Attributes)
                     .Include(p => p.Images)
+                    .Include(p => p.DescriptionImages)
                     .AsQueryable();
 
                 // Филтриране
@@ -89,6 +93,7 @@ namespace BGClima.API.Controllers
                     .Include(p => p.ProductType)
                     .Include(p => p.Attributes)
                     .Include(p => p.Images)
+                    .Include(p => p.DescriptionImages)
                     .AsQueryable();
 
                 // Филтриране
@@ -178,6 +183,15 @@ namespace BGClima.API.Controllers
             }
         }
 
+        // GET: api/products/category/stenen-tip
+        [HttpGet("category/{categoryName}")]
+        public async Task<IActionResult> GetProductsByCategory(string categoryName)
+        {
+            var products = await _productService.GetProductsByCategoryAsync(categoryName);
+            var productDtos = _mapper.Map<IEnumerable<ProductDto>>(products);
+            return Ok(productDtos);
+        }
+
         // GET: api/products/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDto>> GetProduct(int id)
@@ -191,6 +205,7 @@ namespace BGClima.API.Controllers
                     .Include(p => p.ProductType)
                     .Include(p => p.Attributes)
                     .Include(p => p.Images)
+                    .Include(p => p.DescriptionImages)
                     .FirstOrDefaultAsync(p => p.Id == id);
 
                 if (product == null)
@@ -224,6 +239,7 @@ namespace BGClima.API.Controllers
                 // Ensure collections
                 product.Attributes ??= new List<ProductAttribute>();
                 product.Images ??= new List<ProductImage>();
+                product.DescriptionImages ??= new List<ProductDescriptionImage>();
 
                 // Attach back-references and add to context
                 foreach (var attr in product.Attributes)
@@ -231,6 +247,10 @@ namespace BGClima.API.Controllers
                     attr.Product = product;
                 }
                 foreach (var img in product.Images)
+                {
+                    img.Product = product;
+                }
+                foreach (var img in product.DescriptionImages)
                 {
                     img.Product = product;
                 }
@@ -261,6 +281,7 @@ namespace BGClima.API.Controllers
                 var existingProduct = await _context.Products
                     .Include(p => p.Attributes)
                     .Include(p => p.Images)
+                    .Include(p => p.DescriptionImages)
                     .FirstOrDefaultAsync(p => p.Id == id);
 
                 if (existingProduct == null)
@@ -330,6 +351,21 @@ namespace BGClima.API.Controllers
                         _context.ProductImages.Add(img);
                     }
                     existingProduct.Images = newImages;
+                }
+
+                // Обновяване на изображенията към описанието
+                if (updateProductDto.DescriptionImages != null)
+                {
+                    // Изтриваме старите изображения
+                    _context.ProductDescriptionImages.RemoveRange(existingProduct.DescriptionImages);
+                    
+                    // Добавяме новите/актуализирани изображения
+                    foreach (var imgDto in updateProductDto.DescriptionImages)
+                    {
+                        var newImg = _mapper.Map<ProductDescriptionImage>(imgDto);
+                        newImg.ProductId = existingProduct.Id;
+                        existingProduct.DescriptionImages.Add(newImg);
+                    }
                 }
 
                 await _context.SaveChangesAsync();

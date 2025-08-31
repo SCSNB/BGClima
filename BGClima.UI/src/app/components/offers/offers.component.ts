@@ -1,147 +1,149 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ProductDto, ProductService } from '../../services/product.service';
 
 @Component({
   selector: 'app-offers',
   templateUrl: './offers.component.html',
   styleUrls: ['./offers.component.scss']
 })
-export class OffersComponent {
-  offers = [
-    {
-      image: 'assets/product1.png',
-      badges: [
-        { text: 'НОВО', bg: '#F54387', color: '#fff' },
-        { text: 'WiFi Вграден модул', bg: '#3B82F6', color: '#fff' },
-        { text: 'Йоно-дезодориращ филтър', bg: '#3B82F6', color: '#fff' }
-      ],
-      title: 'Инверторен климатик стенен General Fujitsu ASHH09KMCG/AOHN09KMCG',
-      price: { current: '1499.00 лв.', old: '1629.00 лв.' },
-      brand: { logo: 'assets/general_logo.svg', text: 'GENERAL Fujitsu General Limited' },
-      specs: [
-        { label: 'Мощност', value: '9', icon: 'assets/power.svg', color: '#A855F7' },
-        { label: 'Клас', value: 'A++', icon: 'assets/leaf.svg', color: '#10B981' },
-        { label: 'Охлаждане', value: '2.50', icon: 'assets/snowflake.svg', color: '#00BFFF' },
-        { label: 'Отопление', value: '2.80', icon: 'assets/sun.svg', color: '#FDBA74' }
-      ]
-    },
-    {
-      image: 'assets/product2.png',
-      badges: [
-        { text: 'НОВО', bg: '#F54387', color: '#fff' },
-        { text: 'WiFi Вграден модул', bg: '#3B82F6', color: '#fff' },
-        { text: 'Йоно-дезодориращ филтър', bg: '#3B82F6', color: '#fff' }
-      ],
-      title: 'Инверторен климатик стенен General Fujitsu ASHH07KMCG/AOHN07KMCG',
-      price: { current: '1419.00 лв.', old: '1479.00 лв.' },
-      brand: { logo: 'assets/general_logo.svg', text: 'GENERAL Fujitsu General Limited' },
-      specs: [
-        { label: 'Мощност', value: '7', icon: 'assets/power.svg', color: '#A855F7' },
-        { label: 'Клас', value: 'A++', icon: 'assets/leaf.svg', color: '#10B981' },
-        { label: 'Охлаждане', value: '2.00', icon: 'assets/snowflake.svg', color: '#00BFFF' },
-        { label: 'Отопление', value: '2.50', icon: 'assets/sun.svg', color: '#FDBA74' }
-      ]
-    },
-    {
-      image: 'assets/product3.png',
-      badges: [
-        { text: 'НОВО', bg: '#F54387', color: '#fff' },
-        { text: 'WiFi Вграден модул', bg: '#3B82F6', color: '#fff' },
-        { text: 'Йоно-дезодориращ филтър', bg: '#3B82F6', color: '#fff' }
-      ],
-      title: 'Инверторен климатик стенен General Fujitsu ASHH12KMCG/AOHN12KMCG',
-      price: { current: '1729.00 лв.', old: '1749.00 лв.' },
-      brand: { logo: 'assets/general_logo.svg', text: 'GENERAL Fujitsu General Limited' },
-      specs: [
-        { label: 'Мощност', value: '12', icon: 'assets/power.svg', color: '#A855F7' },
-        { label: 'Клас', value: 'A++', icon: 'assets/leaf.svg', color: '#10B981' },
-        { label: 'Охлаждане', value: '3.40', icon: 'assets/snowflake.svg', color: '#00BFFF' },
-        { label: 'Отопление', value: '4.00', icon: 'assets/sun.svg', color: '#FDBA74' }
-      ]
-    },
-    {
-      image: 'assets/product4.png',
-      badges: [
-        { text: 'НОВО', bg: '#F54387', color: '#fff' },
-        { text: 'WiFi Вграден модул', bg: '#3B82F6', color: '#fff' },
-        { text: 'Йоно-дезодориращ филтър', bg: '#3B82F6', color: '#fff' }
-      ],
-      title: 'Инверторен климатик стенен General Fujitsu ASHH14KMCG/AOHN14KMCG',
-      price: { current: '2239.00 лв.', old: '2379.00 лв.' },
-      brand: { logo: 'assets/general_logo.svg', text: 'GENERAL Fujitsu General Limited' },
-      specs: [
-        { label: 'Мощност', value: '14', icon: 'assets/power.svg', color: '#A855F7' },
-        { label: 'Клас', value: 'A++', icon: 'assets/leaf.svg', color: '#10B981' },
-        { label: 'Охлаждане', value: '4.20', icon: 'assets/snowflake.svg', color: '#00BFFF' },
-        { label: 'Отопление', value: '5.40', icon: 'assets/sun.svg', color: '#FDBA74' }
-      ]
-    },
-    {
-      image: 'assets/product5.png',
-      badges: [
-        { text: 'НОВО', bg: '#F54387', color: '#fff' },
-        { text: 'WiFi Вграден модул', bg: '#3B82F6', color: '#fff' },
-        { text: 'Йоно-дезодориращ филтър', bg: '#3B82F6', color: '#fff' }
-      ],
-      title: 'Инверторен климатик стенен General Fujitsu ASHH16KMCG/AOHN16KMCG',
-      price: { current: '2599.00 лв.', old: '2699.00 лв.' },
-      brand: { logo: 'assets/general_logo.svg', text: 'GENERAL Fujitsu General Limited' },
-      specs: [
-        { label: 'Мощност', value: '16', icon: 'assets/power.svg', color: '#A855F7' },
-        { label: 'Клас', value: 'A++', icon: 'assets/leaf.svg', color: '#10B981' },
-        { label: 'Охлаждане', value: '5.00', icon: 'assets/snowflake.svg', color: '#00BFFF' },
-        { label: 'Отопление', value: '6.00', icon: 'assets/sun.svg', color: '#FDBA74' }
-      ]
-    },
-    {
-      image: 'assets/product6.png',
-      badges: [
-        { text: 'НОВО', bg: '#F54387', color: '#fff' },
-        { text: 'WiFi Вграден модул', bg: '#3B82F6', color: '#fff' },
-        { text: 'Йоно-дезодориращ филтър', bg: '#3B82F6', color: '#fff' }
-      ],
-      title: 'Инверторен климатик стенен General Fujitsu ASHH18KMCG/AOHN18KMCG',
-      price: { current: '2999.00 лв.', old: '3199.00 лв.' },
-      brand: { logo: 'assets/general_logo.svg', text: 'GENERAL Fujitsu General Limited' },
-      specs: [
-        { label: 'Мощност', value: '18', icon: 'assets/power.svg', color: '#A855F7' },
-        { label: 'Клас', value: 'A++', icon: 'assets/leaf.svg', color: '#10B981' },
-        { label: 'Охлаждане', value: '6.00', icon: 'assets/snowflake.svg', color: '#00BFFF' },
-        { label: 'Отопление', value: '7.00', icon: 'assets/sun.svg', color: '#FDBA74' }
-      ]
-    },
-    {
-      image: 'assets/product7.png',
-      badges: [
-        { text: 'НОВО', bg: '#F54387', color: '#fff' },
-        { text: 'WiFi Вграден модул', bg: '#3B82F6', color: '#fff' },
-        { text: 'Йоно-дезодориращ филтър', bg: '#3B82F6', color: '#fff' }
-      ],
-      title: 'Инверторен климатик стенен General Fujitsu ASHH20KMCG/AOHN20KMCG',
-      price: { current: '3399.00 лв.', old: '3599.00 лв.' },
-      brand: { logo: 'assets/general_logo.svg', text: 'GENERAL Fujitsu General Limited' },
-      specs: [
-        { label: 'Мощност', value: '20', icon: 'assets/power.svg', color: '#A855F7' },
-        { label: 'Клас', value: 'A++', icon: 'assets/leaf.svg', color: '#10B981' },
-        { label: 'Охлаждане', value: '7.00', icon: 'assets/snowflake.svg', color: '#00BFFF' },
-        { label: 'Отопление', value: '8.00', icon: 'assets/sun.svg', color: '#FDBA74' }
-      ]
-    },
-    {
-      image: 'assets/product8.png',
-      badges: [
-        { text: 'НОВО', bg: '#F54387', color: '#fff' },
-        { text: 'WiFi Вграден модул', bg: '#3B82F6', color: '#fff' },
-        { text: 'Йоно-дезодориращ филтър', bg: '#3B82F6', color: '#fff' }
-      ],
-      title: 'Инверторен климатик стенен General Fujitsu ASHH24KMCG/AOHN24KMCG',
-      price: { current: '3999.00 лв.', old: '4299.00 лв.' },
-      brand: { logo: 'assets/general_logo.svg', text: 'GENERAL Fujitsu General Limited' },
-      specs: [
-        { label: 'Мощност', value: '24', icon: 'assets/power.svg', color: '#A855F7' },
-        { label: 'Клас', value: 'A++', icon: 'assets/leaf.svg', color: '#10B981' },
-        { label: 'Охлаждане', value: '9.00', icon: 'assets/snowflake.svg', color: '#00BFFF' },
-        { label: 'Отопление', value: '10.00', icon: 'assets/sun.svg', color: '#FDBA74' }
-      ]
-    }
-  ];
+export class OffersComponent implements OnInit {
+  featured: Array<{
+    id: number;
+    image: string;
+    title: string;
+    priceBgn: number;
+    priceEur: number;
+    oldPriceBgn?: number | null;
+    oldPriceEur?: number | null;
+    brandText: string;
+    badges: { text: string; bg: string; color: string }[];
+    specs: { label: string; value: string; icon: string }[];
+  }> = [];
+
+  constructor(private productService: ProductService) {}
+
+  ngOnInit(): void {
+    this.productService.getProducts().subscribe((products) => {
+      const items = products.filter(p => !!p.isFeatured);
+      const top = items.slice(0, 8);
+      this.featured = top.map(p => this.mapToCard(p));
+    });
+  }
+
+  private mapToCard(p: ProductDto) {
+    const bgn = p.price ?? 0;
+    const eur = this.toEur(bgn);
+    const oldBgn = p.oldPrice ?? null;
+    const oldEur = oldBgn != null ? this.toEur(oldBgn) : null;
+
+    const getAttr = (key: string): string => {
+      const normalizedKey = key.trim().toLowerCase();
+      
+      // Special handling for BTU to check btu.value first
+      if (normalizedKey === 'btu') {
+        // First check if we have btu value directly on the product
+        if (p.btu?.value) {
+          // Extract the numeric part from the BTU string (e.g., '9000 BTU' -> '9000')
+          const btuMatch = p.btu.value.toString().match(/(\d+(\.\d+)?)/);
+          if (btuMatch) {
+            const btuValue = parseFloat(btuMatch[0]);
+            // Always show as whole number (e.g., 9000 -> 9, 12000 -> 12)
+            return Math.round(btuValue / 1000).toString();
+          }
+          return p.btu.value; // Return as is if we can't parse the number
+        }
+        
+        // Fallback to attributes if btu is not set directly
+        const btuAttr = (p.attributes || []).find(a => {
+          const attrKey = (a.attributeKey || '').trim().toLowerCase();
+          return attrKey === 'btu' || attrKey === 'btu/h' || attrKey === 'btu\/h' || attrKey.includes('btu');
+        });
+        
+        if (btuAttr?.attributeValue) {
+          const attrValue = btuAttr.attributeValue.toString();
+          // Try to extract numeric value from the attribute (e.g., '9000 BTU' -> '9000')
+          const btuMatch = attrValue.match(/(\d+(\.\d+)?)/);
+          if (btuMatch) {
+            const btuValue = parseFloat(btuMatch[0]);
+            // Always show as whole number (e.g., 9000 -> 9, 12000 -> 12)
+            return Math.round(btuValue / 1000).toString();
+          }
+          return attrValue; // Return as is if we can't parse the number
+        }
+        return '';
+      }
+      
+      // Handle cooling and heating values with Min/Nom/Max format
+      if (normalizedKey === 'охлаждане' || normalizedKey === 'отопление') {
+        const attrKey = normalizedKey === 'охлаждане' 
+          ? 'Отдавана мощност на охлаждане (Мин./Ном./Макс)' 
+          : 'Отдавана мощност на отопление (Мин./Ном./Макс)';
+        
+        // Try to find the attribute with the full key first
+        const found = (p.attributes || []).find(a => 
+          (a.attributeKey || '').trim() === attrKey
+        );
+        
+        if (found?.attributeValue) {
+          const value = found.attributeValue.toString();
+          // Try to extract max value from Min/Nom/Max format
+          const matches = value.match(/(\d+[\.,]?\d*)/g);
+          if (matches && matches.length >= 3) {
+            const values = matches.map(v => parseFloat(v.replace(',', '.')));
+            const max = Math.max(...values);
+            // Format with comma as decimal separator and remove trailing .0 if any
+            return max.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+          }
+          return value; // Return original if parsing fails
+        }
+      }
+      
+      // Default attribute lookup for other keys
+      const found = (p.attributes || []).find(a => (a.attributeKey || '').trim().toLowerCase() === normalizedKey);
+      return (found?.attributeValue || '').toString();
+    };
+
+    // Check for Wi-Fi module with flexible matching
+    const hasWifi = (p.attributes || []).some(a => {
+      const key = (a.attributeKey || '').toLowerCase();
+      const value = (a.attributeValue || '').toString().toLowerCase().trim();
+      
+      // Check if this is a Wi-Fi module attribute and the value is 'да' (case insensitive)
+      return (key.includes('wi-fi') || key.includes('wifi') || key.includes('wi fi')) && 
+             key.includes('модул') && 
+             (value === 'да' || value === 'da' || value === 'yes' || value === 'true');
+    });
+    
+    const badges: { text: string; bg: string; color: string }[] = [];
+    if (p.isNew) badges.push({ text: 'НОВО', bg: '#F54387', color: '#fff' });
+    if (p.isOnSale) badges.push({ text: 'ПРОМО', bg: '#E6003E', color: '#fff' });
+    if (hasWifi) badges.push({ text: 'WiFi', bg: '#3B82F6', color: '#fff' });
+
+    return {
+      id: p.id,
+      image: p.imageUrl || 'assets/solar-panel-placeholder.jpg',
+      title: p.name,
+      priceBgn: bgn,
+      priceEur: eur,
+      oldPriceBgn: oldBgn,
+      oldPriceEur: oldEur,
+      brandText: p.brand?.name || '',
+      badges,
+      specs: (() => {
+        const btuStr = (getAttr('BTU') || '').toString();
+        const btuThousands = parseInt(btuStr.replace(/\D+/g, ''), 10) || 0;
+        return [
+          { label: 'Мощност', value: btuThousands > 0 ? String(btuThousands) : '', icon: 'bolt' },
+          { label: 'Клас', value: p.energyClass?.class || getAttr('Клас') || 'A+', icon: 'eco' },
+          { label: 'Охлаждане', value: getAttr('Охлаждане') || '', icon: 'ac_unit' },
+          { label: 'Отопление', value: getAttr('Отопление') || '', icon: 'wb_sunny' }
+        ];
+      })()
+    };
+  }
+
+  private toEur(amountBgn: number): number {
+    const rate = 1.95583;
+    return Math.round((amountBgn / rate) * 100) / 100;
+  }
 }

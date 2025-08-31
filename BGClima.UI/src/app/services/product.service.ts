@@ -7,6 +7,7 @@ import { environment } from '../../environments/environment';
 export interface BrandDto {
   id: number;
   name: string;
+  country?: string;
 }
 
 export interface ProductTypeDto {
@@ -34,10 +35,24 @@ export interface ProductAttributeDto {
   productId: number;
 }
 
+export interface ProductDescriptionImageDto {
+  id: number;
+  imageUrl: string;
+  altText: string;
+  displayOrder: number;
+}
+
+export interface ProductSpec {
+  icon: string;
+  label: string;
+  value: string;
+}
+
 export interface ProductDto {
   id: number;
   name: string;
   description?: string;
+  specs?: ProductSpec[];
   price: number;
   oldPrice?: number | null;
   isOnSale?: boolean;
@@ -49,10 +64,13 @@ export interface ProductDto {
   imageUrl?: string;
   brand?: BrandDto;
   btu?: BTUDto;
-  productType?: ProductTypeDto;
   energyClass?: EnergyClassDto;
+  coolingCapacity?: string;
+  heatingCapacity?: string;
   attributes?: ProductAttributeDto[];
+  productType?: ProductTypeDto;
   images?: any[]; // TODO: Define proper type for images
+  descriptionImages?: ProductDescriptionImageDto[];
   
   // Backward compatibility
   brandId?: number;
@@ -67,6 +85,12 @@ export interface CreateProductAttributeDto {
   groupName?: string;
   displayOrder?: number;
   isVisible?: boolean;
+}
+
+export interface CreateProductDescriptionImageDto {
+  imageUrl: string;
+  altText?: string;
+  displayOrder?: number;
 }
 
 export interface CreateProductDto {
@@ -86,6 +110,7 @@ export interface CreateProductDto {
   isNew?: boolean;
   sku?: string;
   imageUrl?: string;
+  descriptionImages?: CreateProductDescriptionImageDto[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -136,9 +161,48 @@ export class ProductService {
   getProduct(id: number): Observable<ProductDto> {
     return this.http.get<ProductDto>(`${this.baseUrl}/${id}`).pipe(
       tap({
-        next: (product) => console.log('Received product:', product),
-        error: (err) => console.error(`Error fetching product ${id}:`, err)
+        next: (product) => {
+          console.log('Fetched product:', product);
+        },
+        error: (err) => {
+          console.error('Error fetching product:', err);
+        }
       })
     );
   }
-} 
+
+  getProductBySlug(slug: string): Observable<ProductDto> {
+    return this.http.get<ProductDto>(`${this.baseUrl}/by-slug/${slug}`).pipe(
+      tap({
+        next: (product) => {
+          console.log('Fetched product by slug:', product);
+        },
+        error: (err) => {
+          console.error('Error fetching product by slug:', err);
+        }
+      })
+    );
+  }
+
+  getRelatedProducts(productId: number, limit: number = 4): Observable<ProductDto[]> {
+    return this.http.get<ProductDto[]>(`${this.baseUrl}/${productId}/related?limit=${limit}`).pipe(
+      tap({
+        next: (products) => {
+          console.log(`Fetched ${products.length} related products`);
+        },
+        error: (err) => {
+          console.error('Error fetching related products:', err);
+        }
+      })
+    );
+  }
+
+  getProductsByCategory(category: string): Observable<ProductDto[]> {
+    return this.http.get<ProductDto[]>(`${this.baseUrl}/category/${category}`).pipe(
+      tap({
+        next: (products) => console.log(`Fetched ${products.length} products for category ${category}`),
+        error: (err) => console.error(`Error fetching products for category ${category}:`, err)
+      })
+    );
+  }
+}

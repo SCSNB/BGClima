@@ -1,1 +1,48 @@
-<p>promo-banners works!</p>
+<section class="promo-banners-section" *ngIf="!loading && !error && hasBanners">
+  <div class="container">
+    <div class="promo-grid">
+      <!-- Main Left Banner -->
+      <div class="promo-banner main-left" *ngIf="mainLeftBanner">
+        <a [href]="mainLeftBanner.targetUrl || '#'" [target]="mainLeftBanner.targetUrl ? '_blank' : '_self'" class="banner-link">
+          <img [src]="mainLeftBanner.imageUrl" [alt]="mainLeftBanner.name" class="banner-image">
+        </a>
+      </div>
+
+      <!-- Right Side Banners -->
+      <div class="right-banners">
+        <div class="promo-banner small" *ngIf="topRightBanner">
+          <a [href]="topRightBanner.targetUrl || '#'" [target]="topRightBanner.targetUrl ? '_blank' : '_self'" class="banner-link">
+            <img [src]="topRightBanner.imageUrl" [alt]="topRightBanner.name" class="banner-image">
+          </a>
+        </div>
+        <div class="promo-banner small" *ngIf="middleRightBanner">
+          <a [href]="middleRightBanner.targetUrl || '#'" [target]="middleRightBanner.targetUrl ? '_blank' : '_self'" class="banner-link">
+            <img [src]="middleRightBanner.imageUrl" [alt]="middleRightBanner.name" class="banner-image">
+          </a>
+        </div>
+        <div class="promo-banner small" *ngIf="bottomRightBanner">
+          <a [href]="bottomRightBanner.targetUrl || '#'" [target]="bottomRightBanner.targetUrl ? '_blank' : '_self'" class="banner-link">
+            <img [src]="bottomRightBanner.imageUrl" [alt]="bottomRightBanner.name" class="banner-image">
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Loading State -->
+<div *ngIf="loading" class="loading-state">
+  <mat-spinner diameter="40"></mat-spinner>
+  <p>Зареждане на промоции...</p>
+</div>
+
+<!-- Error State -->
+<div *ngIf="error" class="error-state">
+  <p>{{ error }}</p>
+  <button mat-button color="primary" (click)="loadBanners()">Опитайте отново</button>
+</div>
+
+<!-- Empty State -->
+<div *ngIf="!loading && !error && !hasBanners" class="empty-state">
+  <p>Няма налични промоции в момента.</p>
+</div>

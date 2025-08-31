@@ -165,11 +165,14 @@ export class ProductDialogComponent implements OnInit {
   btu: BTUDto[] = [];
   energyClasses: EnergyClassDto[] = [];
   attributes: CreateProductAttributeDto[] = [];
+  editingAttributeIndex: number | null = null;
   title = '';
   images: { url: string, isPrimary: boolean }[] = [];
   newImageUrl: string = '';
   uploadProgress: number = 0;
   isUploading: boolean = false;
+  descriptionImages: { id?: number, imageUrl: string }[] = [];
+  newDescriptionImageUrl: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -231,6 +234,14 @@ export class ProductDialogComponent implements OnInit {
           isPrimary: true
         }];
       }
+
+      // Load existing description images
+      if (this.data.product.descriptionImages && this.data.product.descriptionImages.length > 0) {
+        this.descriptionImages = this.data.product.descriptionImages.map(img => ({
+          id: img.id,
+          imageUrl: img.imageUrl
+        }));
+      }
     } else {
       this.title = 'Добавяне на нов продукт';
     }
@@ -261,6 +272,12 @@ export class ProductDialogComponent implements OnInit {
         altText: `Снимка на ${this.form.get('name')?.value || 'продукт'}`,
         displayOrder: index,
         isPrimary: img.isPrimary
+      })),
+      descriptionImages: this.descriptionImages.map((img, index) => ({
+        id: img.id || 0,
+        imageUrl: img.imageUrl,
+        altText: `Снимка към описание на ${this.form.get('name')?.value || 'продукт'}`,
+        displayOrder: index
       }))
     };
 
@@ -268,11 +285,31 @@ export class ProductDialogComponent implements OnInit {
     this.dialogRef.close({ action: this.data.mode, dto: productData });
   }
 
+  editAttribute(index: number): void {
+    const attribute = this.attributes[index];
+    this.editingAttributeIndex = index;
+    this.form.patchValue({
+      attributeKey: attribute.attributeKey,
+      attributeValue: attribute.attributeValue
+    });
+  }
+
   addAttribute(): void {
-    const key = this.form.get('attributeKey')?.value;
-    const value = this.form.get('attributeValue')?.value;
+    const key = this.form.get('attributeKey')?.value?.trim();
+    const value = this.form.get('attributeValue')?.value?.trim();
     
-    if (key && value) {
+    if (!key || !value) return;
+
+    if (this.editingAttributeIndex !== null) {
+      // Update existing attribute
+      this.attributes[this.editingAttributeIndex] = {
+        ...this.attributes[this.editingAttributeIndex],
+        attributeKey: key,
+        attributeValue: value
+      };
+      this.editingAttributeIndex = null;
+    } else {
+      // Add new attribute
       this.attributes.push({
         attributeKey: key,
         attributeValue: value,
@@ -280,12 +317,24 @@ export class ProductDialogComponent implements OnInit {
         displayOrder: this.attributes.length,
         isVisible: true
       });
-      this.form.get('attributeKey')?.setValue('');
-      this.form.get('attributeValue')?.setValue('');
     }
+    
+    this.form.patchValue({
+      attributeKey: '',
+      attributeValue: ''
+    });
   }
 
   removeAttribute(index: number): void {
+    if (this.editingAttributeIndex === index) {
+      this.editingAttributeIndex = null;
+      this.form.patchValue({
+        attributeKey: '',
+        attributeValue: ''
+      });
+    } else if (this.editingAttributeIndex !== null && this.editingAttributeIndex > index) {
+      this.editingAttributeIndex--;
+    }
     this.attributes.splice(index, 1);
   }
 
@@ -389,6 +438,20 @@ export class ProductDialogComponent implements OnInit {
     this.images.forEach(img => img.isPrimary = false);
     // Set the selected image as primary
     this.images[index].isPrimary = true;
+  }
+
+  // Description Image management methods
+  addDescriptionImage(): void {
+    if (this.newDescriptionImageUrl && !this.descriptionImages.some(img => img.imageUrl === this.newDescriptionImageUrl)) {
+      this.descriptionImages.push({
+        imageUrl: this.newDescriptionImageUrl
+      });
+      this.newDescriptionImageUrl = '';
+    }
+  }
+
+  removeDescriptionImage(index: number): void {
+    this.descriptionImages.splice(index, 1);
   }
 
   cancel(): void {

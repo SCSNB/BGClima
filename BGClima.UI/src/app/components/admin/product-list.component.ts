@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ProductService, ProductDto, CreateProductDto } from '../../services/product.service';
 import { ProductDialogComponent } from './product-dialog.component';
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-admin-product-list',
@@ -11,10 +12,14 @@ import { ProductDialogComponent } from './product-dialog.component';
   styleUrls: ['./product-list.component.scss']
 })
 export class ProductListComponent implements OnInit {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  
   dataSource = new MatTableDataSource<ProductDto>([]);
   displayedColumns = ['id', 'name', 'price', 'stock', 'brand', 'type', 'btu', 'energyClass', 'actions'];
   loading = true;
   error: string | null = null;
+  searchTerm = '';
+  filteredProducts: ProductDto[] = [];
 
   constructor(
     private service: ProductService,
@@ -26,11 +31,16 @@ export class ProductListComponent implements OnInit {
     this.load();
   }
 
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+  }
+
   private load(): void {
     this.loading = true;
     this.service.getProducts().subscribe({
       next: (data) => {
-        this.dataSource.data = data;
+        this.filteredProducts = [...data];
+        this.applyFilter();
         this.loading = false;
       },
       error: () => {
@@ -38,6 +48,25 @@ export class ProductListComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  applyFilter(): void {
+    if (!this.searchTerm) {
+      this.dataSource.data = [...this.filteredProducts];
+      return;
+    }
+
+    const searchLower = this.searchTerm.toLowerCase();
+    this.dataSource.data = this.filteredProducts.filter(product => 
+      product.name.toLowerCase().includes(searchLower) ||
+      product.id.toString().includes(searchLower) ||
+      (product.brand?.name?.toLowerCase().includes(searchLower) ?? false)
+    );
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.applyFilter();
   }
 
   addProduct(): void {

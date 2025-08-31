@@ -16,9 +16,9 @@ import { HomeComponent } from './components/home/home.component';
 import { ProductListComponent } from './components/admin/product-list.component';
 import { ProductDialogComponent } from './components/admin/product-dialog.component';
 import { DashboardHomeComponent } from './components/admin/dashboard-home.component';
+import { VentilationDesignComponent } from './components/ventilation-design/ventilation-design.component';
 
-// Material Imports
-import { MatButtonModule } from '@angular/material/button';
+// Material Imports (only those not in SharedModule)
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -32,17 +32,19 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatMenuModule } from '@angular/material/menu';
 import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
- 
- // Services and Interceptors
- import { AuthService } from './services/auth.service';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
+
+// Shared Module
+import { SharedModule } from './shared/shared.module';
+
+// Services and Interceptors
+import { AuthService } from './services/auth.service';
 import { AuthGuard } from './guards/auth.guard';
 import { JwtInterceptor, ErrorInterceptor } from './interceptors';
 import { ContactsComponent } from './components/contacts/contacts.component';
@@ -53,8 +55,15 @@ import { CertificatesComponent } from './components/certificates/certificates.co
 import { ProjectsComponent } from './components/projects/projects.component';
 import { ConsultingComponent } from './components/consulting/consulting.component';
 import { InstallationComponent } from './components/installation/installation.component';
-import { ProfilaktikaComponent } from './components/profilaktika/profilaktika.component';
 import { ServizComponent } from './components/serviz/serviz.component';
+import { BannersComponent } from './components/admin/banners/banners.component';
+import { BannerDialogComponent } from './components/admin/banners/banner-dialog/banner-dialog.component';
+import { PromoBannersComponent } from './components/promo-banners/promo-banners.component';
+import { ProductDetailsComponent } from './pages/product-details/product-details.component';
+import { VentilationInstallationComponent } from './components/ventilation-installation/ventilation-installation.component';
+import { ProductCategoryComponent } from './components/product-category/product-category.component';
+import { ProductFiltersComponent } from './components/product-filters/product-filters.component';
+import { MaintenanceComponent } from './components/maintenance/maintenance.component';
 
 @NgModule({
   declarations: [
@@ -71,13 +80,20 @@ import { ServizComponent } from './components/serviz/serviz.component';
     MainActivityComponent,
     ResourceComponent,
     CertificatesComponent,
-         ProjectsComponent,
-     ConsultingComponent,
-     ProductListComponent,
-     ProductDialogComponent,
- 	DashboardHomeComponent,
- 	ProfilaktikaComponent,
- 	ServizComponent
+    ProjectsComponent,
+    ConsultingComponent,
+    ProductListComponent,
+    ProductDialogComponent,
+    DashboardHomeComponent,
+    ServizComponent,
+    BannersComponent,
+    BannerDialogComponent,
+    PromoBannersComponent,
+    VentilationDesignComponent,
+    VentilationInstallationComponent,
+    ProductCategoryComponent,
+    ProductFiltersComponent,
+    MaintenanceComponent
    ],
   imports: [
     BrowserModule,
@@ -87,8 +103,7 @@ import { ServizComponent } from './components/serviz/serviz.component';
     ReactiveFormsModule,
     AppRoutingModule,
     
-    // Material Modules
-    MatButtonModule,
+    // Material Modules (only those not in SharedModule)
     MatCardModule,
     MatInputModule,
     MatFormFieldModule,
@@ -102,14 +117,23 @@ import { ServizComponent } from './components/serviz/serviz.component';
     MatExpansionModule,
     MatSliderModule,
     MatDividerModule,
-         MatMenuModule,
-     MatTableModule,
-     MatPaginatorModule,
-     MatSortModule,
-     MatDialogModule,
-     MatSelectModule,
-     MatCheckboxModule,
-     MatProgressBarModule
+    MatMenuModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatDialogModule,
+    MatSelectModule,
+    MatCheckboxModule,
+    MatProgressBarModule
+    MatChipsModule,
+    MatSlideToggleModule,
+    MatTooltipModule,
+    
+    // Shared Module
+    SharedModule,
+    
+    // Standalone Components
+    ProductDetailsComponent
    ],
   providers: [
     AuthService,

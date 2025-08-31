@@ -55,59 +55,59 @@
   text-align: left;
   vertical-align: middle;
 }
-.styled-price-table.profilaktika-table {
+.styled-price-table.maintenance-table {
   margin-top: 2.2rem;
   margin-bottom: 2.2rem;
   width: 100%;
 }
-.styled-price-table.profilaktika-table td {
+.styled-price-table.maintenance-table td {
   border: 1px solid #b0b9d6;
   padding: 1.1rem 0.7rem;
   font-size: 0.89rem;
   text-align: center;
   vertical-align: middle;
 }
-.styled-price-table.profilaktika-table .table-header td {
+.styled-price-table.maintenance-table .table-header td {
   font-size: 0.89rem;
 }
-.styled-price-table.profilaktika-table .profilaktika-extra {
+.styled-price-table.maintenance-table .maintenance-extra {
   font-size: 0.85rem;
 }
-.styled-price-table.profilaktika-table .price-value {
+.styled-price-table.maintenance-table .price-value {
   font-size: 0.8rem !important;
   font-weight: 600;
 }
-.styled-price-table.profilaktika-table .main-title {
+.styled-price-table.maintenance-table .main-title {
   font-size: 0.87rem;
   font-weight: 700;
   display: block;
   color: #0a3a5a;
 }
-.styled-price-table.profilaktika-table .extra-note {
+.styled-price-table.maintenance-table .extra-note {
   font-size: 0.78rem;
   color: #4d5c7a;
   margin-top: 0.45em;
   font-weight: 400;
 }
 @media (max-width: 900px) {
-  .styled-price-table.profilaktika-table .main-title {
+  .styled-price-table.maintenance-table .main-title {
     font-size: 0.81rem;
   }
-  .styled-price-table.profilaktika-table .extra-note {
+  .styled-price-table.maintenance-table .extra-note {
     font-size: 0.72rem;
   }
 }
 
 @media (max-width: 900px) {
-  .styled-price-table.profilaktika-table td,
-  .styled-price-table.profilaktika-table .table-header td,
-  .styled-price-table.profilaktika-table .profilaktika-extra,
-  .styled-price-table.profilaktika-table .price-value {
+  .styled-price-table.maintenance-table td,
+  .styled-price-table.maintenance-table .table-header td,
+  .styled-price-table.maintenance-table .maintenance-extra,
+  .styled-price-table.maintenance-table .price-value {
     font-size: 0.82rem;
   }
 }
 
-.styled-price-table.profilaktika-table .table-header td {
+.styled-price-table.maintenance-table .table-header td {
   background: #e7effa;
   color: #0a3a5a;
   font-weight: 700;
@@ -116,12 +116,12 @@
   padding-top: 0.9rem;
   padding-bottom: 0.7rem;
 }
-.styled-price-table.profilaktika-table .table-header td:last-child {
+.styled-price-table.maintenance-table .table-header td:last-child {
   font-size: 0.8rem !important;
   font-weight: 500;
 }
 
-.styled-price-table.profilaktika-table .profilaktika-extra {
+.styled-price-table.maintenance-table .maintenance-extra {
   display: block;
   color: #1a237e;
   font-size: 0.98rem;
@@ -129,18 +129,18 @@
   margin-top: 0.2em;
 }
 @media (max-width: 900px) {
-  .styled-price-table.profilaktika-table td {
+  .styled-price-table.maintenance-table td {
     font-size: 0.98rem;
     padding: 0.5rem 0.3rem;
   }
-  .styled-price-table.profilaktika-table .table-header td {
+  .styled-price-table.maintenance-table .table-header td {
     font-size: 0.98rem;
     padding-top: 0.5rem;
     padding-bottom: 0.4rem;
   }
 }
 
-.profilaktika-extra {
+.maintenance-extra {
   color: #f57c00;
   font-weight: 500;
   margin-left: 8px;

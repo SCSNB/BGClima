@@ -17,7 +17,6 @@ namespace BGClima.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("bgclima")
                 .HasAnnotation("ProductVersion", "9.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -38,7 +37,43 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BTUs", "bgclima");
+                    b.ToTable("BTUs");
+                });
+
+            modelBuilder.Entity("BGClima.Domain.Entities.Banner", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("TargetUrl")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Banners");
                 });
 
             modelBuilder.Entity("BGClima.Domain.Entities.Brand", b =>
@@ -61,7 +96,7 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Brands", "bgclima");
+                    b.ToTable("Brands");
                 });
 
             modelBuilder.Entity("BGClima.Domain.Entities.EnergyClass", b =>
@@ -79,7 +114,7 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EnergyClasses", "bgclima");
+                    b.ToTable("EnergyClasses");
                 });
 
             modelBuilder.Entity("BGClima.Domain.Entities.Product", b =>
@@ -151,7 +186,7 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasIndex("ProductTypeId");
 
-                    b.ToTable("Products", "bgclima");
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("BGClima.Domain.Entities.ProductAttribute", b =>
@@ -190,7 +225,35 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductAttributes", "bgclima");
+                    b.ToTable("ProductAttributes");
+                });
+
+            modelBuilder.Entity("BGClima.Domain.Entities.ProductDescriptionImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AltText")
+                        .HasColumnType("text");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductDescriptionImages");
                 });
 
             modelBuilder.Entity("BGClima.Domain.Entities.ProductImage", b =>
@@ -223,7 +286,7 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductImages", "bgclima");
+                    b.ToTable("ProductImages");
                 });
 
             modelBuilder.Entity("BGClima.Domain.Entities.ProductType", b =>
@@ -241,7 +304,7 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProductTypes", "bgclima");
+                    b.ToTable("ProductTypes");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -267,7 +330,7 @@ namespace BGClima.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex");
 
-                    b.ToTable("AspNetRoles", "bgclima");
+                    b.ToTable("AspNetRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -292,7 +355,7 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetRoleClaims", "bgclima");
+                    b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
@@ -356,7 +419,7 @@ namespace BGClima.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.ToTable("AspNetUsers", "bgclima");
+                    b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -381,7 +444,7 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserClaims", "bgclima");
+                    b.ToTable("AspNetUserClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -403,7 +466,7 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserLogins", "bgclima");
+                    b.ToTable("AspNetUserLogins", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
@@ -418,7 +481,7 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles", "bgclima");
+                    b.ToTable("AspNetUserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -437,7 +500,7 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens", "bgclima");
+                    b.ToTable("AspNetUserTokens", (string)null);
                 });
 
             modelBuilder.Entity("BGClima.Domain.Entities.Product", b =>
@@ -477,6 +540,17 @@ namespace BGClima.Infrastructure.Migrations
                 {
                     b.HasOne("BGClima.Domain.Entities.Product", "Product")
                         .WithMany("Attributes")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("BGClima.Domain.Entities.ProductDescriptionImage", b =>
+                {
+                    b.HasOne("BGClima.Domain.Entities.Product", "Product")
+                        .WithMany("DescriptionImages")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -559,6 +633,8 @@ namespace BGClima.Infrastructure.Migrations
             modelBuilder.Entity("BGClima.Domain.Entities.Product", b =>
                 {
                     b.Navigation("Attributes");
+
+                    b.Navigation("DescriptionImages");
 
                     b.Navigation("Images");
                 });
