@@ -37,13 +37,20 @@ jobs:
 
       - name: Build Angular app
         working-directory: ./BGClima.UI
-        run: npm run build -- --configuration production
+        run: |
+          npm run build -- --configuration production
+          ls -la ./dist/
 
       # 5️⃣ Copy Angular dist to .NET wwwroot
       - name: Copy Angular build to API wwwroot
         run: |
+          echo "Contents of dist directory:"
+          ls -la ./BGClima.UI/dist/
+          echo "Copying files..."
           rm -rf ./BGClima.API/wwwroot/*
-          cp -r ./BGClima.UI/dist/* ./BGClima.API/wwwroot/
+          cp -r ./BGClima.UI/dist/bgclima.ui/* ./BGClima.API/wwwroot/
+          echo "Files copied to wwwroot:"
+          ls -la ./BGClima.API/wwwroot/
 
       # 6️⃣ Restore & build .NET API
       - name: Restore .NET dependencies
