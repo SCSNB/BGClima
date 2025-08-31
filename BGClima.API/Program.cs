@@ -28,17 +28,32 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
 // Get connection string from environment variable (for Fly.io) or fall back to appsettings.json
-var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") ??
+var connectionString = builder.Configuration.GetValue<string>("DATABASE_URL") ??
+                     Environment.GetEnvironmentVariable("DATABASE_URL") ??
+                     builder.Configuration["DATABASE_URL"] ??
                      builder.Configuration.GetConnectionString("DefaultConnection") ??
-                     "Host=localhost;Port=5432;Database=bgclima;Username=postgres;Password=;";
+                     "Host=localhost;Port=5432;Database=bgclima;Username=postgres;Password=admin";
 
-if (builder.Environment.IsProduction())
+// Log which config source is being used
+if (!string.IsNullOrEmpty(builder.Configuration.GetValue<string>("DATABASE_URL")))
 {
-    Console.WriteLine("Running in production with environment-based configuration");
+    Console.WriteLine("Using connection from DATABASE_URL environment variable");
+}
+else if (!string.IsNullOrEmpty(builder.Configuration.GetConnectionString("DefaultConnection")))
+{
+    Console.WriteLine("Using connection from appsettings.json");
 }
 else
 {
-    Console.WriteLine($"Using connection string from {(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")) ? "appsettings.json" : "environment variable")}");
+    Console.WriteLine("Using default development connection string");
+}
+
+// For Fly.io, we need to format the connection string if it's in URL format
+if (connectionString.StartsWith("postgres://"))
+{
+    var uri = new Uri(connectionString);
+    var userInfo = uri.UserInfo.Split(':');
+    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true;";
 }
 
 // Mask sensitive information in logs
