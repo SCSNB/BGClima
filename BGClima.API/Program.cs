@@ -38,7 +38,7 @@ if (builder.Environment.IsProduction())
 }
 else
 {
-    Console.WriteLine($"Using connection string from {(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")) ? "appsettings.json" : "environment variable"}");
+    Console.WriteLine($"Using connection string from {(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")) ? "appsettings.json" : "environment variable")}");
 }
 
 // Mask sensitive information in logs
