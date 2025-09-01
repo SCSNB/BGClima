@@ -2,9 +2,14 @@
   <div class="layout-header">
     <h2 class="offers-title">{{ title }}</h2>
     <div class="filter-btn-container" *ngIf="isMobile">
-      <button mat-flat-button class="mobile-filter-btn" (click)="openFiltersDialog()">
-        Филтри
-      </button>
+      <button mat-flat-button class="mobile-filter-btn" (click)="openFiltersDialog()">Филтри</button>
+      <button mat-flat-button class="mobile-filter-btn" [matMenuTriggerFor]="mobileSortMenu">Сортиране</button>
+      <mat-menu #mobileSortMenu="matMenu">
+        <button mat-menu-item (click)="onSortChanged('price-asc')">Цена: Ниска → Висока</button>
+        <button mat-menu-item (click)="onSortChanged('price-desc')">Цена: Висока → Ниска</button>
+        <button mat-menu-item (click)="onSortChanged('name-asc')">Име: A → Я</button>
+        <button mat-menu-item (click)="onSortChanged('name-desc')">Име: Я → A</button>
+      </mat-menu>
     </div>
   </div>
 
@@ -22,6 +27,19 @@
   </aside>
 
   <div class="content">
+    <!-- Desktop sort button (hidden on mobile) -->
+    <div class="desktop-sort-container">
+      <button mat-flat-button class="desktop-sort-btn" [matMenuTriggerFor]="desktopSortMenu">
+        <span class="label">{{ currentSortLabel }}</span>
+        <mat-icon class="caret">keyboard_arrow_down</mat-icon>
+      </button>
+      <mat-menu #desktopSortMenu="matMenu">
+        <button mat-menu-item (click)="onSortChanged('price-asc')">Цена: Ниска → Висока</button>
+        <button mat-menu-item (click)="onSortChanged('price-desc')">Цена: Висока → Ниска</button>
+        <button mat-menu-item (click)="onSortChanged('name-asc')">Име: A → Я</button>
+        <button mat-menu-item (click)="onSortChanged('name-desc')">Име: Я → A</button>
+      </mat-menu>
+    </div>
     <div class="loader" *ngIf="loading">
       <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
     </div>

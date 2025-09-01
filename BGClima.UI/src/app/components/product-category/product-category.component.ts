@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, TemplateRef, HostListener } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, HostListener, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { ProductDto, ProductService } from 'src/app/services/product.service';
@@ -16,7 +16,11 @@ type ProductCard = ProductDto & {
 @Component({
   selector: 'app-product-category',
   templateUrl: './product-category.component.html',
-  styleUrls: ['./product-category.component.scss']
+  styleUrls: ['./product-category.component.scss'],
+  encapsulation: ViewEncapsulation.None,
+  host: {
+    'class': 'app-product-category'
+  }
 })
 
 export class ProductCategoryComponent implements OnInit {
@@ -30,6 +34,7 @@ export class ProductCategoryComponent implements OnInit {
   maxPrice: number = 0;
   isMobile: boolean = false;
   currentFilters: any;
+  currentSort: string | null = null; // Track current sort order
 
   constructor(
     private route: ActivatedRoute, 
@@ -66,6 +71,61 @@ export class ProductCategoryComponent implements OnInit {
   onFiltersChanged(filters: any) {
     this.currentFilters = filters;
     this.applyFilters(filters);
+  }
+
+  // Сортиране на продукти
+  getCurrentSortLabel(): string {
+    switch (this.currentSort) {
+      case 'price-asc': return 'Ниска цена';
+      case 'price-desc': return 'Висока цена';
+      case 'name-asc': return 'А → Я';
+      case 'name-desc': return 'Я → А';
+      default: return 'Сортиране';
+    }
+  }
+
+  // Икона за текущото сортиране (за бутона на десктоп)
+  getCurrentSortIcon(): string {
+    switch (this.currentSort) {
+      case 'name-asc':
+        return 'north'; // стрелка нагоре
+      case 'name-desc':
+        return 'south'; // стрелка надолу
+      default:
+        return 'keyboard_arrow_down'; // по подразбиране за отваряне на менюто
+    }
+  }
+
+  onSortChanged(sortKey: string) {
+    this.currentSort = sortKey;
+    this.applySorting();
+  }
+
+  private applySorting() {
+    if (!this.currentSort) return;
+    
+    const products = [...this.filteredProducts];
+    
+    switch (this.currentSort) {
+      case 'name-asc':
+        products.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+        break;
+      case 'name-desc':
+        products.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+        break;
+      case 'price-asc':
+        products.sort((a, b) => (a.price || 0) - (b.price || 0));
+        break;
+      case 'price-desc':
+        products.sort((a, b) => (b.price || 0) - (a.price || 0));
+        break;
+      default:
+        // Default sorting (by original order)
+        products.sort((a, b) => (a.id || 0) - (b.id || 0));
+        break;
+    }
+    
+    this.filteredProducts = products;
   }
 
   clearFilters() {
@@ -291,6 +351,8 @@ export class ProductCategoryComponent implements OnInit {
   }
 
   applyFilters(filters: any): void {
+    this.currentFilters = filters;
+    
     // Филтриране по марка, цена, енергиен клас, BTU (в хиляди) и площ на помещението
     const selectedBrands: string[] = filters?.brands || [];
     const selectedEnergy: string[] = filters?.energyClasses || [];
@@ -307,7 +369,8 @@ export class ProductCategoryComponent implements OnInit {
     const isHeatPumpCategory = new Set(['termopompeni-sistemi','multisplit-sistemi','bgclima-toploobmennici']).has(this.currentCategory);
     const selectedPowerKwNum = new Set<number>((selectedPowerKws || []).map(v => Number(v)).filter(n => !isNaN(n)));
 
-    this.filteredProducts = this.allProducts.filter(p => {
+    // Apply filters
+    const filtered = this.allProducts.filter(p => {
       // Цена в лева
       const price = Number(p.price ?? 0);
       if (!(price >= priceLower && price <= priceUpper)) return false;
@@ -366,6 +429,11 @@ export class ProductCategoryComponent implements OnInit {
 
       return true;
     });
+
+    // Задаваме филтрираните продукти към списъка за рендериране
+    this.filteredProducts = filtered;
+    // Запазваме активното сортиране, ако има такова
+    this.applySorting();
   }
 
   // Извлича максималната стойност (kW) от атрибут "Отдавана мощност на отопление (Мин./Ном./Макс)"

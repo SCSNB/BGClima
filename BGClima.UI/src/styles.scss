@@ -379,3 +379,29 @@ html, body {
     overflow: hidden !important;
   }
 }
+
+/* ===== Global desktop override for product-category sort button ===== */
+@media (min-width: 992px) {
+  /* Shrink label text reliably (MDC label inside Angular Material button) */
+  app-product-category .desktop-header .desktop-actions button.custom-sort-btn[mat-flat-button] .mdc-button__label {
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    text-transform: none !important;
+  }
+
+  /* Button sizing */
+  app-product-category .desktop-header .desktop-actions button.custom-sort-btn[mat-flat-button] {
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 16px !important;
+    border-radius: 18px !important;
+  }
+
+  /* Icon sizing */
+  app-product-category .desktop-header .desktop-actions button.custom-sort-btn[mat-flat-button] .mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    margin-left: 4px !important;
+  }
+}

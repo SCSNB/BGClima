@@ -25,6 +25,7 @@ import { RouterModule } from '@angular/router';
 import { MaterialModule } from './shared/material.module';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 
 // Services and Interceptors
 import { AuthService } from './services/auth.service';
@@ -131,7 +132,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
     MatSlideToggleModule,
     MatTooltipModule,
     MatDialogModule,
-    MatButtonModule
+    MatButtonModule,
+    MatMenuModule
   ],
   providers: [
     AuthService,
