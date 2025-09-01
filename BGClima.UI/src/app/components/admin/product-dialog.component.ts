@@ -1,16 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormArray, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { 
-  ProductService, 
-  BrandDto, 
-  ProductTypeDto, 
-  CreateProductDto, 
-  ProductDto, 
-  BTUDto, 
-  EnergyClassDto,
-  CreateProductAttributeDto
-} from '../../services/product.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { ProductService, ProductDto, BrandDto, ProductTypeDto, BTUDto, EnergyClassDto, CreateProductDto, CreateProductAttributeDto } from '../../services/product.service';
+import { environment } from '../../../environments/environment';
 
 export interface ProductDialogData {
   mode: 'create' | 'edit';
@@ -117,6 +109,45 @@ export interface ProductDialogData {
       margin-top: 1rem;
       width: 100%;
     }
+
+    /* Upload options styles */
+    .upload-options {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .upload-btn {
+      min-width: 140px;
+    }
+
+    .or-divider {
+      color: #666;
+      font-style: italic;
+      margin: 0 0.5rem;
+    }
+
+    .url-input {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .upload-progress {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #f5f5f5;
+      border-radius: 4px;
+    }
+
+    .upload-progress span {
+      display: block;
+      text-align: center;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
   `]
 })
 export class ProductDialogComponent implements OnInit {
@@ -130,6 +161,8 @@ export class ProductDialogComponent implements OnInit {
   title = '';
   images: { url: string, isPrimary: boolean }[] = [];
   newImageUrl: string = '';
+  uploadProgress: number = 0;
+  isUploading: boolean = false;
   descriptionImages: { id?: number, imageUrl: string }[] = [];
   newDescriptionImageUrl: string = '';
 
@@ -298,7 +331,7 @@ export class ProductDialogComponent implements OnInit {
   }
 
   // Image management methods
-  addImage(): void {
+  addImageFromUrl(): void {
     if (this.newImageUrl && !this.images.some(img => img.url === this.newImageUrl)) {
       this.images.push({
         url: this.newImageUrl,
@@ -306,6 +339,81 @@ export class ProductDialogComponent implements OnInit {
       });
       this.newImageUrl = '';
     }
+  }
+
+  onFileSelected(event: any): void {
+    const files: FileList = event.target.files;
+    if (files && files.length > 0) {
+      this.uploadFiles(files);
+    }
+  }
+
+  async uploadFiles(files: FileList): Promise<void> {
+    this.isUploading = true;
+    this.uploadProgress = 0;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      try {
+        const imageUrl = await this.uploadSingleFile(file);
+        this.images.push({
+          url: imageUrl,
+          isPrimary: this.images.length === 0 // First image is primary by default
+        });
+        this.uploadProgress = ((i + 1) / files.length) * 100;
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        alert(`Грешка при качване на ${file.name}`);
+      }
+    }
+
+    this.isUploading = false;
+    this.uploadProgress = 0;
+  }
+
+  private uploadSingleFile(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // For now, we'll use a placeholder URL until the backend endpoint is implemented
+      // TODO: Replace with actual Azure Storage upload endpoint
+      const xhr = new XMLHttpRequest();
+      
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) {
+          const progress = (e.loaded / e.total) * 100;
+          this.uploadProgress = progress;
+        }
+      });
+
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            try {
+              const response = JSON.parse(xhr.responseText);
+              resolve(response.imageUrl || response.url);
+            } catch (error) {
+              reject(error);
+            }
+          } else {
+            reject(new Error(`Upload failed with status ${xhr.status}`));
+          }
+        }
+      };
+
+      // Upload to the image controller endpoint
+      const uploadUrl = environment.production ? '/api/image/upload' : `${environment.apiUrl}/api/image/upload`;
+      xhr.open('POST', uploadUrl);
+      
+      // Add authentication header
+      const token = localStorage.getItem('token');
+      if (token) {
+        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      }
+      
+      xhr.send(formData);
+    });
   }
 
   removeImage(index: number): void {

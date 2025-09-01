@@ -8,21 +8,11 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { FormatLabelPipe } from '../../shared/pipes/format-label.pipe';
 
 @Component({
   selector: 'app-product-details',
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    MatIconModule,
-    MatButtonModule,
-    MatProgressSpinnerModule,
-    FormatLabelPipe
-  ],
   animations: [
     trigger('expandCollapse', [
       state('collapsed', style({ height: '0px', minHeight: '0', overflow: 'hidden' })),

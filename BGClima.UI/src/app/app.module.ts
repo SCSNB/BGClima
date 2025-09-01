@@ -17,32 +17,14 @@ import { ProductListComponent } from './components/admin/product-list.component'
 import { ProductDialogComponent } from './components/admin/product-dialog.component';
 import { DashboardHomeComponent } from './components/admin/dashboard-home.component';
 import { VentilationDesignComponent } from './components/ventilation-design/ventilation-design.component';
+import { ProductDetailsComponent } from './pages/product-details/product-details.component';
+import { FormatLabelPipe } from './shared/pipes/format-label.pipe';
+import { RouterModule } from '@angular/router';
 
-// Material Imports (only those not in SharedModule)
-import { MatCardModule } from '@angular/material/card';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatSliderModule } from '@angular/material/slider';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatTableModule } from '@angular/material/table';
-import { MatSortModule } from '@angular/material/sort';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatTooltipModule } from '@angular/material/tooltip';
+// Material Module
+import { MaterialModule } from './shared/material.module';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-
-// Shared Module
-import { SharedModule } from './shared/shared.module';
 
 // Services and Interceptors
 import { AuthService } from './services/auth.service';
@@ -60,7 +42,6 @@ import { ServizComponent } from './components/serviz/serviz.component';
 import { BannersComponent } from './components/admin/banners/banners.component';
 import { BannerDialogComponent } from './components/admin/banners/banner-dialog/banner-dialog.component';
 import { PromoBannersComponent } from './components/promo-banners/promo-banners.component';
-import { ProductDetailsComponent } from './pages/product-details/product-details.component';
 import { VentilationInstallationComponent } from './components/ventilation-installation/ventilation-installation.component';
 import { ProductCategoryComponent } from './components/product-category/product-category.component';
 import { ProductFiltersComponent } from './components/product-filters/product-filters.component';
@@ -97,8 +78,9 @@ import { PromoProductsComponent } from './pages/promo-products/promo-products.co
     ProductCategoryComponent,
     ProductFiltersComponent,
     MaintenanceComponent,
-    PromoProductsComponent
-   ],
+	PromoProductsComponent,
+	FormatLabelPipe,
+	ProductDetailsComponent   ],
   imports: [
     BrowserModule,
     SharedModule,
@@ -106,9 +88,9 @@ import { PromoProductsComponent } from './pages/promo-products/promo-products.co
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
+    MaterialModule,
     AppRoutingModule,
-    
-    // Material Modules (only those not in SharedModule)
+ // Material Modules (only those not in SharedModule)
     MatCardModule,
     MatInputModule,
     MatFormFieldModule,
@@ -130,10 +112,6 @@ import { PromoProductsComponent } from './pages/promo-products/promo-products.co
     MatTooltipModule,
     MatDialogModule,
     MatButtonModule,
-    
-    // Standalone Components
-    ProductDetailsComponent
-   ],
   providers: [
     AuthService,
     AuthGuard,

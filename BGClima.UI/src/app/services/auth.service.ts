@@ -16,6 +16,7 @@ export class AuthService {
   private readonly AUTH_COOKIE = 'bgclima_auth';
 
   constructor(private http: HttpClient, private router: Router) {
+    console.log('API URL:', this.apiUrl);
     const user = this.getUserFromCookie();
     console.log('Initial user from cookie:', user);
     this.currentUserSubject = new BehaviorSubject<User | null>(user);
