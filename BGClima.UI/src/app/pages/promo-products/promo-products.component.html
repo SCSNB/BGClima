@@ -13,6 +13,7 @@
       [currentCategory]="currentCategory"
       [minPrice]="minPrice"
       [maxPrice]="maxPrice"
+      [preset]="filters"
       [allowedBrands]="allowedBrandNames"
       [showCategoriesNav]="false"
       (filtersChanged)="onFiltersChanged($event)"
@@ -90,6 +91,7 @@
             [currentCategory]="currentCategory"
             [minPrice]="minPrice"
             [maxPrice]="maxPrice"
+            [preset]="filters"
             [allowedBrands]="allowedBrandNames"
             [showCategoriesNav]="false"
             (filtersChanged)="onFiltersChanged($event)">

@@ -107,6 +107,14 @@ export class PromoProductsComponent implements OnInit {
   }
 
   onFiltersChanged = (f: { brands: string[]; price: { lower: number; upper: number }; energyClasses: string[]; btus: string[]; roomSizeRanges: string[] }) => {
+    // Запази последния избор, за да се подаде като preset при повторно отваряне на диалога
+    this.filters = {
+      brands: [...(f.brands || [])],
+      price: { lower: Number(f.price?.lower ?? this.minPrice), upper: Number(f.price?.upper ?? this.maxPrice) },
+      energyClasses: [...(f.energyClasses || [])],
+      btus: [...(f.btus || [])],
+      roomSizeRanges: [...(f.roomSizeRanges || [])]
+    };
     const byBrand = (p: ProductCard) => !f.brands.length || !!p.brand && f.brands.includes(p.brand.name);
     const byPrice = (p: ProductCard) => {
       const price = p.price || 0;

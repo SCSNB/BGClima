@@ -19,7 +19,8 @@
         <app-product-filters 
           [currentCategory]="currentCategory" 
           [minPrice]="minPrice" 
-          [maxPrice]="maxPrice" 
+          [maxPrice]="maxPrice"
+          [preset]="currentFilters"
           (filtersChanged)="onFiltersChanged($event)">
         </app-product-filters>
       </div>
@@ -27,7 +28,12 @@
   </ng-template>
   <div class="content-wrapper">
     <aside class="filters-sidebar" *ngIf="!isMobile">
-      <app-product-filters [currentCategory]="currentCategory" [minPrice]="minPrice" [maxPrice]="maxPrice" (filtersChanged)="applyFilters($event)"></app-product-filters>
+      <app-product-filters 
+        [currentCategory]="currentCategory" 
+        [minPrice]="minPrice" 
+        [maxPrice]="maxPrice"
+        [preset]="currentFilters"
+        (filtersChanged)="onFiltersChanged($event)"></app-product-filters>
     </aside>
     <div class="product-grid">
       <ng-container *ngIf="filteredProducts.length > 0; else noProducts">

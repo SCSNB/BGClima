@@ -17,6 +17,14 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   @Input() allowedBrands: string[] = [];
   // Показва/скрива секцията с бързи връзки (категории)
   @Input() showCategoriesNav: boolean = true;
+  // Външен preset за текущ избор на филтри (за запазване при повторно отваряне)
+  @Input() preset: {
+    brands: string[];
+    price: { lower: number; upper: number };
+    energyClasses: string[];
+    btus: string[];
+    roomSizeRanges: string[];
+  } | null = null;
 
   filters = {
     brands: [] as string[],
@@ -181,6 +189,22 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['preset'] && this.preset) {
+      // При подаден preset, приложи стойностите към вътрешните филтри
+      this.filters = {
+        brands: [...(this.preset.brands || [])],
+        price: {
+          lower: Number(this.preset.price?.lower ?? this.minPrice),
+          upper: Number(this.preset.price?.upper ?? this.maxPrice)
+        },
+        energyClasses: [...(this.preset.energyClasses || [])],
+        btus: [...(this.preset.btus || [])],
+        roomSizeRanges: [...(this.preset.roomSizeRanges || [])]
+      };
+      this.clampPrices();
+      // Емитни, за да синхронизираме списъка с продукти с възстановените стойности
+      this.filtersChanged.emit(this.filters);
+    }
     if (changes['minPrice'] || changes['maxPrice']) {
       // При промяна на входните граници инициализирай диапазона към [min, max]
       this.filters.price.lower = this.minPrice;
