@@ -370,3 +370,12 @@ html, body {
     gap: 20px;
   }
 }
+
+/* Mobile filters dialog container – full-screen look */
+.mobile-filters-dialog-container {
+  .mat-dialog-container {
+    padding: 0 !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+  }
+}

@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, HostListener } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { ProductDto, ProductService } from 'src/app/services/product.service';
+import { FilterDialogComponent } from 'src/app/shared/components/filter-dialog/filter-dialog.component';
 
 type Badge = { bg: string; color: string; text: string };
 type Spec = { icon: string; label: string; value: string };
@@ -18,13 +20,65 @@ type ProductCard = ProductDto & {
 })
 
 export class ProductCategoryComponent implements OnInit {
+  @ViewChild('mobileFiltersDialog', { static: true }) mobileFiltersDialog!: TemplateRef<any>;
+  
   categoryTitle: string = '';
   allProducts: ProductCard[] = []; // Store all products for the category
   filteredProducts: ProductCard[] = []; // Products to display after filtering
   currentCategory: string = '';
+  minPrice: number = 0;
   maxPrice: number = 0;
+  isMobile: boolean = false;
+  currentFilters: any;
 
-  constructor(private route: ActivatedRoute, private productService: ProductService) { }
+  constructor(
+    private route: ActivatedRoute, 
+    private productService: ProductService,
+    public dialog: MatDialog
+  ) { 
+    this.checkScreenSize();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+    this.checkScreenSize();
+  }
+
+  checkScreenSize() {
+    this.isMobile = window.innerWidth < 960; // Matches Angular Material's breakpoint for 'handset'
+  }
+
+  openFiltersDialog() {
+    this.dialog.open(this.mobileFiltersDialog, {
+      width: '100%',
+      maxWidth: '100%',
+      height: '100%',
+      maxHeight: '100vh',
+      panelClass: 'mobile-filters-dialog-container'
+    });
+  }
+
+  closeFiltersDialog() {
+    this.dialog.closeAll();
+  }
+
+  // Method to handle filter changes from the filter component
+  onFiltersChanged(filters: any) {
+    this.currentFilters = filters;
+    this.applyFilters(filters);
+  }
+
+  clearFilters() {
+    this.currentFilters = {
+      brands: [],
+      price: { lower: this.minPrice, upper: this.maxPrice },
+      energyClasses: [],
+      btus: [],
+      roomSizeRanges: []
+    };
+    this.applyFilters(this.currentFilters);
+    this.closeFiltersDialog();
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {

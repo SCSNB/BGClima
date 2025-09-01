@@ -1,8 +1,33 @@
 <div class="category-container">
-  <h1 class="category-title">{{ categoryTitle }}</h1>
+  <div class="category-header">
+    <h1 class="category-title">{{ categoryTitle }}</h1>
+    <button *ngIf="isMobile" mat-flat-button class="mobile-filter-btn" (click)="openFiltersDialog()">
+      Филтри
+    </button>
+  </div>
+
+  <!-- Mobile Filter Dialog -->
+  <ng-template #mobileFiltersDialog>
+    <app-filter-dialog 
+      [isMobile]="true" 
+      [title]="'Филтрирай по'"
+      [showClearButton]="true"
+      (apply)="applyFilters(currentFilters); closeFiltersDialog()"
+      (clear)="clearFilters()"
+      (close)="closeFiltersDialog()">
+      <div class="filters-wrapper">
+        <app-product-filters 
+          [currentCategory]="currentCategory" 
+          [minPrice]="minPrice" 
+          [maxPrice]="maxPrice" 
+          (filtersChanged)="onFiltersChanged($event)">
+        </app-product-filters>
+      </div>
+    </app-filter-dialog>
+  </ng-template>
   <div class="content-wrapper">
-    <aside class="filters-sidebar">
-      <app-product-filters [currentCategory]="currentCategory" [minPrice]="100" [maxPrice]="maxPrice" (filtersChanged)="applyFilters($event)"></app-product-filters>
+    <aside class="filters-sidebar" *ngIf="!isMobile">
+      <app-product-filters [currentCategory]="currentCategory" [minPrice]="minPrice" [maxPrice]="maxPrice" (filtersChanged)="applyFilters($event)"></app-product-filters>
     </aside>
     <div class="product-grid">
       <ng-container *ngIf="filteredProducts.length > 0; else noProducts">
@@ -53,3 +78,5 @@
     </div>
   </div>
 </div>
+
+<!-- Mobile Filters Dialog duplicate removed -->

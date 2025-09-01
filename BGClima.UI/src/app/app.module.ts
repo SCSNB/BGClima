@@ -38,6 +38,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
 
 // Shared Module
 import { SharedModule } from './shared/shared.module';
@@ -64,6 +66,7 @@ import { ProductCategoryComponent } from './components/product-category/product-
 import { ProductFiltersComponent } from './components/product-filters/product-filters.component';
 import { MaintenanceComponent } from './components/maintenance/maintenance.component';
 import { PromoProductsComponent } from './pages/promo-products/promo-products.component';
+// FilterDialogComponent is declared and exported by SharedModule
 
 @NgModule({
   declarations: [
@@ -98,6 +101,7 @@ import { PromoProductsComponent } from './pages/promo-products/promo-products.co
    ],
   imports: [
     BrowserModule,
+    SharedModule,
     BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
@@ -124,9 +128,8 @@ import { PromoProductsComponent } from './pages/promo-products/promo-products.co
     MatChipsModule,
     MatSlideToggleModule,
     MatTooltipModule,
-    
-    // Shared Module
-    SharedModule,
+    MatDialogModule,
+    MatButtonModule,
     
     // Standalone Components
     ProductDetailsComponent
@@ -135,8 +138,13 @@ import { PromoProductsComponent } from './pages/promo-products/promo-products.co
     AuthService,
     AuthGuard,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [
+    ProductDialogComponent,
+    BannerDialogComponent
+  ]
 })
 export class AppModule { }

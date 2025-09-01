@@ -1,5 +1,12 @@
 <section class="promo-layout">
-  <h2 class="offers-title layout-header">{{ title }}</h2>
+  <div class="layout-header">
+    <h2 class="offers-title">{{ title }}</h2>
+    <div class="filter-btn-container" *ngIf="isMobile">
+      <button mat-flat-button class="mobile-filter-btn" (click)="openFiltersDialog()">
+        Филтри
+      </button>
+    </div>
+  </div>
 
   <aside class="sidebar desktop-only">
     <app-product-filters
@@ -67,4 +74,37 @@
       Няма активни промо продукти в момента.
     </div>
   </div>
+
+  <!-- Mobile Filters Dialog -->
+  <ng-template #mobileFiltersDialog>
+    <div class="mobile-filters-dialog">
+      <div class="dialog-header">
+        <h2>Филтрирай по</h2>
+        <button mat-icon-button (click)="closeFiltersDialog()" class="close-btn">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="filters-wrapper">
+        <div class="filters-content">
+          <app-product-filters
+            [currentCategory]="currentCategory"
+            [minPrice]="minPrice"
+            [maxPrice]="maxPrice"
+            [allowedBrands]="allowedBrandNames"
+            [showCategoriesNav]="false"
+            (filtersChanged)="onFiltersChanged($event)">
+          </app-product-filters>
+        </div>
+        <div class="dialog-actions">
+          <button mat-flat-button (click)="applyFilters()" class="apply-btn">
+            Приложи филтрите
+          </button>
+          <button mat-button (click)="clearFilters()" class="clear-filters-btn">
+            <mat-icon class="clear-icon">close</mat-icon>
+            Изчисти филтрите
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
 </section>

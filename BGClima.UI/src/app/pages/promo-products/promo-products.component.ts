@@ -1,4 +1,5 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, TemplateRef, HostListener } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ProductDto, ProductService } from '../../services/product.service';
 
 interface Badge { bg: string; color: string; text: string }
@@ -20,6 +21,21 @@ export class PromoProductsComponent implements OnInit {
   title = 'ПРОМО оферти';
   loading = true;
   products: ProductCard[] = [];
+  
+  // Current filter state
+  filters: {
+    brands: string[];
+    price: { lower: number; upper: number };
+    energyClasses: string[];
+    btus: string[];
+    roomSizeRanges: string[];
+  } = {
+    brands: [],
+    price: { lower: 0, upper: 0 },
+    energyClasses: [],
+    btus: [],
+    roomSizeRanges: []
+  };
   allPromoProducts: ProductCard[] = [];
   // Марки, които реално присъстват сред промо продуктите (за филтрите)
   allowedBrandNames: string[] = [];
@@ -28,8 +44,63 @@ export class PromoProductsComponent implements OnInit {
   minPrice = 0;
   maxPrice = 0;
   currentCategory = '';
+  isMobile = false;
+  private dialogRef: any;
 
-  constructor(private productService: ProductService) {}
+  @ViewChild('mobileFiltersDialog') mobileFiltersDialog!: TemplateRef<any>;
+
+  constructor(
+    private productService: ProductService,
+    private dialog: MatDialog
+  ) {
+    this.checkIfMobile();
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.checkIfMobile();
+  }
+
+  private checkIfMobile() {
+    this.isMobile = window.innerWidth < 768;
+  }
+
+  openFiltersDialog() {
+    this.dialogRef = this.dialog.open(this.mobileFiltersDialog, {
+      width: '100%',
+      maxWidth: '100%',
+      height: '100%',
+      maxHeight: '100vh',
+      panelClass: 'mobile-filters-dialog-container',
+      hasBackdrop: true,
+      disableClose: true
+    });
+  }
+
+  closeFiltersDialog() {
+    if (this.dialogRef) {
+      this.dialogRef.close();
+    }
+  }
+
+  applyFilters() {
+    this.closeFiltersDialog();
+  }
+
+  clearFilters() {
+    // Reset all filters to their default values
+    this.filters = {
+      brands: [],
+      price: { lower: this.minPrice, upper: this.maxPrice },
+      energyClasses: [],
+      btus: [],
+      roomSizeRanges: []
+    };
+    // Apply the cleared filters
+    this.onFiltersChanged(this.filters);
+    // Close the dialog
+    this.closeFiltersDialog();
+  }
 
   ngOnInit(): void {
     this.loadPromoProducts();
