@@ -236,10 +236,11 @@ export class ProductCategoryComponent implements OnInit {
   }
 
   applyFilters(filters: any): void {
-    // Филтриране по марка, цена, енергиен клас и BTU (в хиляди)
+    // Филтриране по марка, цена, енергиен клас, BTU (в хиляди) и площ на помещението
     const selectedBrands: string[] = filters?.brands || [];
     const selectedEnergy: string[] = filters?.energyClasses || [];
     const selectedBtus: string[] = filters?.btus || [];
+    const selectedRoomSizes: string[] = filters?.roomSizeRanges || [];
     const priceLower: number = Number(filters?.price?.lower ?? 0);
     const priceUpper: number = Number(filters?.price?.upper ?? Number.MAX_SAFE_INTEGER);
 
@@ -268,6 +269,33 @@ export class ProductCategoryComponent implements OnInit {
       if (selectedBtusNum.size > 0) {
         const btuK = this.getBtuInThousands(p);
         if (!selectedBtusNum.has(btuK)) return false;
+      }
+
+      // Филтър по площ на помещението
+      if (selectedRoomSizes.length > 0) {
+        const roomSizeAttr = (p.attributes || []).find(a => 
+          (a.attributeKey || '').toLowerCase().includes('подходящ за помещения')
+        );
+        
+        if (roomSizeAttr && roomSizeAttr.attributeValue) {
+          // Извличаме числовата стойност от атрибута (например "45 кв.м" -> 45)
+          const roomSizeMatch = roomSizeAttr.attributeValue.match(/(\d+(\.\d+)?)/);
+          if (roomSizeMatch) {
+            const roomSize = parseFloat(roomSizeMatch[0]);
+            const isInRange = selectedRoomSizes.some(range => {
+              const [min, max] = range.split('-').map(Number);
+              return roomSize >= min && roomSize <= max;
+            });
+            
+            if (!isInRange) return false;
+          } else {
+            // Ако не успеем да извлечем числова стойност, пропускаме филтъра за този продукт
+            return false;
+          }
+        } else {
+          // Ако продуктът няма атрибут за площ, не го показваме при филтриране по площ
+          return false;
+        }
       }
 
       return true;

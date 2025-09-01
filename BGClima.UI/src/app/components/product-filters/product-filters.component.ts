@@ -22,8 +22,21 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     brands: [] as string[],
     price: { lower: 230, upper: 79900 },
     energyClasses: [] as string[],
-    btus: [] as string[]
+    btus: [] as string[],
+    roomSizeRanges: [] as string[]
   };
+
+  // Опции за филтър по площ на помещението
+  roomSizeOptions = [
+    { value: '10-15', label: '10-15 кв.м' },
+    { value: '15-20', label: '15-20 кв.м' },
+    { value: '20-25', label: '20-25 кв.м' },
+    { value: '25-30', label: '25-30 кв.м' },
+    { value: '30-40', label: '30-40 кв.м' },
+    { value: '40-50', label: '40-50 кв.м' },
+    { value: '50-65', label: '50-65 кв.м' },
+    { value: '65-75', label: '65-75 кв.м' }
+  ];
 
   // Списък с марки от бекенда
   brands: BrandDto[] = [];
@@ -84,6 +97,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     this.filters.brands = [];
     this.filters.energyClasses = [];
     this.filters.btus = [];
+    this.filters.roomSizeRanges = [];
     this.filters.price.lower = this.minPrice;
     this.filters.price.upper = this.maxPrice;
     this.onFiltersChanged();

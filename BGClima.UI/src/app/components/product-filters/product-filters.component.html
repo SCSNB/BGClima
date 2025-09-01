@@ -101,4 +101,22 @@
       </mat-checkbox>
     </div>
   </mat-expansion-panel>
+
+  <mat-divider></mat-divider>
+
+  <!-- Room Size Filter -->
+  <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        За помещения (кв.м)
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div class="filter-options">
+      <mat-checkbox *ngFor="let size of roomSizeOptions"
+                   [checked]="isSelected(filters.roomSizeRanges, size.value)"
+                   (change)="toggleFilter(filters.roomSizeRanges, size.value)">
+        {{ size.label }}
+      </mat-checkbox>
+    </div>
+  </mat-expansion-panel>
 </mat-accordion>

@@ -35,7 +35,7 @@ export class PromoProductsComponent implements OnInit {
     this.loadPromoProducts();
   }
 
-  onFiltersChanged = (f: { brands: string[]; price: { lower: number; upper: number }; energyClasses: string[]; btus: string[]; }) => {
+  onFiltersChanged = (f: { brands: string[]; price: { lower: number; upper: number }; energyClasses: string[]; btus: string[]; roomSizeRanges: string[] }) => {
     const byBrand = (p: ProductCard) => !f.brands.length || !!p.brand && f.brands.includes(p.brand.name);
     const byPrice = (p: ProductCard) => {
       const price = p.price || 0;
@@ -49,8 +49,29 @@ export class PromoProductsComponent implements OnInit {
       const k = match ? Math.round(parseFloat(match[1]) / 1000).toString() : '';
       return f.btus.includes(k) || f.btus.includes((p.btu as any)?.value?.toString?.() ?? '');
     };
+    const byRoomSize = (p: ProductCard) => {
+      if (!f.roomSizeRanges.length) return true;
+      
+      const roomSizeAttr = (p.attributes || []).find(a => 
+        (a.attributeKey || '').toLowerCase().includes('подходящ за помещения')
+      );
+      
+      if (roomSizeAttr && roomSizeAttr.attributeValue) {
+        // Извличаме числовата стойност от атрибута (например "45 кв.м" -> 45)
+        const roomSizeMatch = roomSizeAttr.attributeValue.match(/(\d+(\.\d+)?)/);
+        if (roomSizeMatch) {
+          const roomSize = parseFloat(roomSizeMatch[0]);
+          return f.roomSizeRanges.some(range => {
+            const [min, max] = range.split('-').map(Number);
+            return roomSize >= min && roomSize <= max;
+          });
+        }
+      }
+      return false;
+    };
+    
     this.products = this.allPromoProducts
-      .filter(p => byBrand(p) && byPrice(p) && byClass(p) && byBTU(p));
+      .filter(p => byBrand(p) && byPrice(p) && byClass(p) && byBTU(p) && byRoomSize(p));
   };
 
   onSortChanged = (key: string) => {
