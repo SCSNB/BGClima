@@ -429,6 +429,11 @@ export class ProductCategoryComponent implements OnInit {
 
       return true;
     });
+
+    // Задаваме филтрираните продукти към списъка за рендериране
+    this.filteredProducts = filtered;
+    // Запазваме активното сортиране, ако има такова
+    this.applySorting();
   }
 
   // Извлича максималната стойност (kW) от атрибут "Отдавана мощност на отопление (Мин./Ном./Макс)"
