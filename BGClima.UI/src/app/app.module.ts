@@ -40,6 +40,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 
 // Shared Module
 import { SharedModule } from './shared/shared.module';
@@ -130,6 +131,7 @@ import { PromoProductsComponent } from './pages/promo-products/promo-products.co
     MatTooltipModule,
     MatDialogModule,
     MatButtonModule,
+    MatMenuModule,
     
     // Standalone Components
     ProductDetailsComponent

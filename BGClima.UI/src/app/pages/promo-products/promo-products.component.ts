@@ -21,6 +21,7 @@ export class PromoProductsComponent implements OnInit {
   title = 'ПРОМО оферти';
   loading = true;
   products: ProductCard[] = [];
+  private lastSortKey: string = '';
   
   // Current filter state
   filters: {
@@ -151,9 +152,21 @@ export class PromoProductsComponent implements OnInit {
     
     this.products = this.allPromoProducts
       .filter(p => byBrand(p) && byPrice(p) && byClass(p) && byBTU(p) && byRoomSize(p));
+    // re-apply last sort to keep ordering consistent
+    this.onSortChanged(this.lastSortKey);
   };
 
   onSortChanged = (key: string) => {
+    // Normalize incoming keys from different sources
+    const map: Record<string, string> = {
+      priceAsc: 'price-asc',
+      priceDesc: 'price-desc',
+      nameAsc: 'name-asc',
+      nameDesc: 'name-desc'
+    };
+    key = map[key] || key;
+    this.lastSortKey = key;
+
     const arr = [...this.products];
     const by = (k: keyof ProductCard, dir: 1|-1 = 1) => arr.sort((a,b)=>((a[k]||0)>(b[k]||0)?dir:-dir));
     switch (key) {
@@ -169,6 +182,16 @@ export class PromoProductsComponent implements OnInit {
     if (bgn === undefined || bgn === null) return null;
     const rate = 1.95583; // BGN -> EUR фиксиран курс
     return +(bgn / rate).toFixed(2);
+  }
+
+  get currentSortLabel(): string {
+    switch (this.lastSortKey) {
+      case 'price-asc': return 'Ниска цена';
+      case 'price-desc': return 'Висока цена';
+      case 'name-asc': return 'A → Я';
+      case 'name-desc': return 'Я → A';
+      default: return 'Сортиране';
+    }
   }
 
   private loadPromoProducts(): void {
@@ -213,8 +236,9 @@ export class PromoProductsComponent implements OnInit {
         const prices = this.allPromoProducts.map(p => p.price || 0);
         this.minPrice = prices.length ? Math.min(...prices) : 0;
         this.maxPrice = prices.length ? Math.max(...prices) : 0;
-        // Първоначално показваме всички
+        // Първоначално показваме всички и прилагаме последната подредба
         this.products = [...this.allPromoProducts];
+        this.onSortChanged(this.lastSortKey);
         this.loading = false;
       },
       error: () => {

@@ -1,9 +1,16 @@
 <div class="category-container">
   <div class="category-header">
     <h1 class="category-title">{{ categoryTitle }}</h1>
-    <button *ngIf="isMobile" mat-flat-button class="mobile-filter-btn" (click)="openFiltersDialog()">
-      Филтри
-    </button>
+    <div class="mobile-actions" *ngIf="isMobile">
+      <button mat-flat-button class="mobile-filter-btn" (click)="openFiltersDialog()">Филтри</button>
+      <button mat-flat-button class="mobile-filter-btn" [matMenuTriggerFor]="mobileSortMenu">Сортиране</button>
+      <mat-menu #mobileSortMenu="matMenu">
+        <button mat-menu-item (click)="onSortChanged('price-asc')">Цена: Ниска → Висока</button>
+        <button mat-menu-item (click)="onSortChanged('price-desc')">Цена: Висока → Ниска</button>
+        <button mat-menu-item (click)="onSortChanged('name-asc')">Име: A → Я</button>
+        <button mat-menu-item (click)="onSortChanged('name-desc')">Име: Я → A</button>
+      </mat-menu>
+    </div>
   </div>
 
   <!-- Mobile Filter Dialog -->
@@ -26,6 +33,21 @@
       </div>
     </app-filter-dialog>
   </ng-template>
+  <div class="desktop-header" *ngIf="!isMobile">
+    <div class="desktop-actions">
+      <button mat-flat-button class="desktop-sort-btn custom-sort-btn" [matMenuTriggerFor]="desktopSortMenu">
+        <span class="label">{{ getCurrentSortLabel() }}</span>
+        <mat-icon class="caret">keyboard_arrow_down</mat-icon>
+      </button>
+      <mat-menu #desktopSortMenu="matMenu">
+        <button mat-menu-item (click)="onSortChanged('price-asc')">Цена: Ниска → Висока</button>
+        <button mat-menu-item (click)="onSortChanged('price-desc')">Цена: Висока → Ниска</button>
+        <button mat-menu-item (click)="onSortChanged('name-asc')">Име: A → Я</button>
+        <button mat-menu-item (click)="onSortChanged('name-desc')">Име: Я → A</button>
+      </mat-menu>
+    </div>
+  </div>
+  
   <div class="content-wrapper">
     <aside class="filters-sidebar" *ngIf="!isMobile">
       <app-product-filters 
