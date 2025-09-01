@@ -31,7 +31,9 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     price: { lower: 230, upper: 79900 },
     energyClasses: [] as string[],
     btus: [] as string[],
-    roomSizeRanges: [] as string[]
+    roomSizeRanges: [] as string[],
+    // Само за термопомпи: избор на мощност (kW)
+    powerKws: [] as string[]
   };
 
   // Опции за филтър по площ на помещението
@@ -53,6 +55,11 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   // Списък с BTU стойности от бекенда
   btuOptions: BTUDto[] = [];
 
+  // Термопомпи: опции за Мощност (kW) – визуално като чеклист
+  powerKwOptions: string[] = [
+    '3','4','5','6','8','9','10','11','12','14','15','16','17','22','25','30','32','65','75','110','140'
+  ];
+
   constructor(private productService: ProductService, private dialog: MatDialog) {}
 
   // Mobile dialog template for filters
@@ -64,12 +71,18 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
 
   // Sorting options
   sortOptions = [
-    { key: 'name-asc', label: 'Име A–Я' },
-    { key: 'name-desc', label: 'Име Я–А' },
-    { key: 'price-asc', label: 'Цена ↑' },
-    { key: 'price-desc', label: 'Цена ↓' },
-    { key: 'newest', label: 'Най-нови' }
+    { value: 'priceAsc', label: 'Цена: Ниска към Висока' },
+    { value: 'priceDesc', label: 'Цена: Висока към Ниска' },
+    { value: 'nameAsc', label: 'Име: A → Я' },
+    { value: 'nameDesc', label: 'Име: Я → A' }
   ];
+
+  // Хелпър: дали текущата категория е термопомпена секция
+  isHeatPumpCategory(): boolean {
+    const c = (this.currentCategory || '').trim();
+    return c === 'termopompeni-sistemi' || c === 'multisplit-sistemi' || c === 'bgclima-toploobmennici';
+  }
+
   selectedSort: string = 'name-asc';
 
   // Бърза навигация по типове климатици (от ПРОДУКТИ > Климатици)
@@ -106,6 +119,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     this.filters.energyClasses = [];
     this.filters.btus = [];
     this.filters.roomSizeRanges = [];
+    this.filters.powerKws = [];
     this.filters.price.lower = this.minPrice;
     this.filters.price.upper = this.maxPrice;
     this.onFiltersChanged();
@@ -199,7 +213,8 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
         },
         energyClasses: [...(this.preset.energyClasses || [])],
         btus: [...(this.preset.btus || [])],
-        roomSizeRanges: [...(this.preset.roomSizeRanges || [])]
+        roomSizeRanges: [...(this.preset.roomSizeRanges || [])],
+        powerKws: [...((this.preset as any).powerKws || [])]
       };
       this.clampPrices();
       // Емитни, за да синхронизираме списъка с продукти с възстановените стойности

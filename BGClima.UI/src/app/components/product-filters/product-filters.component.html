@@ -86,8 +86,24 @@
 
   <mat-divider></mat-divider>
 
-  <!-- BTU Filter -->
-  <mat-expansion-panel [expanded]="true">
+  <!-- Power (kW) for Heat Pump categories -->
+  <mat-expansion-panel *ngIf="isHeatPumpSection" [expanded]="true">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Мощност (kW)
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div class="filter-options">
+      <mat-checkbox *ngFor="let kw of powerKwOptions"
+                    [checked]="isSelected(filters.powerKws, kw)"
+                    (change)="toggleFilter(filters.powerKws, kw)">
+        {{ kw }}
+      </mat-checkbox>
+    </div>
+  </mat-expansion-panel>
+
+  <!-- BTU Filter (non-heat-pump) -->
+  <mat-expansion-panel *ngIf="!isHeatPumpSection" [expanded]="true">
     <mat-expansion-panel-header>
       <mat-panel-title>
         BTU
@@ -104,8 +120,8 @@
 
   <mat-divider></mat-divider>
 
-  <!-- Room Size Filter -->
-  <mat-expansion-panel [expanded]="true">
+  <!-- Room Size Filter (non-heat-pump only) -->
+  <mat-expansion-panel *ngIf="!isHeatPumpSection" [expanded]="true">
     <mat-expansion-panel-header>
       <mat-panel-title>
         За помещения (кв.м)

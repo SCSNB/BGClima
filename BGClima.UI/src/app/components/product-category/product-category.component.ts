@@ -74,7 +74,8 @@ export class ProductCategoryComponent implements OnInit {
       price: { lower: this.minPrice, upper: this.maxPrice },
       energyClasses: [],
       btus: [],
-      roomSizeRanges: []
+      roomSizeRanges: [],
+      powerKws: []
     };
     this.applyFilters(this.currentFilters);
     this.closeFiltersDialog();
@@ -295,12 +296,16 @@ export class ProductCategoryComponent implements OnInit {
     const selectedEnergy: string[] = filters?.energyClasses || [];
     const selectedBtus: string[] = filters?.btus || [];
     const selectedRoomSizes: string[] = filters?.roomSizeRanges || [];
+    const selectedPowerKws: string[] = (filters as any)?.powerKws || [];
     const priceLower: number = Number(filters?.price?.lower ?? 0);
     const priceUpper: number = Number(filters?.price?.upper ?? Number.MAX_SAFE_INTEGER);
 
     const selectedBtusNum = new Set<number>(
       (selectedBtus || []).map((b: string) => parseInt(String(b).replace(/\D+/g, ''), 10) / 1000).filter((n: number) => !isNaN(n))
     );
+
+    const isHeatPumpCategory = new Set(['termopompeni-sistemi','multisplit-sistemi','bgclima-toploobmennici']).has(this.currentCategory);
+    const selectedPowerKwNum = new Set<number>((selectedPowerKws || []).map(v => Number(v)).filter(n => !isNaN(n)));
 
     this.filteredProducts = this.allProducts.filter(p => {
       // Цена в лева
@@ -319,8 +324,15 @@ export class ProductCategoryComponent implements OnInit {
         if (!selectedEnergy.includes(cls)) return false;
       }
 
-      // BTU (в хиляди)
-      if (selectedBtusNum.size > 0) {
+      // Мощност (kW) за термопомпени категории – филтрираме по макс отоплителна мощност, закръглена
+      if (isHeatPumpCategory && selectedPowerKwNum.size > 0) {
+        const maxHeatKw = this.getHeatingPowerMaxKw(p);
+        if (maxHeatKw === null) return false;
+        const rounded = Math.round(maxHeatKw);
+        if (!selectedPowerKwNum.has(rounded)) return false;
+      }
+      // BTU (в хиляди) – използваме само когато НЕ сме в термопомпена секция
+      if (!isHeatPumpCategory && selectedBtusNum.size > 0) {
         const btuK = this.getBtuInThousands(p);
         if (!selectedBtusNum.has(btuK)) return false;
       }
@@ -354,6 +366,22 @@ export class ProductCategoryComponent implements OnInit {
 
       return true;
     });
+  }
+
+  // Извлича максималната стойност (kW) от атрибут "Отдавана мощност на отопление (Мин./Ном./Макс)"
+  // Връща число (kW) или null ако липсва/невалидно
+  private getHeatingPowerMaxKw(p: ProductDto): number | null {
+    const attrs = p?.attributes || [];
+    const fullKey = 'Отдавана мощност на отопление (Мин./Ном./Макс)';
+    const found = attrs.find(a => (a.attributeKey || '').trim() === fullKey);
+    const raw = found?.attributeValue?.toString() || '';
+    if (!raw) return null;
+    const matches = raw.match(/(\d+[\.,]?\d*)/g);
+    if (!matches || matches.length === 0) return null;
+    const nums = matches.map(v => parseFloat(v.replace(',', '.'))).filter(n => !isNaN(n));
+    if (nums.length === 0) return null;
+    const max = Math.max(...nums);
+    return isFinite(max) ? max : null;
   }
 
   private setCategoryTitle(category: string): void {
