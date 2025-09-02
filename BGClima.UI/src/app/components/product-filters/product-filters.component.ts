@@ -55,6 +55,24 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   // Списък с BTU стойности от бекенда
   btuOptions: BTUDto[] = [];
 
+  // Специален набор BTU за "БГКЛИМА тръбни топлообменници"
+  private topHeatExchangerBtuValues: string[] = ['24000','36000','48000','60000','72000'];
+
+  // Източник за показване на BTU: за топлообменници показваме само големите стъпки
+  get btuOptionsToShow(): BTUDto[] {
+    if (this.isToploobmennici) {
+      return this.topHeatExchangerBtuValues.map(v => ({ value: v } as BTUDto));
+    }
+    return this.btuOptions;
+  }
+
+  // Форматира етикета за BTU без дублиране на "BTU"
+  formatBtuLabel(opt: BTUDto): string {
+    const raw = String((opt as any)?.value ?? '').trim();
+    if (!raw) return '';
+    return /\bBTU\b/i.test(raw) ? raw : `${raw} BTU`;
+  }
+
   // Термопомпи: опции за Мощност (kW) – визуално като чеклист
   powerKwOptions: string[] = [
     '3','4','5','6','8','9','10','11','12','14','15','16','17','22','25','30','32','65','75','110','140'
@@ -107,6 +125,11 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   get isHeatPumpSection(): boolean {
     const hpSet = new Set(['termopompeni-sistemi', 'multisplit-sistemi', 'bgclima-toploobmennici']);
     return hpSet.has(this.currentCategory);
+  }
+
+  // Специален флаг за страницата БГКЛИМА тръбни топлообменници
+  get isToploobmennici(): boolean {
+    return (this.currentCategory || '').trim() === 'bgclima-toploobmennici';
   }
 
   applyFilters(): void {
@@ -203,6 +226,19 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['currentCategory']) {
+      // При смяна на категория – ако сме в топлообменници, остави само Марка, Цена и BTU
+      if (this.isToploobmennici) {
+        this.filters.energyClasses = [];
+        this.filters.powerKws = [];
+        this.filters.roomSizeRanges = [];
+        // Пази само позволените BTU стойности
+        const allowed = new Set(this.topHeatExchangerBtuValues);
+        this.filters.btus = (this.filters.btus || []).filter(v => allowed.has(String(v)));
+        this.clampPrices();
+        this.filtersChanged.emit(this.filters);
+      }
+    }
     if (changes['preset'] && this.preset) {
       // При подаден preset, приложи стойностите към вътрешните филтри
       this.filters = {

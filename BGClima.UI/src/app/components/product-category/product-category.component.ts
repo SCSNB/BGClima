@@ -198,10 +198,16 @@ export class ProductCategoryComponent implements OnInit {
 
           const specs: Spec[] = [
             { icon: 'bolt', label: 'Мощност', value: btuThousands > 0 ? String(btuThousands) : '' },
-            { icon: 'eco', label: 'Енергиен клас', value: p.energyClass?.class || '-' },
             { icon: 'ac_unit', label: 'Охлаждане', value: cooling },
             { icon: 'wb_sunny', label: 'Отопление', value: heating },
           ];
+          // Добавяме Енергиен клас за всички, освен за тръбни топлообменници
+          if (category !== 'bgclima-toploobmennici') {
+            const eclass = p.energyClass?.class || '';
+            if (eclass) {
+              specs.splice(1, 0, { icon: 'eco', label: 'Енергиен клас', value: eclass });
+            }
+          }
           return { ...p, badges, specs, priceEur, oldPriceEur } as ProductCard;
         });
 
@@ -242,10 +248,16 @@ export class ProductCategoryComponent implements OnInit {
 
         const specs: Spec[] = [
           { icon: 'bolt', label: 'Мощност', value: btuThousands > 0 ? String(btuThousands) : '' },
-          { icon: 'eco', label: 'Енергиен клас', value: p.energyClass?.class || '-' },
           { icon: 'ac_unit', label: 'Охлаждане', value: cooling },
           { icon: 'wb_sunny', label: 'Отопление', value: heating },
         ];
+        // Добавяме Енергиен клас за всички, освен за тръбни топлообменници
+        if (category !== 'bgclima-toploobmennici') {
+          const eclass = p.energyClass?.class || '';
+          if (eclass) {
+            specs.splice(1, 0, { icon: 'eco', label: 'Енергиен клас', value: eclass });
+          }
+        }
 
         return { ...p, badges, specs, priceEur, oldPriceEur } as ProductCard;
       });
@@ -366,7 +378,8 @@ export class ProductCategoryComponent implements OnInit {
       (selectedBtus || []).map((b: string) => parseInt(String(b).replace(/\D+/g, ''), 10) / 1000).filter((n: number) => !isNaN(n))
     );
 
-    const isHeatPumpCategory = new Set(['termopompeni-sistemi','multisplit-sistemi','bgclima-toploobmennici']).has(this.currentCategory);
+    const isToploobmennici = (this.currentCategory || '').trim() === 'bgclima-toploobmennici';
+    const isHeatPumpCategory = new Set(['termopompeni-sistemi','multisplit-sistemi']).has(this.currentCategory); // изключваме топлообменници
     const selectedPowerKwNum = new Set<number>((selectedPowerKws || []).map(v => Number(v)).filter(n => !isNaN(n)));
 
     // Apply filters
@@ -387,15 +400,15 @@ export class ProductCategoryComponent implements OnInit {
         if (!selectedEnergy.includes(cls)) return false;
       }
 
-      // Мощност (kW) за термопомпени категории – филтрираме по макс отоплителна мощност, закръглена
+      // Мощност (kW) само за истински термопомпени категории (без топлообменници)
       if (isHeatPumpCategory && selectedPowerKwNum.size > 0) {
         const maxHeatKw = this.getHeatingPowerMaxKw(p);
         if (maxHeatKw === null) return false;
         const rounded = Math.round(maxHeatKw);
         if (!selectedPowerKwNum.has(rounded)) return false;
       }
-      // BTU (в хиляди) – използваме само когато НЕ сме в термопомпена секция
-      if (!isHeatPumpCategory && selectedBtusNum.size > 0) {
+      // BTU (в хиляди) – използваме когато НЕ сме в термопомпена секция ИЛИ сме в топлообменници
+      if ((!isHeatPumpCategory || isToploobmennici) && selectedBtusNum.size > 0) {
         const btuK = this.getBtuInThousands(p);
         if (!selectedBtusNum.has(btuK)) return false;
       }
