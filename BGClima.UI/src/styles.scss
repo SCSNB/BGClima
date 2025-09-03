@@ -2,6 +2,43 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
+/* Глобален стил за всички snackbar-и */
+.mat-mdc-snack-bar-container {
+  --mdc-snackbar-container-color: #ffffff; /* Бял фон */
+  --mdc-snackbar-supporting-text-color: #000000; /* Черен текст за съобщението */
+  --mdc-snackbar-supporting-text-weight: 400;
+  
+  .mdc-snackbar__surface {
+    border: 1px solid #e0e0e0; /* Лека граница за по-добра видимост */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Лека сянка за дълбочина */
+  }
+  
+  /* Стил за бутона за затваряне и бутона за действие */
+  .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled) {
+    color: #000000 !important; /* Черен цвят за бутона */
+  }
+}
+
+/* Стил за snackbar с тип грешка (ако се използва) */
+.mat-mdc-snack-bar-container.error-snackbar {
+  --mdc-snackbar-container-color: #ffebee; /* Светлочервен фон за грешки */
+  --mdc-snackbar-supporting-text-color: #c62828; /* Тъмночервен текст за грешки */
+  
+  .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled) {
+    color: #c62828;
+  }
+}
+
+/* Стил за snackbar с успех */
+.mat-mdc-snack-bar-container.success-snackbar {
+  --mdc-snackbar-container-color: #e8f5e9; /* Светлозелен фон за успех */
+  --mdc-snackbar-supporting-text-color: #2e7d32; /* Тъмнозелен текст за успех */
+  
+  .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled) {
+    color: #2e7d32;
+  }
+}
+
 html, body { 
   height: 100%; 
   margin: 0;
