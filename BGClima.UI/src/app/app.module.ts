@@ -44,6 +44,7 @@ import { VentilationInstallationComponent } from './components/ventilation-insta
 import { ProductCategoryComponent } from './components/product-category/product-category.component';
 import { ProductFiltersComponent } from './components/product-filters/product-filters.component';
 import { MaintenanceComponent } from './components/maintenance/maintenance.component';
+import { SharedModule } from './shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -83,9 +84,9 @@ import { MaintenanceComponent } from './components/maintenance/maintenance.compo
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    MaterialModule,
     AppRoutingModule,
     RouterModule,
+    SharedModule,
     MaterialModule
   ],
   providers: [
