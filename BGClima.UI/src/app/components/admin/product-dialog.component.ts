@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ProductService, ProductDto, BrandDto, ProductTypeDto, BTUDto, EnergyClassDto, CreateProductDto, CreateProductAttributeDto } from '../../services/product.service';
@@ -150,7 +150,7 @@ export interface ProductDialogData {
     }
   `]
 })
-export class ProductDialogComponent implements OnInit {
+export class ProductDialogComponent implements OnInit, OnDestroy {
   form: FormGroup;
   brands: BrandDto[] = [];
   types: ProductTypeDto[] = [];
@@ -159,7 +159,8 @@ export class ProductDialogComponent implements OnInit {
   attributes: CreateProductAttributeDto[] = [];
   editingAttributeIndex: number | null = null;
   title = '';
-  images: { url: string, isPrimary: boolean }[] = [];
+  // Store both the file object and its preview URL
+  images: { file?: File, url: string, isPrimary: boolean, isNew: boolean }[] = [];
   newImageUrl: string = '';
   uploadProgress: number = 0;
   isUploading: boolean = false;
@@ -217,13 +218,15 @@ export class ProductDialogComponent implements OnInit {
       if (this.data.product.images && this.data.product.images.length > 0) {
         this.images = this.data.product.images.map(img => ({
           url: img.imageUrl,
-          isPrimary: img.isPrimary
+          isPrimary: img.isPrimary,
+          isNew: false // These are existing images from the server
         }));
       } else if (this.data.product.imageUrl) {
         // For backward compatibility with single image
         this.images = [{
           url: this.data.product.imageUrl,
-          isPrimary: true
+          isPrimary: true,
+          isNew: false
         }];
       }
 
@@ -239,7 +242,7 @@ export class ProductDialogComponent implements OnInit {
     }
   }
 
-  save(): void {
+  async save(): Promise<void> {
     if (this.form.invalid) {
       return;
     }
@@ -249,32 +252,63 @@ export class ProductDialogComponent implements OnInit {
       return;
     }
 
-    const primaryImage = this.images.find(img => img.isPrimary) || this.images[0];
-    
-    const productData: any = {
-      ...this.form.value,
-      attributes: this.attributes.length > 0 ? this.attributes : undefined,
-      imageUrl: primaryImage.url, // For backward compatibility
-      isNew: !!this.form.value.isNew,
-      isOnSale: !!this.form.value.isOnSale,
-      isFeatured: !!this.form.value.isFeatured,
-      stockQuantity: this.form.value.stockQuantity || 0,
-      images: this.images.map((img, index) => ({
-        imageUrl: img.url,
-        altText: `Снимка на ${this.form.get('name')?.value || 'продукт'}`,
-        displayOrder: index,
-        isPrimary: img.isPrimary
-      })),
-      descriptionImages: this.descriptionImages.map((img, index) => ({
-        id: img.id || 0,
-        imageUrl: img.imageUrl,
-        altText: `Снимка към описание на ${this.form.get('name')?.value || 'продукт'}`,
-        displayOrder: index
-      }))
-    };
+    try {
+      this.isUploading = true;
+      
+      // Upload new images first
+      for (const img of this.images) {
+        if (img.isNew && img.file) {
+          try {
+            const uploadedUrl = await this.uploadSingleFile(img.file);
+            const oldUrl = img.url;
+            img.url = uploadedUrl; // Update URL to the final blob URL
+            img.isNew = false;
+            
+            // Clean up the old blob URL if it was a blob URL
+            if (oldUrl.startsWith('blob:')) {
+              URL.revokeObjectURL(oldUrl);
+            }
+          } catch (error) {
+            console.error('Error uploading image:', error);
+            alert(`Грешка при качване на снимка: ${img.file?.name || 'неизвестен файл'}`);
+            this.isUploading = false;
+            return;
+          }
+        }
+      }
 
-    console.log('Submitting product:', productData);
-    this.dialogRef.close({ action: this.data.mode, dto: productData });
+      const primaryImage = this.images.find(img => img.isPrimary) || this.images[0];
+      
+      const productData: any = {
+        ...this.form.value,
+        attributes: this.attributes.length > 0 ? this.attributes : undefined,
+        imageUrl: primaryImage.url, // For backward compatibility
+        isNew: !!this.form.value.isNew,
+        isOnSale: !!this.form.value.isOnSale,
+        isFeatured: !!this.form.value.isFeatured,
+        stockQuantity: this.form.value.stockQuantity || 0,
+        images: this.images.map((img, index) => ({
+          imageUrl: img.url,
+          altText: `Снимка на ${this.form.get('name')?.value || 'продукт'}`,
+          displayOrder: index,
+          isPrimary: img.isPrimary
+        })),
+        descriptionImages: this.descriptionImages.map((img, index) => ({
+          id: img.id || 0,
+          imageUrl: img.imageUrl,
+          altText: `Снимка към описание на ${this.form.get('name')?.value || 'продукт'}`,
+          displayOrder: index
+        }))
+      };
+
+      console.log('Submitting product:', productData);
+      this.dialogRef.close({ action: this.data.mode, dto: productData });
+    } catch (error) {
+      console.error('Error saving product:', error);
+      alert('Грешка при запазване на продукта');
+    } finally {
+      this.isUploading = false;
+    }
   }
 
   editAttribute(index: number): void {
@@ -335,7 +369,8 @@ export class ProductDialogComponent implements OnInit {
     if (this.newImageUrl && !this.images.some(img => img.url === this.newImageUrl)) {
       this.images.push({
         url: this.newImageUrl,
-        isPrimary: this.images.length === 0 // First image is primary by default
+        isPrimary: this.images.length === 0, // First image is primary by default
+        isNew: true // Mark as new (not yet uploaded to blob storage)
       });
       this.newImageUrl = '';
     }
@@ -355,15 +390,18 @@ export class ProductDialogComponent implements OnInit {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       try {
-        const imageUrl = await this.uploadSingleFile(file);
+        // Create object URL for preview
+        const objectUrl = URL.createObjectURL(file);
         this.images.push({
-          url: imageUrl,
-          isPrimary: this.images.length === 0 // First image is primary by default
+          file: file, // Store the actual File object
+          url: objectUrl, // Use object URL for preview
+          isPrimary: this.images.length === 0, // First image is primary by default
+          isNew: true // Mark as new (not yet uploaded to blob storage)
         });
         this.uploadProgress = ((i + 1) / files.length) * 100;
       } catch (error) {
-        console.error('Error uploading file:', error);
-        alert(`Грешка при качване на ${file.name}`);
+        console.error('Error processing file:', error);
+        alert(`Грешка при обработка на ${file.name}`);
       }
     }
 
@@ -417,6 +455,11 @@ export class ProductDialogComponent implements OnInit {
   }
 
   removeImage(index: number): void {
+    // Revoke object URL if it was created from a file
+    if (this.images[index].url.startsWith('blob:')) {
+      URL.revokeObjectURL(this.images[index].url);
+    }
+    
     const wasPrimary = this.images[index].isPrimary;
     this.images.splice(index, 1);
     
@@ -448,6 +491,20 @@ export class ProductDialogComponent implements OnInit {
   }
 
   cancel(): void {
+    this.cleanupObjectUrls();
     this.dialogRef.close();
+  }
+
+  ngOnDestroy(): void {
+    this.cleanupObjectUrls();
+  }
+
+  private cleanupObjectUrls(): void {
+    // Clean up all object URLs to prevent memory leaks
+    this.images.forEach(img => {
+      if (img.url && img.url.startsWith('blob:')) {
+        URL.revokeObjectURL(img.url);
+      }
+    });
   }
 } 
