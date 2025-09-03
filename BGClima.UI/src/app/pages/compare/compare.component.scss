@@ -1,0 +1,156 @@
+/* Page paddings */
+.compare-page {
+  padding: 16px 0 32px;
+}
+
+/* Actions row */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 16px 12px;
+}
+
+/* Table container */
+.compare-table {
+  /* Центриране и ограничаване на ширината */
+  margin: 0 auto;
+  border: 1px solid #e1e5ee;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  max-width: 1160px; /* ~ 3 продукта + лейбъл колона */
+  width: calc(100% - 32px); /* странични гътъри на мобилни */
+}
+
+/* Generic row with grid columns: first fixed label col, then product columns */
+.row {
+  display: grid;
+  grid-auto-flow: column; /* подреждане по колони */
+  grid-auto-columns: 1fr; /* всички колони еднаква ширина, включително етикетната */
+}
+
+/* Header row with subtle background on label cell */
+.header-row {
+  background: transparent; /* без бекграунд за реда със снимките */
+  border-bottom: 1px solid #e1e5ee;
+}
+
+/* Премахни светлия фон само за етикетната клетка в първия ред */
+.header-row .cell.label {
+  background: transparent;
+}
+
+.cell {
+  padding: 16px;
+  border-bottom: 1px solid #eef1f6;
+}
+
+.cell.label {
+  background: #f7f9fc;
+  font-weight: 600;
+  color: #4b5563;
+  border-right: 1px solid #e6eaf2;
+}
+
+/* Вертикални бордъри между продуктовите колони */
+.row .cell:not(.label) {
+  border-right: 1px solid #e6eaf2;
+}
+
+/* Без бордър за последната клетка (последната продуктова колона) */
+.row .cell:last-child {
+  border-right: none;
+}
+
+/* Product header cell */
+.product-header {
+  position: relative;
+  text-align: center;
+}
+
+.product-top {
+  position: relative;
+  padding-top: 8px;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.product-image {
+  width: 100%;
+  height: 160px;
+  object-fit: contain;
+}
+
+.product-name {
+  font-weight: 700;
+  font-size: 15px;
+  margin: 8px 0 6px;
+  color: #1f2937;
+}
+
+.product-rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.product-rating .star {
+  font-variation-settings: 'FILL' 1;
+  color: #f6b01e;
+  font-size: 18px;
+}
+
+.product-rating .votes {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.price-box {
+  margin-top: 6px;
+}
+
+.price-box .price {
+  color: #c81e1e; /* red price */
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.price-box .old-price {
+  color: #9ca3af;
+  text-decoration: line-through;
+  font-size: 13px;
+}
+
+/* Description bullets */
+.desc-list {
+  margin: 0;
+  padding-left: 20px;
+  list-style: disc;
+}
+
+.desc-list li {
+  margin: 8px 0;
+}
+
+.desc-list li::marker {
+  color: #1e6dd8; /* синя точка както в детайлите */
+}
+
+/* Empty state */
+.empty-state {
+  padding: 32px;
+  text-align: center;
+}
+
+/* Responsive tweaks */
+@media (max-width: 1024px) {
+  .row {
+    grid-auto-columns: 1fr;
+  }
+}

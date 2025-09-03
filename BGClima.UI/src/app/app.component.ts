@@ -3,6 +3,9 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { AuthService } from './services/auth.service';
 import { Router, NavigationEnd, Event } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { CompareService } from './services/compare.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +15,7 @@ import { filter } from 'rxjs/operators';
 export class AppComponent implements OnInit {
   @ViewChild('sidenav') sidenav!: MatSidenav;
   isMobileSearchVisible = false;
+  compareCount$!: Observable<number>;
 
   title = 'BGClima';
   isAuthenticated = false;
@@ -72,7 +76,9 @@ export class AppComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private compareService: CompareService,
+    private snackBar: MatSnackBar
   ) {
     // Subscribe to router events to keep track of the current URL
     this.router.events.pipe(
@@ -100,6 +106,8 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // сравнение: брояч за баджа в хедъра
+    this.compareCount$ = this.compareService.count$;
     this.authService.currentUser.subscribe(user => {
       this.isAuthenticated = !!user;
       this.isAdmin = this.authService.isAdmin();
@@ -113,5 +121,10 @@ export class AppComponent implements OnInit {
   // Check if the current route is admin or login
   isAdminOrLoginRoute(): boolean {
     return this.currentUrl.includes('/admin') || this.currentUrl.includes('/login');
+  }
+
+  // Навигация към сравнение (валидацията е в CompareGuard)
+  goToCompare(): void {
+    this.router.navigate(['/compare']);
   }
 }

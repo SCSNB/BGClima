@@ -1,6 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, TemplateRef, HostListener } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ProductDto, ProductService } from '../../services/product.service';
+import { CompareService } from '../../services/compare.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 interface Badge { bg: string; color: string; text: string }
 interface Spec { icon: string; label: string; value: string }
@@ -37,6 +39,24 @@ export class PromoProductsComponent implements OnInit {
     btus: [],
     roomSizeRanges: []
   };
+
+  // === Compare actions ===
+  isCompared(id: number): boolean {
+    return this.compareService.isSelected(id);
+  }
+
+  onCompareClick(event: MouseEvent, product: ProductDto) {
+    // предотвратяваме навигацията от линка на картата
+    event.preventDefault();
+    event.stopPropagation();
+    const res = this.compareService.toggle(product);
+    if (!res.ok && res.reason) {
+      this.snackBar.open(res.reason, 'OK', { duration: 2500 });
+      return;
+    }
+    const msg = res.selected ? 'Добавено за сравнение' : 'Премахнато от сравнение';
+    this.snackBar.open(msg, 'OK', { duration: 1200 });
+  }
   allPromoProducts: ProductCard[] = [];
   // Марки, които реално присъстват сред промо продуктите (за филтрите)
   allowedBrandNames: string[] = [];
@@ -52,7 +72,9 @@ export class PromoProductsComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private compareService: CompareService,
+    private snackBar: MatSnackBar
   ) {
     this.checkIfMobile();
   }
@@ -300,3 +322,5 @@ export class PromoProductsComponent implements OnInit {
     return (found?.attributeValue || '').toString();
   }
 }
+
+// Append compare handlers to class prototype (within class in actual edit above). For clarity, the proper placement is before the closing brace of the class.

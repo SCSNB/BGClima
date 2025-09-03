@@ -63,12 +63,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatExpansionModule } from '@angular/material/expansion';
 // FilterDialogComponent is declared and exported by SharedModule
+import { CompareComponent } from './pages/compare/compare.component';
 
 @NgModule({
   declarations: [
@@ -99,9 +101,10 @@ import { MatExpansionModule } from '@angular/material/expansion';
     ProductCategoryComponent,
     ProductFiltersComponent,
     MaintenanceComponent,
-	PromoProductsComponent,
-	FormatLabelPipe,
-	ProductDetailsComponent   ],
+    PromoProductsComponent,
+    CompareComponent,
+    FormatLabelPipe,
+    ProductDetailsComponent   ],
   imports: [
     BrowserModule,
     SharedModule,
@@ -133,7 +136,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
     MatTooltipModule,
     MatDialogModule,
     MatButtonModule,
-    MatMenuModule
+    MatMenuModule,
+    MatBadgeModule
   ],
   providers: [
     AuthService,

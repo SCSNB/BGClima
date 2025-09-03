@@ -3,6 +3,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { ProductDto, ProductService } from 'src/app/services/product.service';
 import { FilterDialogComponent } from 'src/app/shared/components/filter-dialog/filter-dialog.component';
+import { CompareService } from 'src/app/services/compare.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 type Badge = { bg: string; color: string; text: string };
 type Spec = { icon: string; label: string; value: string };
@@ -39,7 +41,9 @@ export class ProductCategoryComponent implements OnInit {
   constructor(
     private route: ActivatedRoute, 
     private productService: ProductService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private compareService: CompareService,
+    private snackBar: MatSnackBar
   ) { 
     this.checkScreenSize();
   }
@@ -495,5 +499,23 @@ export class ProductCategoryComponent implements OnInit {
       default:
         return [];
     }
+  }
+
+  // === Compare actions ===
+  isCompared(id: number): boolean {
+    return this.compareService.isSelected(id);
+  }
+
+  onCompareClick(event: MouseEvent, product: ProductDto) {
+    // предотвратяваме навигацията от линка на картата
+    event.preventDefault();
+    event.stopPropagation();
+    const res = this.compareService.toggle(product);
+    if (!res.ok && res.reason) {
+      this.snackBar.open(res.reason, 'OK', { duration: 2500 });
+      return;
+    }
+    const msg = res.selected ? 'Добавено за сравнение' : 'Премахнато от сравнение';
+    this.snackBar.open(msg, 'OK', { duration: 1200 });
   }
 }

@@ -23,7 +23,10 @@
       <button mat-icon-button aria-label="Калкулатор" class="desktop-only">
         <mat-icon>calculate</mat-icon>
       </button>
-      <button mat-icon-button aria-label="Сравняване" class="desktop-only">
+      <button mat-icon-button aria-label="Сравняване" class="desktop-only"
+              (click)="goToCompare()"
+              [matBadge]="compareCount$ | async" [matBadgeHidden]="(compareCount$ | async) === 0"
+              matBadgeColor="warn" matBadgePosition="above after" [matBadgeOverlap]="false">
         <mat-icon>swap_vert</mat-icon>
       </button>
     </div>
@@ -40,7 +43,10 @@
     <button mat-icon-button class="nav-item" routerLink="/contacts">
       <mat-icon>call</mat-icon>
     </button>
-    <button mat-icon-button class="nav-item mobile-only">
+    <button mat-icon-button class="nav-item mobile-only"
+            (click)="goToCompare()"
+            [matBadge]="compareCount$ | async" [matBadgeHidden]="(compareCount$ | async) === 0"
+            matBadgeColor="warn" matBadgePosition="above after" [matBadgeOverlap]="false">
       <mat-icon>swap_vert</mat-icon>
     </button>
   </nav>

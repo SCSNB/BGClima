@@ -19,6 +19,10 @@
       <button class="icon-btn" aria-label="Телефон" (click)="onPhone()">
         <mat-icon>phone</mat-icon>
       </button>
+      <button mat-icon-button class="icon-btn" aria-label="Сравнение" (click)="goToCompare()"
+              [matBadge]="(compareCount$ | async) || 0" matBadgeColor="warn" matBadgePosition="above after" [matBadgeHidden]="false" [matBadgeOverlap]="false">
+        <mat-icon>compare_arrows</mat-icon>
+      </button>
     </div>
   </div>
   <!-- Навигация -->

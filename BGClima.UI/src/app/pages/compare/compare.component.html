@@ -1,0 +1,100 @@
+<div class="compare-page" *ngIf="products && products.length >= 2; else needMore">
+  <div class="actions">
+    <button mat-stroked-button color="primary" (click)="clear()">Изчисти всички</button>
+  </div>
+
+  <!-- Header row: product headers with image, name, price and remove button -->
+  <div class="table compare-table">
+    <div class="row header-row">
+      <div class="cell label"></div>
+      <div class="cell product-header" *ngFor="let p of products">
+        <div class="product-top">
+          <img class="product-image" [src]="p.imageUrl || 'assets/placeholder.png'" [alt]="p.name" />
+          <button mat-icon-button color="warn" class="remove-btn" (click)="remove(p.id)" aria-label="Премахни">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="product-name">{{ p.name }}</div>
+        <div class="price-box">
+          <div class="price">{{ p.price | number:'1.2-2' }} лв.</div>
+          <div class="old-price" *ngIf="p.oldPrice">{{ p.oldPrice | number:'1.2-2' }} лв.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Highlights list instead of plain description -->
+    <div class="row">
+      <div class="cell label">Описание</div>
+      <div class="cell" *ngFor="let p of products">
+        <ng-container *ngIf="getHighlights(p)?.length; else noHighlights">
+          <ul class="desc-list">
+            <li *ngFor="let line of getHighlights(p)">{{ line }}</li>
+          </ul>
+        </ng-container>
+        <ng-template #noHighlights> - </ng-template>
+      </div>
+    </div>
+
+    <!-- Марка -->
+    <div class="row">
+      <div class="cell label">Марка</div>
+      <div class="cell" *ngFor="let p of products">{{ getBrandName(p) }}</div>
+    </div>
+
+    <!-- Мощност (BTU) -->
+    <div class="row">
+      <div class="cell label">Мощност (BTU)</div>
+      <div class="cell" *ngFor="let p of products">{{ getPowerBTU(p) }}</div>
+    </div>
+
+    <!-- Клас -->
+    <div class="row">
+      <div class="cell label">Клас</div>
+      <div class="cell" *ngFor="let p of products">{{ getClass(p) }}</div>
+    </div>
+
+    <!-- За помещения (кв. м.) -->
+    <div class="row">
+      <div class="cell label">За помещения (кв. м.)</div>
+      <div class="cell" *ngFor="let p of products">{{ getArea(p) }}</div>
+    </div>
+
+    <!-- Капацитет на охлаждане -->
+    <div class="row">
+      <div class="cell label">Капацитет на охлаждане</div>
+      <div class="cell" *ngFor="let p of products">{{ getCoolingCapacity(p) }}</div>
+    </div>
+
+    <!-- Капацитет на отопление -->
+    <div class="row">
+      <div class="cell label">Капацитет на отопление</div>
+      <div class="cell" *ngFor="let p of products">{{ getHeatingCapacity(p) }}</div>
+    </div>
+
+    <!-- Консумирана мощност за охлаждане -->
+    <div class="row">
+      <div class="cell label">Консумирана мощност за охлаждане</div>
+      <div class="cell" *ngFor="let p of products">{{ getConsumptionCooling(p) }}</div>
+    </div>
+
+    <!-- Консумирана мощност за отопление -->
+    <div class="row">
+      <div class="cell label">Консумирана мощност за отопление</div>
+      <div class="cell" *ngFor="let p of products">{{ getConsumptionHeating(p) }}</div>
+    </div>
+
+    <!-- Модел -->
+    <div class="row">
+      <div class="cell label">Модел</div>
+      <div class="cell" *ngFor="let p of products">{{ getModel(p) }}</div>
+    </div>
+
+  </div>
+</div>
+
+<ng-template #needMore>
+  <div class="empty-state">
+    <p>Моля, изберете поне 2 продукта за сравнение.</p>
+    <button mat-raised-button color="primary" routerLink="/products/stenen-tip">Към продуктите</button>
+  </div>
+</ng-template>
