@@ -98,6 +98,14 @@ export class AppComponent implements OnInit {
       } catch (_) {
         // no-op
       }
+      // Close mobile sidenav after navigation so the panel does not remain open
+      try {
+        if (this.sidenav && this.sidenav.opened) {
+          this.sidenav.close();
+        }
+      } catch (_) {
+        // no-op
+      }
     });
   }
 

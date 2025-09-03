@@ -3,7 +3,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { ProductDto } from './product.service';
 
 const STORAGE_KEY = 'compare_products';
-const MAX_COMPARE = 4; // опционално ограничение като в повечето магазини
+const DESKTOP_MAX_COMPARE = 4; // ограничение за десктоп
+const MOBILE_MAX_COMPARE = 2;  // ограничение за мобилно
+const MOBILE_BREAKPOINT = 576; // px, синхронизирано с SCSS медиите
 
 @Injectable({ providedIn: 'root' })
 export class CompareService {
@@ -27,6 +29,23 @@ export class CompareService {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
   }
 
+  private isMobileViewport(): boolean {
+    try {
+      return typeof window !== 'undefined' && window.innerWidth <= MOBILE_BREAKPOINT;
+    } catch {
+      return false;
+    }
+  }
+
+  private currentMaxCompare(): number {
+    return this.isMobileViewport() ? MOBILE_MAX_COMPARE : DESKTOP_MAX_COMPARE;
+  }
+
+  // Публичен getter за текущия лимит (полезно за UI/дизабъл на бутони)
+  getMaxCompare(): number {
+    return this.currentMaxCompare();
+  }
+
   getAll(): ProductDto[] {
     return this.productsSubject.value;
   }
@@ -40,8 +59,12 @@ export class CompareService {
     if (this.isSelected(product.id)) {
       return { ok: true };
     }
-    if (list.length >= MAX_COMPARE) {
-      return { ok: false, reason: 'Достигнат е максималният брой за сравнение' };
+    const max = this.currentMaxCompare();
+    if (list.length >= max) {
+      const reason = this.isMobileViewport()
+        ? `В мобилен изглед можете да сравнявате до ${MOBILE_MAX_COMPARE} продукта`
+        : `Можете да сравнявате до ${DESKTOP_MAX_COMPARE} продукта`;
+      return { ok: false, reason };
     }
     const next = [...list, product];
     this.productsSubject.next(next);
@@ -63,7 +86,7 @@ export class CompareService {
       return { selected: false, ok: true };
     }
     const res = this.add(product);
-    return { selected: true, ok: res.ok, reason: res.reason };
+    return { selected: res.ok, ok: res.ok, reason: res.reason };
   }
 
   clear() {
