@@ -35,7 +35,6 @@ import { ResourceComponent } from './components/resource/resource.component';
 import { CertificatesComponent } from './components/certificates/certificates.component';
 import { ProjectsComponent } from './components/projects/projects.component';
 import { ConsultingComponent } from './components/consulting/consulting.component';
-import { InstallationComponent } from './components/installation/installation.component';
 import { ServizComponent } from './components/serviz/serviz.component';
 import { BannersComponent } from './components/admin/banners/banners.component';
 import { BannerDialogComponent } from './components/admin/banners/banner-dialog/banner-dialog.component';
@@ -44,7 +43,8 @@ import { VentilationInstallationComponent } from './components/ventilation-insta
 import { ProductCategoryComponent } from './components/product-category/product-category.component';
 import { ProductFiltersComponent } from './components/product-filters/product-filters.component';
 import { MaintenanceComponent } from './components/maintenance/maintenance.component';
-import { SharedModule } from './shared/shared.module';
+import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -86,14 +86,15 @@ import { SharedModule } from './shared/shared.module';
     ReactiveFormsModule,
     AppRoutingModule,
     RouterModule,
-    SharedModule,
-    MaterialModule
+    MaterialModule,
+    CommonModule
   ],
   providers: [
     AuthService,
     AuthGuard,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true } }
   ],
   bootstrap: [AppComponent]
 })
