@@ -55,6 +55,9 @@
 /* Вертикални бордъри между продуктовите колони */
 .row .cell:not(.label) {
   border-right: 1px solid #e6eaf2;
+  /* направи продуктовите клетки flex колони, за да може съдържанието да запълни височината */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Без бордър за последната клетка (последната продуктова колона) */
@@ -66,6 +69,10 @@
 .product-header {
   position: relative;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  /* запълва наличната височина в клетката */
+  flex: 1 1 auto;
 }
 
 .product-top {
@@ -90,6 +97,14 @@
   font-size: 15px;
   margin: 8px 0 6px;
   color: #1f2937;
+  /* стабилизира височината на заглавието, за да не измества цената */
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 42px; /* приблизителна височина за 2 реда */
 }
 
 .product-rating {
@@ -111,8 +126,17 @@
   font-size: 12px;
 }
 
+
 .price-box {
-  margin-top: 6px;
+  /* избутваме цената в дъното, за да се подравнява между колоните */
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  /* резервирай място за два реда (нова + стара цена),
+     за да остане височината консистентна дори без стара цена */
+  min-height: 52px;
 }
 
 .price-box .price {
@@ -152,5 +176,24 @@
 @media (max-width: 1024px) {
   .row {
     grid-auto-columns: 1fr;
+  }
+}
+
+/* Допълнителни мобилни подобрения за подравняване */
+@media (max-width: 576px) {
+  .product-name {
+    /* ограничаваме височината на заглавието до 2 реда за да не бута цената различно */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2; /* стандартно свойство за съвместимост */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    /* осигуряваме минимална височина приблизително за 2 реда текста */
+    min-height: 40px;
+  }
+
+  .price-box {
+    /* малко по-голям резерв на мобилни, където текстът може да преноси */
+    min-height: 56px;
   }
 }
