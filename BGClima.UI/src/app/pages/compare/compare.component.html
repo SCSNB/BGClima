@@ -9,7 +9,9 @@
       <div class="cell label"></div>
       <div class="cell product-header" *ngFor="let p of products">
         <div class="product-top">
-          <img class="product-image" [src]="p.imageUrl || 'assets/placeholder.png'" [alt]="p.name" />
+          <a class="image-link" [routerLink]="['/product', p.id]" [title]="p.name">
+            <img class="product-image" [src]="p.imageUrl || 'assets/placeholder.png'" [alt]="p.name" />
+          </a>
           <button mat-icon-button color="warn" class="remove-btn" (click)="remove(p.id)" aria-label="Премахни">
             <mat-icon>close</mat-icon>
           </button>
