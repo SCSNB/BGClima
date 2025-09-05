@@ -1,45 +1,36 @@
 <div class="dashboard-content">
   <h1>Admin Dashboard</h1>
   <div class="stats-cards">
-    <mat-card>
+    <mat-card [routerLink]="['/admin/product']" role="button" tabindex="0" aria-label="Manage Products">
       <mat-card-header>
         <mat-icon mat-card-avatar>inventory_2</mat-icon>
         <mat-card-title>Products</mat-card-title>
         <mat-card-subtitle>Total Products</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <h2>156</h2>
+        <h2>{{ totalProducts === null ? '—' : totalProducts }}</h2>
       </mat-card-content>
     </mat-card>
-    <mat-card>
+    <mat-card [routerLink]="['/admin/banners']" role="button" tabindex="0" aria-label="Manage Banners">
       <mat-card-header>
-        <mat-icon mat-card-avatar>category</mat-icon>
-        <mat-card-title>Categories</mat-card-title>
-        <mat-card-subtitle>Active Categories</mat-card-subtitle>
+        <mat-icon mat-card-avatar>collections</mat-icon>
+        <mat-card-title>Banners</mat-card-title>
+        <mat-card-subtitle>Active Banners</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <h2>12</h2>
+        <h2>{{ totalBanners === null ? '—' : totalBanners }}</h2>
       </mat-card-content>
     </mat-card>
-    <mat-card>
-      <mat-card-header>
-        <mat-icon mat-card-avatar>shopping_cart</mat-icon>
-        <mat-card-title>Orders</mat-card-title>
-        <mat-card-subtitle>This Month</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <h2>28</h2>
-      </mat-card-content>
-    </mat-card>
-    <mat-card>
+    <!-- Placeholder Users card (no functionality yet) -->
+    <mat-card role="button" tabindex="0" aria-label="Users (placeholder)">
       <mat-card-header>
         <mat-icon mat-card-avatar>people</mat-icon>
         <mat-card-title>Users</mat-card-title>
         <mat-card-subtitle>Registered Users</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <h2>245</h2>
+        <h2>—</h2>
       </mat-card-content>
     </mat-card>
   </div>
-</div> 
+</div>
