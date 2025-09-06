@@ -32,23 +32,6 @@
           <mat-radio-button class="radio-item" *ngFor="let p of purposes" [value]="p.value">{{ p.label }}</mat-radio-button>
         </mat-radio-group>
       </section>
-
-      <!-- Колона 3: Цена и продължителност -->
-      <section class="col">
-        <h3>Изберете цена за kWh ел. енергия и работна продължителност</h3>
-        <div class="field">
-          <mat-form-field appearance="outline" class="full">
-            <mat-label>Цена за киловат час (лв.)</mat-label>
-            <input matInput type="number" formControlName="energyPrice" min="0.01" step="0.01">
-          </mat-form-field>
-        </div>
-        <div class="field">
-          <label class="label">Работна продължителност</label>
-          <mat-radio-group formControlName="durationHours" class="radio-group horizontal">
-            <mat-radio-button class="radio-item" *ngFor="let d of durations" [value]="d.value">{{ d.label }}</mat-radio-button>
-          </mat-radio-group>
-        </div>
-      </section>
     </div>
   </form>
 
@@ -68,7 +51,7 @@
         </div>
         <div class="metric">
           <div class="label">Препоръчителен клас</div>
-          <div class="value class">{{ r.recommendedClass | number }} BTU</div>
+          <div class="value class">{{ formatBtuDisplay(r.recommendedClass) }}</div>
         </div>
       </div>
       <p class="hint">Забележка: Това е ориентировъчна стойност. За точна консултация се свържете с наш специалист.</p>
@@ -77,7 +60,7 @@
 
   <!-- Recommended products based on BTU class -->
   <section class="recommended-section" *ngIf="recommendedCards?.length">
-    <h2 class="offers-title">Препоръчани продукти за {{ (result?.recommendedClass || 0) | number }} BTU</h2>
+    <h2 class="offers-title">Препоръчани продукти за {{ formatBtuDisplay(result?.recommendedClass || 0) }}</h2>
     <div class="offers-cards-wrapper">
       <ng-container *ngFor="let item of recommendedCards">
         <a [routerLink]="['/product', item.id]" class="offer-card-link">

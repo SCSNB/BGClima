@@ -4,11 +4,11 @@
 
   .offers-title {
     font-family: 'Montserrat', sans-serif;
-    font-size: 28px;
+    font-size: 21px; /* намален за да съвпада с текущия h1 визуално */
     font-weight: 700;
     color: #1A1A33;
     text-align: center;
-    margin-bottom: 18px;
+    margin: 8px 0 16px;
     position: relative;
     padding-bottom: 12px;
     &::after {
@@ -113,7 +113,8 @@ h1 {
   border-top: 2px solid #eaeaf0;
   max-width: 1200px;
   margin: 0 auto;
-  align-items: flex-start; /* подравняване отгоре */
+  align-items: stretch; /* колоните се изравняват по височина -> бордърът стига до долу */
+  position: relative;
 }
 
 .col {
@@ -122,8 +123,15 @@ h1 {
   min-width: 0; /* позволява съдържанието да се свива без да чупи реда */
 }
 
-.col + .col {
-  border-left: 2px solid #eaeaf0;
+.col + .col { position: relative; }
+.col + .col::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -12px; /* изравнява с горната линия (padding-top: 12px) */
+  bottom: 0;
+  width: 2px;
+  background: #eaeaf0;
 }
 
 .field + .field { margin-top: 12px; }
@@ -193,6 +201,27 @@ $primary-200: #c8d7ff; /* outline по подразбиране */
   --mdc-radio-unselected-icon-color: #b6d4ff;
   --mat-mdc-radio-ripple-color: #b6d4ff;
   --mat-mdc-radio-checked-ripple-color: #4da3ff;
+  /* Selected state layers (hover/focus/pressed) да са тъмно сини */
+  --mdc-radio-selected-hover-icon-color: #1e2a78;
+  --mdc-radio-selected-pressed-icon-color: #1e2a78;
+  --mdc-radio-selected-focus-icon-color: #1e2a78;
+  --mdc-radio-selected-hover-state-layer-color: #1e2a78;
+  --mdc-radio-selected-pressed-state-layer-color: #1e2a78;
+  --mdc-radio-selected-focus-state-layer-color: #1e2a78;
+}
+
+/* Hover: тъмен син цвят вместо розов */
+:host ::ng-deep .mat-mdc-radio-button:hover .mdc-radio__outer-circle,
+:host ::ng-deep .mat-mdc-radio-button:hover .mdc-radio__inner-circle {
+  border-color: #1e2a78; /* тъмно син */
+}
+:host ::ng-deep .mat-mdc-radio-button:hover .mdc-radio__background {
+  color: #1e2a78;
+}
+:host ::ng-deep .mat-mdc-radio-button:hover .mat-ripple-element,
+:host ::ng-deep .mat-mdc-radio-button:hover .mdc-radio__ripple::before,
+:host ::ng-deep .mat-mdc-radio-button:hover .mdc-radio__ripple::after {
+  background-color: rgba(30, 42, 120, 0.2) !important; /* тъмно син ripple */
 }
 
 /* Радио етикети да пренасят коректно и да не разместват колони */

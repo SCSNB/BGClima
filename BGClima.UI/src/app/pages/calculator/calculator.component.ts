@@ -80,21 +80,32 @@ export class CalculatorComponent implements OnInit {
 
   private calculate(): void {
     if (this.form.invalid) { this.result = null; return; }
-    const { length, width, height, purpose } = this.form.value;
+    const { length, width, purpose } = this.form.value;
 
-    // Базова топлинна натовареност по обем (W) ~ 35 W/m3
-    const area = length * width; // m2
-    const volume = area * height; // m3
-    let watts = volume * 35;
+    // Изчисляваме площ и прилагаме фактор според предназначението
+    const area = (length || 0) * (width || 0); // m2
+    const purposeFactor = purpose === 'primary' ? 1.15 : 1.0; // основно отопление изисква ~15% повече
+    const effArea = area * purposeFactor;
 
-    // Корекция според предназначението:
-    // seasonal: 1.0, primary: 1.15 (повече натоварване за основно отопление)
-    const purposeFactor = purpose === 'primary' ? 1.15 : 1.0;
-    watts *= purposeFactor;
+    // Норми (площ -> BTU клас), по-консервативна препоръка.
+    // 9k: до 15/16 кв; 12k: до 24/26 кв; 14/16k: до 38 кв; 18k: до 40/45 кв; 24k: до 50/55 кв
+    const ranges: { max: number; btuk: number }[] = [
+      { max: 16, btuk: 9000 },
+      { max: 26, btuk: 12000 },
+      { max: 38, btuk: 14000 }, // 14k и 16k се считат еквивалентни
+      { max: 45, btuk: 18000 },
+      { max: 55, btuk: 24000 },
+      { max: 70, btuk: 30000 },
+      { max: Infinity, btuk: 36000 }
+    ];
 
-    // Преобразуване W -> BTU/h (1 W = 3.412 BTU/h)
-    const btu = Math.round(watts * 3.412);
-    const recommendedClass = this.roundToBTUClass(btu);
+    let recommendedClass = 9000;
+    for (const r of ranges) {
+      if (effArea <= r.max) { recommendedClass = r.btuk; break; }
+    }
+
+    // За визуализация на „Необходим капацитет“ използваме директно BTU класа
+    const btu = recommendedClass;
 
     this.result = { btu, recommendedClass };
     this.loadRecommended(recommendedClass);
@@ -149,6 +160,13 @@ export class CalculatorComponent implements OnInit {
           }
           if (btuVal == null) return false;
           const thousands = Math.round(btuVal / 1000);
+          // 14k и 16k се считат еквивалентни за този диапазон
+          if (targetThousands === 14) {
+            return thousands === 14 || thousands === 16;
+          }
+          if (targetThousands === 16) {
+            return thousands === 14 || thousands === 16;
+          }
           return thousands === targetThousands;
         });
 
@@ -164,6 +182,19 @@ export class CalculatorComponent implements OnInit {
   private toEur(amountBgn: number): number {
     const rate = 1.95583;
     return Math.round((amountBgn / rate) * 100) / 100;
+  }
+
+  private formatNumber(n: number): string {
+    try { return new Intl.NumberFormat('bg-BG').format(n); } catch { return String(n); }
+  }
+
+  // Форматиране на етикет за показване на BTU класа
+  formatBtuDisplay(val: number): string {
+    if (!val) return '';
+    if (val === 14000) {
+      return `${this.formatNumber(14000)} до ${this.formatNumber(16000)} BTU`;
+    }
+    return `${this.formatNumber(val)} BTU`;
   }
 
   private mapToCard(p: ProductDto) {
