@@ -1,11 +1,62 @@
 <div class="category-container">
-  <h1 class="category-title">{{ categoryTitle }}</h1>
+  <div class="category-header">
+    <h1 class="category-title">{{ categoryTitle }}</h1>
+    <div class="mobile-actions" *ngIf="isMobile">
+      <button mat-flat-button class="mobile-filter-btn" (click)="openFiltersDialog()">Филтри</button>
+      <button mat-flat-button class="mobile-filter-btn" [matMenuTriggerFor]="mobileSortMenu">Сортиране</button>
+      <mat-menu #mobileSortMenu="matMenu">
+        <button mat-menu-item (click)="onSortChanged('price-asc')">Цена: Ниска → Висока</button>
+        <button mat-menu-item (click)="onSortChanged('price-desc')">Цена: Висока → Ниска</button>
+        <button mat-menu-item (click)="onSortChanged('name-asc')">Име: A → Я</button>
+        <button mat-menu-item (click)="onSortChanged('name-desc')">Име: Я → A</button>
+      </mat-menu>
+    </div>
+  </div>
+
+  <!-- Mobile Filter Dialog -->
+  <ng-template #mobileFiltersDialog>
+    <app-filter-dialog 
+      [isMobile]="true" 
+      [title]="'Филтрирай по'"
+      [showClearButton]="true"
+      (apply)="applyFilters(currentFilters); closeFiltersDialog()"
+      (clear)="clearFilters()"
+      (close)="closeFiltersDialog()">
+      <div class="filters-wrapper">
+        <app-product-filters 
+          [currentCategory]="currentCategory" 
+          [minPrice]="minPrice" 
+          [maxPrice]="maxPrice"
+          [preset]="currentFilters"
+          (filtersChanged)="onFiltersChanged($event)">
+        </app-product-filters>
+      </div>
+    </app-filter-dialog>
+  </ng-template>
+  <div class="desktop-header" *ngIf="!isMobile">
+    <div class="desktop-actions">
+      <button mat-flat-button class="desktop-sort-btn custom-sort-btn" [matMenuTriggerFor]="desktopSortMenu">
+        <span class="label">{{ getCurrentSortLabel() }}</span>
+        <mat-icon class="caret">keyboard_arrow_down</mat-icon>
+      </button>
+      <mat-menu #desktopSortMenu="matMenu">
+        <button mat-menu-item (click)="onSortChanged('price-asc')">Цена: Ниска → Висока</button>
+        <button mat-menu-item (click)="onSortChanged('price-desc')">Цена: Висока → Ниска</button>
+        <button mat-menu-item (click)="onSortChanged('name-asc')">Име: A → Я</button>
+        <button mat-menu-item (click)="onSortChanged('name-desc')">Име: Я → A</button>
+      </mat-menu>
+    </div>
+  </div>
+  
   <div class="content-wrapper">
-    <!-- Временно скрит панел с филтри
-    <aside class="filters-sidebar">
-      <app-product-filters (filtersChanged)="applyFilters($event)"></app-product-filters>
+    <aside class="filters-sidebar" *ngIf="!isMobile">
+      <app-product-filters 
+        [currentCategory]="currentCategory" 
+        [minPrice]="minPrice" 
+        [maxPrice]="maxPrice"
+        [preset]="currentFilters"
+        (filtersChanged)="onFiltersChanged($event)"></app-product-filters>
     </aside>
-    -->
     <div class="product-grid">
       <ng-container *ngIf="filteredProducts.length > 0; else noProducts">
         <a *ngFor="let product of filteredProducts" [routerLink]="['/product', product.id]" class="offer-card-link">
@@ -31,7 +82,11 @@
             </div>
             <div class="offer-card-brand-row">
               <span class="brand-text">{{ product.brand?.name }}</span>
-              <button class="compare-btn" type="button">Сравни</button>
+              <button class="compare-btn" type="button"
+                      [class.selected]="isCompared(product.id)"
+                      (click)="onCompareClick($event, product)">
+                {{ isCompared(product.id) ? 'В сравнение' : 'Сравни' }}
+              </button>
             </div>
             <div class="offer-card-specs">
               <ng-container *ngFor="let spec of product.specs">
@@ -55,3 +110,5 @@
     </div>
   </div>
 </div>
+
+<!-- Mobile Filters Dialog duplicate removed -->

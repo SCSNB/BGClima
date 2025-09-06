@@ -20,10 +20,13 @@
         <span class="phone-number"><mat-icon>call</mat-icon> 042 / 638 248</span>
         <span class="phone-desc">Безплатна консултация</span>
       </div>
-      <button mat-icon-button aria-label="Калкулатор" class="desktop-only">
+      <button mat-icon-button aria-label="Калкулатор" class="desktop-only" routerLink="/calculator">
         <mat-icon>calculate</mat-icon>
       </button>
-      <button mat-icon-button aria-label="Сравняване" class="desktop-only">
+      <button mat-icon-button aria-label="Сравняване" class="desktop-only"
+              (click)="goToCompare()"
+              [matBadge]="compareCount$ | async" [matBadgeHidden]="(compareCount$ | async) === 0"
+              matBadgeColor="warn" matBadgePosition="above after" [matBadgeOverlap]="false">
         <mat-icon>swap_vert</mat-icon>
       </button>
     </div>
@@ -40,7 +43,10 @@
     <button mat-icon-button class="nav-item" routerLink="/contacts">
       <mat-icon>call</mat-icon>
     </button>
-    <button mat-icon-button class="nav-item mobile-only">
+    <button mat-icon-button class="nav-item mobile-only compare-btn"
+            (click)="goToCompare()"
+            [matBadge]="(compareCount$ | async) ?? 0" [matBadgeHidden]="((compareCount$ | async) ?? 0) === 0"
+            matBadgeColor="warn" matBadgePosition="below after" [matBadgeOverlap]="true" matBadgeSize="small">
       <mat-icon>swap_vert</mat-icon>
     </button>
   </nav>

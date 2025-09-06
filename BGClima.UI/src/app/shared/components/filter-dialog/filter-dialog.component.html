@@ -1,0 +1,22 @@
+<div class="mobile-filters-dialog">
+  <div class="dialog-header">
+    <h2>{{ title }}</h2>
+    <button mat-icon-button (click)="onClose()" class="close-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="filters-wrapper">
+    <div class="filters-content">
+      <ng-content></ng-content>
+    </div>
+    <div class="dialog-actions" *ngIf="isMobile">
+      <button mat-flat-button (click)="onApply()" class="apply-btn">
+        Приложи филтрите
+      </button>
+      <button mat-button (click)="onClear()" class="clear-filters-btn" *ngIf="showClearButton">
+        <mat-icon class="clear-icon">close</mat-icon>
+        Изчисти филтрите
+      </button>
+    </div>
+  </div>
+</div>

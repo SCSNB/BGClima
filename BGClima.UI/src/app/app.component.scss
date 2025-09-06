@@ -881,6 +881,30 @@ body {
       background: #FF385C;
       color: #fff;
     }
+
+    /* Keep badge inside the compare button */
+    .compare-btn {
+      position: relative;
+      overflow: hidden; // prevent badge from sticking out
+    }
+    /* Force badge inside the button regardless of positional classes */
+    .compare-btn.mat-badge-overlap {
+      .mat-badge-content {
+        position: absolute !important;
+        inset: auto 8px 8px auto !important; // top right bottom left
+        transform: none !important;
+        z-index: 10 !important;
+        min-width: 16px;
+        height: 16px;
+        line-height: 16px;
+        font-size: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
+    }
   }
 }
 

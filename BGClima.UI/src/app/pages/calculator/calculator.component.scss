@@ -1,0 +1,410 @@
+/* === Recommended products grid (reuse Offers styles locally) === */
+.recommended-section {
+  margin-top: 24px;
+
+  .offers-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 21px; /* намален за да съвпада с текущия h1 визуално */
+    font-weight: 700;
+    color: #1A1A33;
+    text-align: center;
+    margin: 8px 0 16px;
+    position: relative;
+    padding-bottom: 12px;
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 3px;
+      background: linear-gradient(90deg, #3f51b5, #2196f3);
+    }
+  }
+
+  .offers-cards-wrapper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 12px 0;
+    justify-items: stretch;
+    align-items: stretch;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+
+    @media (max-width: 1200px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @media (max-width: 991px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @media (max-width: 576px) {
+      grid-template-columns: 1fr;
+      max-width: 420px;
+    }
+  }
+
+  .offer-card-link { text-decoration: none; color: inherit; display: block; }
+
+  .offer-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.06);
+    padding: 15px 12px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.3s ease;
+    &:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
+  }
+
+  .offer-card-image-badges { position: relative; width: 100%; min-height: 220px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+  .offer-card-image { max-width: 100%; max-height: 220px; object-fit: contain; }
+  .offer-badges { position: absolute; top: 8px; left: 8px; display: flex; gap: 6px; flex-direction: column; }
+  .offer-badges .badge { padding: 2px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #fff; }
+
+  .offer-card-title { font-size: 14px; color: #1A1A33; margin: 10px 0 6px; text-align: center; min-height: 40px; font-weight: 500; }
+  .offer-card-prices { margin: 6px 0; min-height: 45px; display: flex; align-items: center; width: 100%; }
+  .price-container { display: flex; flex-direction: column; align-items: center; width: 100%; }
+  .current-prices { display: flex; align-items: baseline; gap: 6px; line-height: 1; margin-bottom: 2px; }
+  .current-price, .current-price-eur { color: #E6003E; font-size: 16px; font-weight: 600; }
+  .old-prices { display: flex; align-items: baseline; gap: 4px; line-height: 1; }
+  .old-price { color: #9aa0a6; font-size: 13px; text-decoration: line-through; }
+  .old-price-eur { color: #9aa0a6; font-size: 11px; text-decoration: line-through; }
+
+  .offer-card-brand-row { display: flex; align-items: center; justify-content: space-between; margin: 5px 0; width: 100%; }
+  .brand-text-container { flex: 1; text-align: center; margin-right: 8px; }
+  .brand-text { color: #E6003E; font-size: 14px; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+  .compare-btn { margin-left: auto; font-size: 14px; font-weight: 500; color: #6b7280; background: transparent; border: none; border-radius: 6px; padding: 8px 16px; cursor: pointer; }
+
+  .offer-card-specs { display: grid; grid-template-columns: repeat(2, 1fr); width: 100%; margin-top: 8px; gap: 10px; }
+  .spec { display: grid; grid-template-columns: 48px 1fr; align-items: center; column-gap: 10px; width: 100%; min-height: 44px; }
+  .spec-icon { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border-radius: 10px; color: #5f6368; }
+  .spec-details { display: flex; flex-direction: column; justify-content: center; }
+  .spec-label { font-size: 11px; color: #9aa0a6; line-height: 1.2; }
+  .spec-value { font-size: 16px; font-weight: 600; color: #202124; line-height: 1.2; }
+}
+.calculator-page {
+  padding: 16px;
+}
+
+.result-icon { font-size: 28px; width: 28px; height: 28px; }
+.result-header-text { text-align: center; }
+
+h1 {
+  font-weight: 700;
+  margin: 8px 0 16px;
+  text-align: center;
+}
+
+.calc-form {
+  background: #fff;
+  margin-bottom: 0; /* прилепване към секцията с резултата */
+}
+
+.three-cols {
+  display: flex;
+  gap: 32px;
+  padding-top: 12px;
+  border-top: 2px solid #eaeaf0;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: stretch; /* колоните се изравняват по височина -> бордърът стига до долу */
+  position: relative;
+}
+
+.col {
+  flex: 1 1 0;
+  padding: 8px 24px;
+  min-width: 0; /* позволява съдържанието да се свива без да чупи реда */
+}
+
+.col + .col { position: relative; }
+.col + .col::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -12px; /* изравнява с горната линия (padding-top: 12px) */
+  bottom: 0;
+  width: 2px;
+  background: #eaeaf0;
+}
+
+.field + .field { margin-top: 12px; }
+.full { width: 100%; }
+
+/* Color palette */
+$primary: #1e2a78; /* тъмно синьо */
+$primary-50: #eef3ff; /* светло синкав фон */
+$primary-200: #c8d7ff; /* outline по подразбиране */
+
+/* --- Inputs: rounded pills with blue theme --- */
+.mat-mdc-form-field.mat-mdc-form-field-appearance-outline .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-mdc-form-field-appearance-outline .mdc-notched-outline__trailing,
+.mat-mdc-form-field.mat-mdc-form-field-appearance-outline .mdc-notched-outline__notch {
+  border-radius: 9999px;
+  border-color: $primary-200;
+}
+
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined {
+  border-radius: 9999px;
+  height: 52px;
+  align-items: center;
+  background: $primary-50;
+}
+
+.mat-mdc-form-field .mat-mdc-input-element {
+  padding: 0 16px;
+}
+
+.mat-mdc-form-field .mdc-floating-label {
+  font-weight: 500;
+}
+
+/* Focus/hover states */
+.mat-mdc-form-field.mat-mdc-form-field-appearance-outline .mdc-text-field--focused .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-mdc-form-field-appearance-outline .mdc-text-field--focused .mdc-notched-outline__trailing,
+.mat-mdc-form-field.mat-mdc-form-field-appearance-outline .mdc-text-field--focused .mdc-notched-outline__notch {
+  border-color: $primary !important;
+}
+
+.mat-mdc-form-field:hover .mdc-notched-outline__leading,
+.mat-mdc-form-field:hover .mdc-notched-outline__trailing,
+.mat-mdc-form-field:hover .mdc-notched-outline__notch {
+  border-color: $primary !important;
+}
+
+/* radios */
+.radio-group.vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.radio-group.horizontal {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.label { display: block; margin: 0 0 6px; color: #333; font-weight: 500; }
+
+/* --- Radio buttons larger blue discs --- */
+:host ::ng-deep .mat-mdc-radio-button {
+  /* Light blue tones for selected/unselected states */
+  --mdc-theme-primary: #4da3ff; /* fallback */
+  --mdc-radio-selected-icon-color: #4da3ff;
+  --mdc-radio-unselected-icon-color: #b6d4ff;
+  --mat-mdc-radio-ripple-color: #b6d4ff;
+  --mat-mdc-radio-checked-ripple-color: #4da3ff;
+  /* Selected state layers (hover/focus/pressed) да са тъмно сини */
+  --mdc-radio-selected-hover-icon-color: #1e2a78;
+  --mdc-radio-selected-pressed-icon-color: #1e2a78;
+  --mdc-radio-selected-focus-icon-color: #1e2a78;
+  --mdc-radio-selected-hover-state-layer-color: #1e2a78;
+  --mdc-radio-selected-pressed-state-layer-color: #1e2a78;
+  --mdc-radio-selected-focus-state-layer-color: #1e2a78;
+}
+
+/* Hover: тъмен син цвят вместо розов */
+:host ::ng-deep .mat-mdc-radio-button:hover .mdc-radio__outer-circle,
+:host ::ng-deep .mat-mdc-radio-button:hover .mdc-radio__inner-circle {
+  border-color: #1e2a78; /* тъмно син */
+}
+:host ::ng-deep .mat-mdc-radio-button:hover .mdc-radio__background {
+  color: #1e2a78;
+}
+:host ::ng-deep .mat-mdc-radio-button:hover .mat-ripple-element,
+:host ::ng-deep .mat-mdc-radio-button:hover .mdc-radio__ripple::before,
+:host ::ng-deep .mat-mdc-radio-button:hover .mdc-radio__ripple::after {
+  background-color: rgba(30, 42, 120, 0.2) !important; /* тъмно син ripple */
+}
+
+/* Радио етикети да пренасят коректно и да не разместват колони */
+:host ::ng-deep .mat-mdc-radio-button .mdc-form-field {
+  white-space: normal;
+}
+/* Хоризонтална група: радио диск и текст да са по средата по вертикала */
+.radio-group.horizontal :host ::ng-deep .mat-mdc-radio-button .mdc-form-field {
+  align-items: center;
+}
+/* Вертикална група: позволяваме много редове текст, изравнен отгоре */
+.radio-group.vertical :host ::ng-deep .mat-mdc-radio-button .mdc-form-field {
+  align-items: flex-start;
+}
+:host ::ng-deep .mat-mdc-radio-button .mdc-form-field > label {
+  line-height: 1.35;
+}
+
+/* По-компактни секционни заглавия, за да не чупят реда */
+.col > h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.mat-mdc-radio-button .mdc-radio__background { width: 22px; height: 22px; }
+.mat-mdc-radio-button .mdc-radio__outer-circle,
+.mat-mdc-radio-button .mdc-radio__inner-circle { border-width: 2px; }
+
+.result-card {
+  margin: 0 auto;             /* без вертикален отстъп отгоре */
+  max-width: 1200px;          /* същата ширина като горната секция */
+  width: 100%;
+  box-sizing: border-box;
+  /* Центриране на заглавие/подзаглавие и съдържание */
+  :host ::ng-deep .mat-mdc-card-header,
+  .result-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-direction: column; /* иконата над заглавието, всичко центрирано */
+  }
+  :host ::ng-deep .mat-mdc-card-header-text,
+  :host ::ng-deep .mat-mdc-card-title,
+  :host ::ng-deep .mat-mdc-card-subtitle {
+    text-align: center;
+    width: 100%;
+  }
+  :host ::ng-deep .mat-mdc-card-content,
+  .hint {
+    text-align: center;
+    color: #8a94a6; /* по-светъл цвят за забележката */
+    font-size: 12px; /* по-малък шрифт за забележката */
+  }
+}
+
+.result-grid {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.metric .label { font-size: 12px; color: #777; }
+.metric .value { font-size: 20px; font-weight: 600; }
+.metric .value.class { color: #3f51b5; }
+
+@media (max-width: 960px) {
+  .three-cols { flex-direction: column; gap: 8px; }
+  .col { padding: 8px 0; border-left: 0 !important; }
+}
+h1 {
+  font-weight: 700;
+  margin: 8px 0 16px;
+  text-align: center;
+}
+
+.calc-form {
+  background: #fff;
+}
+
+.three-cols {
+  display: flex;
+  gap: 32px;
+  padding-top: 12px;
+  border-top: 2px solid #eaeaf0;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.col {
+  flex: 1 1 0;
+  padding: 8px 24px;
+}
+
+.col + .col {
+  border-left: 2px solid #eaeaf0;
+}
+
+.field + .field { margin-top: 12px; }
+.full { width: 100%; }
+
+/* --- Inputs: rounded (pill-like) outline style --- */
+.mat-mdc-form-field.mat-mdc-form-field-appearance-outline .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-mdc-form-field-appearance-outline .mdc-notched-outline__trailing,
+.mat-mdc-form-field.mat-mdc-form-field-appearance-outline .mdc-notched-outline__notch {
+  border-radius: 9999px;
+}
+
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined {
+  border-radius: 9999px;
+  height: 48px;
+  align-items: center;
+}
+
+.mat-mdc-form-field .mat-mdc-input-element {
+  padding: 0 16px;
+}
+
+.mat-mdc-form-field .mdc-floating-label {
+  font-weight: 500;
+}
+
+/* radios */
+.radio-group.vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.radio-group.horizontal {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.label { display: block; margin: 0 0 6px; color: #333; font-weight: 500; }
+
+/* --- Radio buttons larger disc style --- */
+.mat-mdc-radio-button .mdc-radio__background {
+  width: 22px;
+  height: 22px;
+}
+
+.mat-mdc-radio-button .mdc-radio__outer-circle,
+.mat-mdc-radio-button .mdc-radio__inner-circle {
+  border-width: 2px;
+}
+
+.radio-item {
+  --mdc-theme-primary: #1e2a78; /* adjust if needed */
+}
+
+.result-card {
+  margin-top: 16px;
+}
+
+.result-grid {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.metric .label {
+  font-size: 12px;
+  color: #777;
+}
+
+.metric .value {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.metric .value.class {
+  color: #3f51b5;
+}
+
+@media (max-width: 960px) {
+  .three-cols {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .col { padding: 8px 0; border-left: 0 !important; }
+}

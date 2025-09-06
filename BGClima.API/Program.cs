@@ -1,5 +1,6 @@
 using BGClima.API.Data;
 using BGClima.Domain.Entities;
+using BGClima.Domain.Interfaces;
 using BGClima.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using BGClima.Infrastructure.Repositories;
@@ -121,6 +122,9 @@ builder.Services.AddScoped<BGClima.Application.Services.IAuthService, BGClima.Ap
 builder.Services.AddScoped<BGClima.Application.Services.IImageService, BGClima.Application.Services.ImageService>();
 //// Register repositories
 //builder.Services.AddScoped<BGClima.Domain.Entities.IProductRepository, BGClima.Infrastructure.Repositories.ProductRepository>();
+
+// Register banner repository
+builder.Services.AddScoped<IBannerRepository, BannerRepository>();
 
 // Register AutoMapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);

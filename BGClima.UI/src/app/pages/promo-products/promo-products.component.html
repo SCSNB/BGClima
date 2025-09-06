@@ -1,56 +1,134 @@
-<section class="offers-section">
-  <h2 class="offers-title">{{ title }}</h2>
-
-  <div class="loader" *ngIf="loading">
-    <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+<section class="promo-layout">
+  <div class="layout-header">
+    <h2 class="offers-title">{{ title }}</h2>
+    <div class="filter-btn-container" *ngIf="isMobile">
+      <button mat-flat-button class="mobile-filter-btn" (click)="openFiltersDialog()">Филтри</button>
+      <button mat-flat-button class="mobile-filter-btn" [matMenuTriggerFor]="mobileSortMenu">Сортиране</button>
+      <mat-menu #mobileSortMenu="matMenu">
+        <button mat-menu-item (click)="onSortChanged('price-asc')">Цена: Ниска → Висока</button>
+        <button mat-menu-item (click)="onSortChanged('price-desc')">Цена: Висока → Ниска</button>
+        <button mat-menu-item (click)="onSortChanged('name-asc')">Име: A → Я</button>
+        <button mat-menu-item (click)="onSortChanged('name-desc')">Име: Я → A</button>
+      </mat-menu>
+    </div>
   </div>
 
-  <div class="offers-cards-wrapper" *ngIf="!loading && products.length">
-    <ng-container *ngFor="let p of products">
-      <a [routerLink]="['/product', p.id]" class="offer-card-link">
-        <div class="offer-card">
-          <div class="offer-card-image-badges">
-            <img [src]="p.imageUrl || 'assets/solar-panel-placeholder.jpg'" [alt]="p.name" class="offer-card-image" />
-            <div class="offer-badges">
-              <span class="badge" *ngFor="let b of p.badges" [ngStyle]="{background: b.bg, color: b.color}">{{ b.text }}</span>
+  <aside class="sidebar desktop-only">
+    <app-product-filters
+      [currentCategory]="currentCategory"
+      [minPrice]="minPrice"
+      [maxPrice]="maxPrice"
+      [preset]="filters"
+      [allowedBrands]="allowedBrandNames"
+      [showCategoriesNav]="false"
+      (filtersChanged)="onFiltersChanged($event)"
+      (sortChanged)="onSortChanged($event)">
+    </app-product-filters>
+  </aside>
+
+  <div class="content">
+    <!-- Desktop sort button (hidden on mobile) -->
+    <div class="desktop-sort-container">
+      <button mat-flat-button class="desktop-sort-btn" [matMenuTriggerFor]="desktopSortMenu">
+        <span class="label">{{ currentSortLabel }}</span>
+        <mat-icon class="caret">keyboard_arrow_down</mat-icon>
+      </button>
+      <mat-menu #desktopSortMenu="matMenu">
+        <button mat-menu-item (click)="onSortChanged('price-asc')">Цена: Ниска → Висока</button>
+        <button mat-menu-item (click)="onSortChanged('price-desc')">Цена: Висока → Ниска</button>
+        <button mat-menu-item (click)="onSortChanged('name-asc')">Име: A → Я</button>
+        <button mat-menu-item (click)="onSortChanged('name-desc')">Име: Я → A</button>
+      </mat-menu>
+    </div>
+    <div class="loader" *ngIf="loading">
+      <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+    </div>
+
+    <div class="offers-cards-wrapper" *ngIf="!loading && products.length">
+      <ng-container *ngFor="let p of products">
+        <a [routerLink]="['/product', p.id]" class="offer-card-link">
+          <div class="offer-card">
+            <div class="offer-card-image-badges">
+              <img [src]="p.imageUrl || 'assets/solar-panel-placeholder.jpg'" [alt]="p.name" class="offer-card-image" />
+              <div class="offer-badges">
+                <span class="badge" *ngFor="let b of p.badges" [ngStyle]="{background: b.bg, color: b.color}">{{ b.text }}</span>
+              </div>
+            </div>
+            <div class="offer-card-title">{{ p.name }}</div>
+            <div class="offer-card-prices">
+              <div class="price-container">
+                <div class="current-prices">
+                  <span class="current-price">{{ p.price | number:'1.2-2' }} лв.</span>
+                  <span class="current-price-eur" *ngIf="p.priceEur">/ {{ p.priceEur | number:'1.2-2' }} €</span>
+                </div>
+                <div class="old-prices" *ngIf="p.oldPrice">
+                  <span class="old-price">{{ p.oldPrice | number:'1.2-2' }} лв.</span>
+                  <span class="old-price-eur" *ngIf="p.oldPriceEur">/ {{ p.oldPriceEur | number:'1.2-2' }} €</span>
+                </div>
+              </div>
+            </div>
+            <div class="offer-card-brand-row">
+              <span class="brand-text">{{ p.brand?.name || '' }}</span>
+              <button class="compare-btn" type="button"
+                      [class.selected]="isCompared(p.id)"
+                      (click)="onCompareClick($event, p)">
+                {{ isCompared(p.id) ? 'В сравнение' : 'Сравни' }}
+              </button>
+            </div>
+            <div class="offer-card-specs">
+              <ng-container *ngFor="let spec of p.specs">
+                <div class="spec" *ngIf="spec?.value">
+                  <div class="spec-icon" [ngClass]="spec.icon">
+                    <span class="material-icons">{{ spec.icon }}</span>
+                  </div>
+                  <div class="spec-details">
+                    <div class="spec-label">{{ spec.label }}</div>
+                    <div class="spec-value">{{ spec.value }}</div>
+                  </div>
+                </div>
+              </ng-container>
             </div>
           </div>
-          <div class="offer-card-title">{{ p.name }}</div>
-          <div class="offer-card-prices">
-            <div class="price-container">
-              <div class="current-prices">
-                <span class="current-price">{{ p.price | number:'1.2-2' }} лв.</span>
-                <span class="current-price-eur" *ngIf="p.priceEur">/ {{ p.priceEur | number:'1.2-2' }} €</span>
-              </div>
-              <div class="old-prices" *ngIf="p.oldPrice">
-                <span class="old-price">{{ p.oldPrice | number:'1.2-2' }} лв.</span>
-                <span class="old-price-eur" *ngIf="p.oldPriceEur">/ {{ p.oldPriceEur | number:'1.2-2' }} €</span>
-              </div>
-            </div>
-          </div>
-          <div class="offer-card-brand-row">
-            <span class="brand-text">{{ p.brand?.name || '' }}</span>
-            <button class="compare-btn" type="button">Сравни</button>
-          </div>
-          <div class="offer-card-specs">
-            <ng-container *ngFor="let spec of p.specs">
-              <div class="spec" *ngIf="spec?.value">
-                <div class="spec-icon" [ngClass]="spec.icon">
-                  <span class="material-icons">{{ spec.icon }}</span>
-                </div>
-                <div class="spec-details">
-                  <div class="spec-label">{{ spec.label }}</div>
-                  <div class="spec-value">{{ spec.value }}</div>
-                </div>
-              </div>
-            </ng-container>
-          </div>
+        </a>
+      </ng-container>
+    </div>
+
+    <div class="empty" *ngIf="!loading && !products.length">
+      Няма активни промо продукти в момента.
+    </div>
+  </div>
+
+  <!-- Mobile Filters Dialog -->
+  <ng-template #mobileFiltersDialog>
+    <div class="mobile-filters-dialog">
+      <div class="dialog-header">
+        <h2>Филтрирай по</h2>
+        <button mat-icon-button (click)="closeFiltersDialog()" class="close-btn">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="filters-wrapper">
+        <div class="filters-content">
+          <app-product-filters
+            [currentCategory]="currentCategory"
+            [minPrice]="minPrice"
+            [maxPrice]="maxPrice"
+            [preset]="filters"
+            [allowedBrands]="allowedBrandNames"
+            [showCategoriesNav]="false"
+            (filtersChanged)="onFiltersChanged($event)">
+          </app-product-filters>
         </div>
-      </a>
-    </ng-container>
-  </div>
-
-  <div class="empty" *ngIf="!loading && !products.length">
-    Няма активни промо продукти в момента.
-  </div>
+        <div class="dialog-actions">
+          <button mat-flat-button (click)="applyFilters()" class="apply-btn">
+            Приложи филтрите
+          </button>
+          <button mat-button (click)="clearFilters()" class="clear-filters-btn">
+            <mat-icon class="clear-icon">close</mat-icon>
+            Изчисти филтрите
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
 </section>

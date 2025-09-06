@@ -27,7 +27,11 @@
             <div class="brand-text-container">
               <span class="brand-text">{{ item.brandText }}</span>
             </div>
-            <button class="compare-btn" type="button">Сравни</button>
+            <button class="compare-btn" type="button"
+                    [class.selected]="isCompared(item.id)"
+                    (click)="onCompareClick($event, item.id)">
+              {{ isCompared(item.id) ? 'В сравнение' : 'Сравни' }}
+            </button>
           </div>
           <div class="offer-card-specs">
             <ng-container *ngFor="let spec of item.specs">

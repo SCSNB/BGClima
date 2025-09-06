@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductDto, ProductService } from '../../services/product.service';
+import { CompareService } from '../../services/compare.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-offers',
@@ -20,12 +22,21 @@ export class OffersComponent implements OnInit {
     specs: { label: string; value: string; icon: string }[];
   }> = [];
 
-  constructor(private productService: ProductService) {}
+  // Оригинални продукти за бърз достъп по id (за CompareService.toggle)
+  private byId: Record<number, ProductDto> = {};
+
+  constructor(
+    private productService: ProductService,
+    private compareService: CompareService,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
     this.productService.getProducts().subscribe((products) => {
       const items = products.filter(p => !!p.isFeatured);
       const top = items.slice(0, 8);
+      // попълни карта по id за последваща работа с CompareService
+      this.byId = top.reduce((acc, p) => { acc[p.id] = p; return acc; }, {} as Record<number, ProductDto>);
       this.featured = top.map(p => this.mapToCard(p));
     });
   }
@@ -145,5 +156,27 @@ export class OffersComponent implements OnInit {
   private toEur(amountBgn: number): number {
     const rate = 1.95583;
     return Math.round((amountBgn / rate) * 100) / 100;
+  }
+
+  // === Compare actions ===
+  isCompared(id: number): boolean {
+    return this.compareService.isSelected(id);
+  }
+
+  onCompareClick(event: MouseEvent, id: number) {
+    // предотвратяване на навигацията от линка на картата
+    event.preventDefault();
+    event.stopPropagation();
+    const product = this.byId[id];
+    if (!product) {
+      return;
+    }
+    const res = this.compareService.toggle(product);
+    if (!res.ok && res.reason) {
+      this.snackBar.open(res.reason, 'OK', { duration: 2500 });
+      return;
+    }
+    const msg = res.selected ? 'Добавено за сравнение' : 'Премахнато от сравнение';
+    this.snackBar.open(msg, 'OK', { duration: 1200 });
   }
 }

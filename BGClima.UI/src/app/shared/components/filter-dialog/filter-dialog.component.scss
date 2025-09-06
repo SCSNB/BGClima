@@ -1,0 +1,116 @@
+.mobile-filters-dialog {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+  max-width: 100%;
+
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #e0e0e0;
+    position: sticky;
+    top: 0;
+    background: #26235e;
+    color: #fff;
+    z-index: 2;
+
+    h2 {
+      margin: 0;
+      font-size: 1rem; /* smaller title */
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;        /* one line */
+      overflow: hidden;           /* clip overflow */
+      text-overflow: ellipsis;    /* add ellipsis */
+      max-width: calc(100% - 48px); /* leave room for close icon */
+    }
+
+    .close-btn {
+      color: #fff;
+      .mat-icon { color: #fff; }
+    }
+  }
+
+  .filters-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .filters-content {
+    padding: 0 16px 16px;
+    flex: 1 0 auto;
+  }
+
+  .dialog-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background: #fff;
+    border-top: 1px solid #e0e0e0;
+    margin-top: auto;
+    flex-shrink: 0;
+
+    button {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 15px;
+      letter-spacing: 0.25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      text-transform: none;
+      border: 1px solid transparent;
+
+      &.apply-btn {
+        background: #3f51b5;
+        color: #fff;
+        border-radius: 24px;
+        height: 48px;
+        width: 220px;
+        margin: 0 auto;
+        &:hover { background: #334296; }
+      }
+
+      &.clear-filters-btn {
+        background: transparent;
+        color: #212121;
+        border: none;
+        box-shadow: none;
+        font-size: 15px;
+        height: auto;
+        padding: 0;
+        min-width: auto;
+        line-height: 1.5;
+        text-align: center;
+        justify-content: center;
+        display: block;
+        margin: 8px auto 0;
+
+        .clear-icon {
+          margin-right: 8px;
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+          color: #f44336;
+          vertical-align: middle;
+        }
+
+        &:hover, &:active {
+          background: transparent;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}

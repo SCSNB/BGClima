@@ -1,6 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, HostListener, ViewEncapsulation } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { ProductDto, ProductService } from 'src/app/services/product.service';
+import { FilterDialogComponent } from 'src/app/shared/components/filter-dialog/filter-dialog.component';
+import { CompareService } from 'src/app/services/compare.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 type Badge = { bg: string; color: string; text: string };
 type Spec = { icon: string; label: string; value: string };
@@ -14,24 +18,148 @@ type ProductCard = ProductDto & {
 @Component({
   selector: 'app-product-category',
   templateUrl: './product-category.component.html',
-  styleUrls: ['./product-category.component.scss']
+  styleUrls: ['./product-category.component.scss'],
+  encapsulation: ViewEncapsulation.None,
+  host: {
+    'class': 'app-product-category'
+  }
 })
 
 export class ProductCategoryComponent implements OnInit {
+  @ViewChild('mobileFiltersDialog', { static: true }) mobileFiltersDialog!: TemplateRef<any>;
+  
   categoryTitle: string = '';
   allProducts: ProductCard[] = []; // Store all products for the category
   filteredProducts: ProductCard[] = []; // Products to display after filtering
+  currentCategory: string = '';
+  minPrice: number = 0;
+  maxPrice: number = 0;
+  isMobile: boolean = false;
+  currentFilters: any;
+  currentSort: string | null = null; // Track current sort order
 
-  constructor(private route: ActivatedRoute, private productService: ProductService) { }
+  constructor(
+    private route: ActivatedRoute, 
+    private productService: ProductService,
+    public dialog: MatDialog,
+    private compareService: CompareService,
+    private snackBar: MatSnackBar
+  ) { 
+    this.checkScreenSize();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+    this.checkScreenSize();
+  }
+
+  checkScreenSize() {
+    this.isMobile = window.innerWidth < 960; // Matches Angular Material's breakpoint for 'handset'
+  }
+
+  openFiltersDialog() {
+    this.dialog.open(this.mobileFiltersDialog, {
+      width: '100%',
+      maxWidth: '100%',
+      height: '100%',
+      maxHeight: '100vh',
+      panelClass: 'mobile-filters-dialog-container'
+    });
+  }
+
+  closeFiltersDialog() {
+    this.dialog.closeAll();
+  }
+
+  // Method to handle filter changes from the filter component
+  onFiltersChanged(filters: any) {
+    this.currentFilters = filters;
+    this.applyFilters(filters);
+  }
+
+  // Сортиране на продукти
+  getCurrentSortLabel(): string {
+    switch (this.currentSort) {
+      case 'price-asc': return 'Ниска цена';
+      case 'price-desc': return 'Висока цена';
+      case 'name-asc': return 'А → Я';
+      case 'name-desc': return 'Я → А';
+      default: return 'Сортиране';
+    }
+  }
+
+  // Икона за текущото сортиране (за бутона на десктоп)
+  getCurrentSortIcon(): string {
+    switch (this.currentSort) {
+      case 'name-asc':
+        return 'north'; // стрелка нагоре
+      case 'name-desc':
+        return 'south'; // стрелка надолу
+      default:
+        return 'keyboard_arrow_down'; // по подразбиране за отваряне на менюто
+    }
+  }
+
+  onSortChanged(sortKey: string) {
+    this.currentSort = sortKey;
+    this.applySorting();
+  }
+
+  private applySorting() {
+    if (!this.currentSort) return;
+    
+    const products = [...this.filteredProducts];
+    
+    switch (this.currentSort) {
+      case 'name-asc':
+        products.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+        break;
+      case 'name-desc':
+        products.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+        break;
+      case 'price-asc':
+        products.sort((a, b) => (a.price || 0) - (b.price || 0));
+        break;
+      case 'price-desc':
+        products.sort((a, b) => (b.price || 0) - (a.price || 0));
+        break;
+      default:
+        // Default sorting (by original order)
+        products.sort((a, b) => (a.id || 0) - (b.id || 0));
+        break;
+    }
+    
+    this.filteredProducts = products;
+  }
+
+  clearFilters() {
+    this.currentFilters = {
+      brands: [],
+      price: { lower: this.minPrice, upper: this.maxPrice },
+      energyClasses: [],
+      btus: [],
+      roomSizeRanges: [],
+      powerKws: []
+    };
+    this.applyFilters(this.currentFilters);
+    this.closeFiltersDialog();
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const category = params.get('category');
       if (category) {
+        this.currentCategory = category;
         this.setCategoryTitle(category);
         this.loadProducts(category);
       }
     });
+  }
+
+  private computeMaxPrice(products: ProductCard[]): number {
+    const prices = products.map(p => Number(p.price ?? 0)).filter(n => !isNaN(n));
+    if (!prices.length) return 0;
+    return Math.max(...prices);
   }
 
   private toEur(bgn?: number | null): number | null {
@@ -74,15 +202,22 @@ export class ProductCategoryComponent implements OnInit {
 
           const specs: Spec[] = [
             { icon: 'bolt', label: 'Мощност', value: btuThousands > 0 ? String(btuThousands) : '' },
-            { icon: 'eco', label: 'Енергиен клас', value: p.energyClass?.class || '-' },
             { icon: 'ac_unit', label: 'Охлаждане', value: cooling },
             { icon: 'wb_sunny', label: 'Отопление', value: heating },
           ];
+          // Добавяме Енергиен клас за всички, освен за тръбни топлообменници
+          if (category !== 'bgclima-toploobmennici') {
+            const eclass = p.energyClass?.class || '';
+            if (eclass) {
+              specs.splice(1, 0, { icon: 'eco', label: 'Енергиен клас', value: eclass });
+            }
+          }
           return { ...p, badges, specs, priceEur, oldPriceEur } as ProductCard;
         });
 
         this.allProducts = withCardData;
         this.filteredProducts = [...withCardData];
+        this.maxPrice = this.computeMaxPrice(withCardData);
       });
       return;
     }
@@ -117,16 +252,23 @@ export class ProductCategoryComponent implements OnInit {
 
         const specs: Spec[] = [
           { icon: 'bolt', label: 'Мощност', value: btuThousands > 0 ? String(btuThousands) : '' },
-          { icon: 'eco', label: 'Енергиен клас', value: p.energyClass?.class || '-' },
           { icon: 'ac_unit', label: 'Охлаждане', value: cooling },
           { icon: 'wb_sunny', label: 'Отопление', value: heating },
         ];
+        // Добавяме Енергиен клас за всички, освен за тръбни топлообменници
+        if (category !== 'bgclima-toploobmennici') {
+          const eclass = p.energyClass?.class || '';
+          if (eclass) {
+            specs.splice(1, 0, { icon: 'eco', label: 'Енергиен клас', value: eclass });
+          }
+        }
 
         return { ...p, badges, specs, priceEur, oldPriceEur } as ProductCard;
       });
 
       this.allProducts = withCardData;
       this.filteredProducts = [...withCardData];
+      this.maxPrice = this.computeMaxPrice(withCardData);
     });
   }
 
@@ -225,8 +367,106 @@ export class ProductCategoryComponent implements OnInit {
   }
 
   applyFilters(filters: any): void {
-    // Временно изключено филтриране: показваме всички продукти върнати от бекенда
-    this.filteredProducts = [...this.allProducts];
+    this.currentFilters = filters;
+    
+    // Филтриране по марка, цена, енергиен клас, BTU (в хиляди) и площ на помещението
+    const selectedBrands: string[] = filters?.brands || [];
+    const selectedEnergy: string[] = filters?.energyClasses || [];
+    const selectedBtus: string[] = filters?.btus || [];
+    const selectedRoomSizes: string[] = filters?.roomSizeRanges || [];
+    const selectedPowerKws: string[] = (filters as any)?.powerKws || [];
+    const priceLower: number = Number(filters?.price?.lower ?? 0);
+    const priceUpper: number = Number(filters?.price?.upper ?? Number.MAX_SAFE_INTEGER);
+
+    const selectedBtusNum = new Set<number>(
+      (selectedBtus || []).map((b: string) => parseInt(String(b).replace(/\D+/g, ''), 10) / 1000).filter((n: number) => !isNaN(n))
+    );
+
+    const isToploobmennici = (this.currentCategory || '').trim() === 'bgclima-toploobmennici';
+    const isHeatPumpCategory = new Set(['termopompeni-sistemi','multisplit-sistemi']).has(this.currentCategory); // изключваме топлообменници
+    const selectedPowerKwNum = new Set<number>((selectedPowerKws || []).map(v => Number(v)).filter(n => !isNaN(n)));
+
+    // Apply filters
+    const filtered = this.allProducts.filter(p => {
+      // Цена в лева
+      const price = Number(p.price ?? 0);
+      if (!(price >= priceLower && price <= priceUpper)) return false;
+
+      // Марка
+      if (selectedBrands.length) {
+        const brandName = (p.brand?.name || '').toString();
+        if (!selectedBrands.includes(brandName)) return false;
+      }
+
+      // Енергиен клас
+      if (selectedEnergy.length) {
+        const cls = (p.energyClass?.class || '').toString();
+        if (!selectedEnergy.includes(cls)) return false;
+      }
+
+      // Мощност (kW) само за истински термопомпени категории (без топлообменници)
+      if (isHeatPumpCategory && selectedPowerKwNum.size > 0) {
+        const maxHeatKw = this.getHeatingPowerMaxKw(p);
+        if (maxHeatKw === null) return false;
+        const rounded = Math.round(maxHeatKw);
+        if (!selectedPowerKwNum.has(rounded)) return false;
+      }
+      // BTU (в хиляди) – използваме когато НЕ сме в термопомпена секция ИЛИ сме в топлообменници
+      if ((!isHeatPumpCategory || isToploobmennici) && selectedBtusNum.size > 0) {
+        const btuK = this.getBtuInThousands(p);
+        if (!selectedBtusNum.has(btuK)) return false;
+      }
+
+      // Филтър по площ на помещението
+      if (selectedRoomSizes.length > 0) {
+        const roomSizeAttr = (p.attributes || []).find(a => 
+          (a.attributeKey || '').toLowerCase().includes('подходящ за помещения')
+        );
+        
+        if (roomSizeAttr && roomSizeAttr.attributeValue) {
+          // Извличаме числовата стойност от атрибута (например "45 кв.м" -> 45)
+          const roomSizeMatch = roomSizeAttr.attributeValue.match(/(\d+(\.\d+)?)/);
+          if (roomSizeMatch) {
+            const roomSize = parseFloat(roomSizeMatch[0]);
+            const isInRange = selectedRoomSizes.some(range => {
+              const [min, max] = range.split('-').map(Number);
+              return roomSize >= min && roomSize <= max;
+            });
+            
+            if (!isInRange) return false;
+          } else {
+            // Ако не успеем да извлечем числова стойност, пропускаме филтъра за този продукт
+            return false;
+          }
+        } else {
+          // Ако продуктът няма атрибут за площ, не го показваме при филтриране по площ
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    // Задаваме филтрираните продукти към списъка за рендериране
+    this.filteredProducts = filtered;
+    // Запазваме активното сортиране, ако има такова
+    this.applySorting();
+  }
+
+  // Извлича максималната стойност (kW) от атрибут "Отдавана мощност на отопление (Мин./Ном./Макс)"
+  // Връща число (kW) или null ако липсва/невалидно
+  private getHeatingPowerMaxKw(p: ProductDto): number | null {
+    const attrs = p?.attributes || [];
+    const fullKey = 'Отдавана мощност на отопление (Мин./Ном./Макс)';
+    const found = attrs.find(a => (a.attributeKey || '').trim() === fullKey);
+    const raw = found?.attributeValue?.toString() || '';
+    if (!raw) return null;
+    const matches = raw.match(/(\d+[\.,]?\d*)/g);
+    if (!matches || matches.length === 0) return null;
+    const nums = matches.map(v => parseFloat(v.replace(',', '.'))).filter(n => !isNaN(n));
+    if (nums.length === 0) return null;
+    const max = Math.max(...nums);
+    return isFinite(max) ? max : null;
   }
 
   private setCategoryTitle(category: string): void {
@@ -259,5 +499,23 @@ export class ProductCategoryComponent implements OnInit {
       default:
         return [];
     }
+  }
+
+  // === Compare actions ===
+  isCompared(id: number): boolean {
+    return this.compareService.isSelected(id);
+  }
+
+  onCompareClick(event: MouseEvent, product: ProductDto) {
+    // предотвратяваме навигацията от линка на картата
+    event.preventDefault();
+    event.stopPropagation();
+    const res = this.compareService.toggle(product);
+    if (!res.ok && res.reason) {
+      this.snackBar.open(res.reason, 'OK', { duration: 2500 });
+      return;
+    }
+    const msg = res.selected ? 'Добавено за сравнение' : 'Премахнато от сравнение';
+    this.snackBar.open(msg, 'OK', { duration: 1200 });
   }
 }

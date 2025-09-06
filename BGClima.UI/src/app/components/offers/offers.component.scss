@@ -43,16 +43,6 @@
       background: linear-gradient(90deg, #3f51b5, #2196f3);
     }
   }
-
-  // Fix: allow full-card tap to navigate on mobile by disabling nested button interaction
-  @media (max-width: 576px) {
-    .offer-card .offer-card-brand-row .compare-btn {
-      pointer-events: none;
-      opacity: 0.8;
-      cursor: default;
-      -webkit-tap-highlight-color: transparent;
-    }
-  }
   
   .offers-cards-wrapper {
     display: grid;
