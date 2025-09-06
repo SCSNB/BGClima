@@ -1,0 +1,132 @@
+<div class="calculator-page">
+  <h1>Калкулатор за климатици</h1>
+  <form [formGroup]="form" class="calc-form" novalidate>
+    <div class="three-cols">
+      <!-- Колона 1: Размери -->
+      <section class="col">
+        <h3>Размери на помещението</h3>
+        <div class="field">
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>Дължина в метри (максимум 15)</mat-label>
+            <input matInput type="number" formControlName="length" min="1" max="15" step="0.1">
+          </mat-form-field>
+        </div>
+        <div class="field">
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>Ширина в метри (максимум 15)</mat-label>
+            <input matInput type="number" formControlName="width" min="1" max="15" step="0.1">
+          </mat-form-field>
+        </div>
+        <div class="field">
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>Височина в метри (максимум 4)</mat-label>
+            <input matInput type="number" formControlName="height" min="2" max="4" step="0.1">
+          </mat-form-field>
+        </div>
+      </section>
+
+      <!-- Колона 2: Предназначение -->
+      <section class="col">
+        <h3>Предназначение на климатика</h3>
+        <mat-radio-group formControlName="purpose" class="radio-group vertical">
+          <mat-radio-button class="radio-item" *ngFor="let p of purposes" [value]="p.value">{{ p.label }}</mat-radio-button>
+        </mat-radio-group>
+      </section>
+
+      <!-- Колона 3: Цена и продължителност -->
+      <section class="col">
+        <h3>Изберете цена за kWh ел. енергия и работна продължителност</h3>
+        <div class="field">
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>Цена за киловат час (лв.)</mat-label>
+            <input matInput type="number" formControlName="energyPrice" min="0.01" step="0.01">
+          </mat-form-field>
+        </div>
+        <div class="field">
+          <label class="label">Работна продължителност</label>
+          <mat-radio-group formControlName="durationHours" class="radio-group horizontal">
+            <mat-radio-button class="radio-item" *ngFor="let d of durations" [value]="d.value">{{ d.label }}</mat-radio-button>
+          </mat-radio-group>
+        </div>
+      </section>
+    </div>
+  </form>
+
+  <mat-card class="result-card" *ngIf="result as r">
+    <mat-card-header class="result-header">
+      <mat-icon class="result-icon" color="primary">calculate</mat-icon>
+      <div class="result-header-text">
+        <mat-card-title>Резултат</mat-card-title>
+        <mat-card-subtitle>Препоръчителна мощност</mat-card-subtitle>
+      </div>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="result-grid">
+        <div class="metric">
+          <div class="label">Необходим капацитет</div>
+          <div class="value">{{ r.btu | number }} BTU/h</div>
+        </div>
+        <div class="metric">
+          <div class="label">Препоръчителен клас</div>
+          <div class="value class">{{ r.recommendedClass | number }} BTU</div>
+        </div>
+      </div>
+      <p class="hint">Забележка: Това е ориентировъчна стойност. За точна консултация се свържете с наш специалист.</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Recommended products based on BTU class -->
+  <section class="recommended-section" *ngIf="recommendedCards?.length">
+    <h2 class="offers-title">Препоръчани продукти за {{ (result?.recommendedClass || 0) | number }} BTU</h2>
+    <div class="offers-cards-wrapper">
+      <ng-container *ngFor="let item of recommendedCards">
+        <a [routerLink]="['/product', item.id]" class="offer-card-link">
+          <div class="offer-card">
+            <div class="offer-card-image-badges">
+              <img [src]="item.image" alt="Климатик" class="offer-card-image" />
+              <div class="offer-badges">
+                <span class="badge" *ngFor="let b of item.badges" [ngStyle]="{background: b.bg, color: b.color}">{{ b.text }}</span>
+              </div>
+            </div>
+            <div class="offer-card-title">{{ item.title }}</div>
+            <div class="offer-card-prices">
+              <div class="price-container">
+                <div class="current-prices">
+                  <span class="current-price">{{ item.priceBgn | number:'1.2-2' }} лв.</span>
+                  <span class="current-price-eur">/ {{ item.priceEur | number:'1.2-2' }} €</span>
+                </div>
+                <div class="old-prices" *ngIf="item.oldPriceBgn">
+                  <span class="old-price">{{ item.oldPriceBgn | number:'1.2-2' }} лв.</span>
+                  <span class="old-price-eur" *ngIf="item.oldPriceEur">/ {{ item.oldPriceEur | number:'1.2-2' }} €</span>
+                </div>
+              </div>
+            </div>
+            <div class="offer-card-brand-row">
+              <div class="brand-text-container">
+                <span class="brand-text">{{ item.brandText }}</span>
+              </div>
+              <button class="compare-btn" type="button"
+                      [class.selected]="isCompared(item.id)"
+                      (click)="onCompareClick($event, item.id)">
+                {{ isCompared(item.id) ? 'В сравнение' : 'Сравни' }}
+              </button>
+            </div>
+            <div class="offer-card-specs">
+              <ng-container *ngFor="let spec of item.specs">
+                <div class="spec" *ngIf="spec?.value">
+                  <div class="spec-icon" [ngClass]="spec.icon">
+                    <span class="material-icons">{{ spec.icon }}</span>
+                  </div>
+                  <div class="spec-details">
+                    <div class="spec-label">{{ spec.label }}</div>
+                    <div class="spec-value">{{ spec.value }}</div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </a>
+      </ng-container>
+    </div>
+  </section>
+</div>

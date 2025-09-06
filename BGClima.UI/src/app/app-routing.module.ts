@@ -23,6 +23,7 @@ import { VentilationInstallationComponent } from './components/ventilation-insta
 import { ProductCategoryComponent } from './components/product-category/product-category.component';
 import { PromoProductsComponent } from './pages/promo-products/promo-products.component';
 import { CompareComponent } from './pages/compare/compare.component';
+import { CalculatorComponent } from './pages/calculator/calculator.component';
 import { CompareGuard } from './guards/compare.guard';
 
 const routes: Routes = [
@@ -54,6 +55,7 @@ const routes: Routes = [
   { path: 'product/:id', component: ProductDetailsComponent },
   { path: 'products/:category', component: ProductCategoryComponent },
   { path: 'promo', component: PromoProductsComponent },
+  { path: 'calculator', component: CalculatorComponent },
   { path: 'compare', component: CompareComponent, canActivate: [CompareGuard] },
   // Redirect empty path to home
   { path: '', redirectTo: '/home', pathMatch: 'full' },

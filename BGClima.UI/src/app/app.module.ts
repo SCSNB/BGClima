@@ -26,6 +26,9 @@ import { MaterialModule } from './shared/material.module';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSelectModule } from '@angular/material/select';
+import { MatRadioModule } from '@angular/material/radio';
+import { CalculatorComponent } from './pages/calculator/calculator.component';
 
 // Services and Interceptors
 import { AuthService } from './services/auth.service';
@@ -104,7 +107,8 @@ import { CompareComponent } from './pages/compare/compare.component';
     PromoProductsComponent,
     CompareComponent,
     FormatLabelPipe,
-    ProductDetailsComponent   ],
+    ProductDetailsComponent,
+    CalculatorComponent   ],
   imports: [
     BrowserModule,
     SharedModule,
@@ -137,7 +141,9 @@ import { CompareComponent } from './pages/compare/compare.component';
     MatDialogModule,
     MatButtonModule,
     MatMenuModule,
-    MatBadgeModule
+    MatBadgeModule,
+    MatSelectModule,
+    MatRadioModule
   ],
   providers: [
     AuthService,
