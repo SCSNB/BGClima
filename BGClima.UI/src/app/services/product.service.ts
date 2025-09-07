@@ -205,4 +205,14 @@ export class ProductService {
       })
     );
   }
+
+  // Admin stats (counts)
+  getAdminStats(): Observable<{ totalProducts: number } & Record<string, any>> {
+    return this.http.get<{ totalProducts: number } & Record<string, any>>(`${this.baseUrl}/admin/stats`).pipe(
+      tap({
+        next: (stats) => console.log('Admin stats:', stats),
+        error: (err) => console.error('Error fetching admin stats:', err)
+      })
+    );
+  }
 }

@@ -23,6 +23,12 @@ import { RouterModule } from '@angular/router';
 
 // Material Module
 import { MaterialModule } from './shared/material.module';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSelectModule } from '@angular/material/select';
+import { MatRadioModule } from '@angular/material/radio';
+import { CalculatorComponent } from './pages/calculator/calculator.component';
 
 // Services and Interceptors
 import { AuthService } from './services/auth.service';
@@ -44,6 +50,30 @@ import { VentilationInstallationComponent } from './components/ventilation-insta
 import { ProductCategoryComponent } from './components/product-category/product-category.component';
 import { ProductFiltersComponent } from './components/product-filters/product-filters.component';
 import { MaintenanceComponent } from './components/maintenance/maintenance.component';
+import { PromoProductsComponent } from './pages/promo-products/promo-products.component';
+import { SharedModule } from './shared/shared.module';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatListModule } from '@angular/material/list';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatCardModule } from '@angular/material/card';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatExpansionModule } from '@angular/material/expansion';
+// FilterDialogComponent is declared and exported by SharedModule
+import { CompareComponent } from './pages/compare/compare.component';
 
 @NgModule({
   declarations: [
@@ -74,26 +104,58 @@ import { MaintenanceComponent } from './components/maintenance/maintenance.compo
     ProductCategoryComponent,
     ProductFiltersComponent,
     MaintenanceComponent,
+    PromoProductsComponent,
+    CompareComponent,
+    FormatLabelPipe,
     ProductDetailsComponent,
-    FormatLabelPipe
-   ],
+    CalculatorComponent   ],
   imports: [
     BrowserModule,
+    SharedModule,
     BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
     AppRoutingModule,
-    RouterModule,
-    MaterialModule
+ // Material Modules (only those not in SharedModule)
+    MatCardModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatToolbarModule,
+    MatSidenavModule,
+    MatIconModule,
+    MatListModule,
+    MatGridListModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    MatExpansionModule,
+    MatSliderModule,
+    MatDividerModule,
+    MatTableModule,
+    MatSortModule,
+    MatCheckboxModule,
+    MatChipsModule,
+    MatSlideToggleModule,
+    MatTooltipModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatMenuModule,
+    MatBadgeModule,
+    MatSelectModule,
+    MatRadioModule
   ],
   providers: [
     AuthService,
     AuthGuard,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [
+    ProductDialogComponent,
+    BannerDialogComponent
+  ]
 })
 export class AppModule { }

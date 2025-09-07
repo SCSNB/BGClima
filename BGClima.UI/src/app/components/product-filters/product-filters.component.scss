@@ -1,30 +1,233 @@
 // Премахва излишния padding от тялото на панела, за да изглежда по-добре
 ::ng-deep .mat-expansion-panel-body {
-    padding: 0 16px 16px !important;
-  }
-  
-  // Стилизира контейнерите с чекбоксове
-  .filter-options {
+  padding: 0 16px 16px !important;
+}
+
+/* Премахване на "кутии" около секциите: фон, бордери и сенки */
+::ng-deep .mat-expansion-panel,
+::ng-deep .mat-expansion-panel.mat-elevation-z0 {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+::ng-deep .mat-expansion-panel-header,
+::ng-deep .mat-expansion-panel .mat-expansion-panel-header {
+  background: transparent !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 16px !important;
+}
+/* Премахване на долни бордери вътре в панела; оставяме само <mat-divider> между панелите */
+::ng-deep .mat-expansion-panel:not(:last-child) {
+  margin-bottom: 0 !important;
+}
+
+/* Секция „Климатици“ (бърза навигация) */
+.categories-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 0 8px;
+
+  .category-link {
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 8px;
-  }
-  
-  // Стилизира филтъра за цена
-  .price-filter {
-    .price-inputs {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-      margin-top: 8px;
-  
-      mat-form-field {
-        width: 100%;
-      }
+    padding: 6px 4px;
+    color: #1A1A33;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background 0.15s ease, color 0.15s ease;
+
+    &:before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #94a3b8; /* слейт */
+      flex: 0 0 6px;
+    }
+
+    &:hover { background: #f3f4f6; }
+
+    &.active {
+      font-weight: 700;
+      color: #0ea5e9; /* син акцент */
+      &:before { background: #0ea5e9; }
     }
   }
-  
-  // Добавя малко отстояние на превключвателя за наличност
-  mat-slide-toggle {
-    margin-left: 8px;
+}
+
+// Стилизира контейнерите с чекбоксове
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+// Стилизира филтъра за цена
+.price-filter {
+  .section-divider {
+    height: 2px;
+    background: #111827;
+    opacity: 0.65;
+    margin: 4px 0 10px;
   }
+
+  .bars-wrap {
+    position: relative;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Базови сиви вертикални черти (цяла ширина) */
+  .base-bars {
+    width: 100%;
+    height: 18px;
+    border-radius: 6px;
+    background: #e5e7eb;
+    /* по-гъсти ивици */
+    -webkit-mask: repeating-linear-gradient(to right, #000 0 2px, transparent 2px 8px);
+            mask: repeating-linear-gradient(to right, #000 0 2px, transparent 2px 8px);
+    z-index: 1;
+  }
+
+  /* Цветни вертикални черти само в избрания диапазон */
+  .selected-bars {
+    position: absolute;
+    top: 0; bottom: 0; /* контейнер за високите маркери */
+    z-index: 2;
+  }
+  .selected-bars-stripes {
+    position: absolute;
+    left: 0; right: 0;
+    top: 19px; bottom: 19px; /* центрира 18px височина */
+    height: 18px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #2563eb 0%, #7c3aed 50%, #ef4444 100%);
+    /* по-гъсти ивици */
+    -webkit-mask: repeating-linear-gradient(to right, #000 0 2px, transparent 2px 8px);
+            mask: repeating-linear-gradient(to right, #000 0 2px, transparent 2px 8px);
+    pointer-events: none;
+  }
+  /* Високи крайни линии (синя вляво, червена вдясно) */
+  .selected-bars::before,
+  .selected-bars::after {
+    content: '';
+    position: absolute;
+    /* по-високи крайни маркери, да стърчат над и под късите ивици */
+    top: 10px;
+    width: 4px;
+    height: 36px; /* още по-ниски */
+    border-radius: 2px;
+  }
+  .selected-bars::before { left: 0; background: #2563eb; }
+  .selected-bars::after { right: 0; background: #ef4444; }
+
+  /* Прозрачен Material slider над чертите – само за интеракция */
+  .slider-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    z-index: 4;
+  }
+
+  /* Премахнати старите overlay/marker елементи */
+
+  /* Скриваме визуално пистата и палците, за да останат само цветните черти */
+  ::ng-deep .slider-overlay .mat-mdc-slider {
+    width: 100%;
+  }
+  ::ng-deep .slider-overlay .mdc-slider__track--inactive,
+  ::ng-deep .slider-overlay .mdc-slider__track--active,
+  ::ng-deep .slider-overlay .mdc-slider__track--active_fill {
+    background: transparent !important;
+    opacity: 0 !important;
+  }
+  /* Скриваме тик-марки, палци, индикатор и фокус-ринг, но запазваме интеракцията */
+  ::ng-deep .slider-overlay .mdc-slider__tick-marks {
+    opacity: 0 !important;
+  }
+  ::ng-deep .slider-overlay .mdc-slider__thumb,
+  ::ng-deep .slider-overlay .mdc-slider__thumb-knob,
+  ::ng-deep .slider-overlay .mdc-slider__thumb-container,
+  ::ng-deep .slider-overlay .mat-mdc-slider .mdc-slider__thumb,
+  ::ng-deep .slider-overlay .mat-mdc-slider .mdc-slider__thumb-knob {
+    background: transparent !important;
+    box-shadow: none !important;
+    opacity: 0 !important;
+    border: none !important;
+    outline: none !important;
+    filter: none !important;
+    color: transparent !important;
+  }
+  /* Премахваме ripple/ефекти около палеца (синият „балон“) */
+  ::ng-deep .slider-overlay .mdc-slider__ripple {
+    display: none !important;
+    opacity: 0 !important;
+  }
+  /* Премахваме псевдо-елементите на копчето, които могат да рисуват фон */
+  ::ng-deep .slider-overlay .mdc-slider__thumb-knob::before,
+  ::ng-deep .slider-overlay .mdc-slider__thumb-knob::after {
+    display: none !important;
+    content: none !important;
+  }
+  ::ng-deep .slider-overlay .mdc-slider__thumb::before,
+  ::ng-deep .slider-overlay .mdc-slider__thumb::after {
+    display: none !important;
+    content: none !important;
+  }
+  ::ng-deep .slider-overlay .mdc-slider__thumb:focus {
+    outline: none !important;
+  }
+  /* Премахваме value indicator и фокус рингове */
+  ::ng-deep .slider-overlay .mdc-slider__value-indicator-container,
+  ::ng-deep .slider-overlay .mat-mdc-slider .mdc-slider__value-indicator-container,
+  ::ng-deep .slider-overlay .mdc-slider__focus-ring,
+  ::ng-deep .slider-overlay .mat-mdc-focus-indicator,
+  ::ng-deep .slider-overlay .mdc-focus-ring {
+    display: none !important;
+    opacity: 0 !important;
+  }
+  ::ng-deep .slider-overlay .mdc-slider__thumb { width: 28px; height: 56px; }
+
+  .price-range-display {
+    display: flex;
+    justify-content: center;
+    margin-top: 6px;
+    .value {
+      font-weight: 800;
+      font-size: 20px;
+      color: #2563eb; /* син текст */
+    }
+    small { color: #9ca3af; font-weight: 700; }
+  }
+  .price-range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    color: #1A1A33;
+    margin: 6px 2px 2px;
+
+    .price-lower { color: #2563eb; } /* синьо */
+    .price-upper { color: #ef4444; } /* червено */
+  }
+
+  .price-inputs {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-top: 8px;
+
+    mat-form-field { width: 100%; }
+  }
+}
+
+/* Премахнати глобални стилове на mat-slider, за да няма видими палци/маркировки */
+
+// Добавя малко отстояние на превключвателя за наличност
+mat-slide-toggle { margin-left: 8px; }
