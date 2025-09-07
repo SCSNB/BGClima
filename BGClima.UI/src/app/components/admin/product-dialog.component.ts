@@ -1,7 +1,9 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ProductService, ProductDto, BrandDto, ProductTypeDto, BTUDto, EnergyClassDto, CreateProductDto, CreateProductAttributeDto } from '../../services/product.service';
+import { ImageService } from '../../services/image.service';
 import { environment } from '../../../environments/environment';
 
 export interface ProductDialogData {
@@ -170,7 +172,10 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private productService: ProductService,
+    private imageService: ImageService,
     private dialogRef: MatDialogRef<ProductDialogComponent>,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: ProductDialogData
   ) {
     this.form = this.fb.group({
@@ -455,12 +460,34 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
   }
 
   removeImage(index: number): void {
-    // Revoke object URL if it was created from a file
-    if (this.images[index].url.startsWith('blob:')) {
-      URL.revokeObjectURL(this.images[index].url);
+    const imageToRemove = this.images[index];
+    
+    // Show confirmation dialog
+    if (!confirm('Сигурни ли сте, че искате да изтриете това изображение?')) {
+      return;
     }
     
-    const wasPrimary = this.images[index].isPrimary;
+    // If this is a server-side image (not a new upload), delete it from the server
+    // Note: Since we don't have the image ID here, we'll just remove it from the UI
+    // The actual deletion will be handled when the product is saved
+    if (!imageToRemove.isNew && imageToRemove.url && !imageToRemove.url.startsWith('blob:')) {
+      this.removeImageFromUI(index);
+      // Show a message that the image will be removed when the product is saved
+      this.snackBar.open('Изображението ще бъде изтрито при запазване на промените', 'OK', { duration: 3000 });
+    } else {
+      // For client-side images or blob URLs, just remove from UI
+      this.removeImageFromUI(index);
+    }
+  }
+  private removeImageFromUI(index: number): void {
+    const imageToRemove = this.images[index];
+    const wasPrimary = imageToRemove.isPrimary;
+    
+    // Revoke object URL if it was created from a file
+    if (imageToRemove.url.startsWith('blob:')) {
+      URL.revokeObjectURL(imageToRemove.url);
+    }
+    
     this.images.splice(index, 1);
     
     // If we removed the primary image, set the first image as primary
@@ -487,7 +514,45 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
   }
 
   removeDescriptionImage(index: number): void {
-    this.descriptionImages.splice(index, 1);
+    console.log('removeDescriptionImage called with index:', index);
+    const imageToRemove = this.descriptionImages[index];
+    console.log('Image to remove:', imageToRemove);
+    
+    // Show confirmation dialog
+    if (!confirm('Сигурни ли сте, че искате да изтриете това изображение?')) {
+      console.log('Deletion cancelled by user');
+      return;
+    }
+    
+    // If this is a server-side image (has an ID), delete it from the server
+    if (imageToRemove.id) {
+      console.log('Deleting server-side image with ID:', imageToRemove.id);
+      this.isUploading = true;
+      this.productService.deleteImage(imageToRemove.id).subscribe({
+        next: () => {
+          console.log('Description image deleted successfully');
+          this.descriptionImages.splice(index, 1);
+          this.snackBar.open('Снимката беше изтрита успешно', 'OK', { duration: 3000 });
+        },
+        error: (err: Error) => {
+          console.error('Error deleting description image:', err);
+          this.snackBar.open(
+            `Грешка при изтриване на описателното изображение: ${err.message || 'Неизвестна грешка'}`,
+            'Затвори',
+            { duration: 5000, panelClass: ['error-snackbar'] }
+          );
+        },
+        complete: () => {
+          console.log('Delete request completed');
+          this.isUploading = false;
+        }
+      });
+    } else {
+      // For client-side images, just remove from UI
+      console.log('Removing client-side image from UI');
+      this.descriptionImages.splice(index, 1);
+      this.snackBar.open('Снимката беше премахната', 'OK', { duration: 3000 });
+    }
   }
 
   cancel(): void {

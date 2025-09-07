@@ -2,6 +2,7 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -13,10 +14,13 @@ public class ImageService : IImageService
     private readonly BlobServiceClient _blobServiceClient;
     private readonly string _containerName;
 
-    public ImageService(IConfiguration configuration)
+    public ImageService(IConfiguration configuration, IHostEnvironment environment)
     {
         var connectionString = configuration["AzureStorage:ConnectionString"];
-        _containerName = configuration.GetSection("AzureStorage:Container").Value ?? "product-images";
+        var configuredContainer = configuration.GetSection("AzureStorage:Container").Value ?? "product-images";
+
+        // Use a separate container in development to avoid mixing with production assets
+        _containerName = environment.IsDevelopment() ? "dev-images" : configuredContainer;
         
         // Get Azure Storage Key from environment variable
         var storageKey = Environment.GetEnvironmentVariable("AZURE_STORAGE_KEY") ?? 
@@ -78,21 +82,40 @@ public class ImageService : IImageService
         }
     }
 
-    public async Task<bool> DeleteImageAsync(string imageUrl)
+    public async Task<bool> DeleteImageAsync(string imageUrlOrBlobName)
     {
         try
         {
-            var uri = new Uri(imageUrl);
-            var fileName = Path.GetFileName(uri.LocalPath);
+            string blobName;
+            
+            // Check if the input is a full URL
+            if (Uri.TryCreate(imageUrlOrBlobName, UriKind.Absolute, out var uri) && 
+                (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
+            {
+                // Extract the blob name from the URL path
+                blobName = Path.GetFileName(uri.LocalPath);
+            }
+            else
+            {
+                // Assume it's already a blob name
+                blobName = imageUrlOrBlobName;
+            }
+            
+            if (string.IsNullOrWhiteSpace(blobName))
+            {
+                return false;
+            }
             
             var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
-            var blobClient = containerClient.GetBlobClient(fileName);
+            var blobClient = containerClient.GetBlobClient(blobName);
             
             var response = await blobClient.DeleteIfExistsAsync();
             return response.Value;
         }
-        catch
+        catch (Exception ex)
         {
+            // Log the error for debugging
+            Console.WriteLine($"Error deleting image '{imageUrlOrBlobName}': {ex.Message}");
             return false;
         }
     }

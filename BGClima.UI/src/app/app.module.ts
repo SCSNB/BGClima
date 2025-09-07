@@ -45,6 +45,7 @@ import { ProductFiltersComponent } from './components/product-filters/product-fi
 import { MaintenanceComponent } from './components/maintenance/maintenance.component';
 import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
+import { ImageService } from './services/image.service';
 
 @NgModule({
   declarations: [
@@ -92,6 +93,7 @@ import { CommonModule } from '@angular/common';
   providers: [
     AuthService,
     AuthGuard,
+    ImageService,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true } }
