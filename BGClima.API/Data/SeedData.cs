@@ -84,12 +84,15 @@ namespace BGClima.API.Data
                     new Brand { Name = "Mitsubishi Electric", Country = "Япония" },
                     new Brand { Name = "Toshiba", Country = "Япония" },
                     new Brand { Name = "Fujitsu", Country = "Япония" },
+                    new Brand { Name = "Hitachi", Country = "Япония" },
                     new Brand { Name = "Gree", Country = "Китай" },
-                    new Brand { Name = "Haier", Country = "Китай" },
-                    new Brand { Name = "LG", Country = "Южна Корея" },
-                    new Brand { Name = "Samsung", Country = "Южна Корея" },
-                    new Brand { Name = "Ballu", Country = "Русия" },
-                    new Brand { Name = "Hyundai", Country = "Южна Корея" }
+                    new Brand { Name = "AUX", Country = "Китай" },
+                    new Brand { Name = "Nippon", Country = "Япония" },
+                    new Brand { Name = "Inventor", Country = "Гърция" },
+                    new Brand { Name = "Kobe", Country = "Япония" },
+                    new Brand { Name = "Sendo", Country = "Китай" },
+                    new Brand { Name = "Cooper & Hunter", Country = "САЩ" },
+                    new Brand { Name = "Aqua Systems", Country = "България" }
                 };
                 await context.Brands.AddRangeAsync(brands);
             }
@@ -103,9 +106,6 @@ namespace BGClima.API.Data
                     new EnergyClass { Class = "A++" },
                     new EnergyClass { Class = "A+" },
                     new EnergyClass { Class = "A" },
-                    new EnergyClass { Class = "B" },
-                    new EnergyClass { Class = "C" },
-                    new EnergyClass { Class = "D" }
                 };
                 await context.EnergyClasses.AddRangeAsync(energyClasses);
             }
@@ -115,12 +115,29 @@ namespace BGClima.API.Data
             {
                 btus = new List<BTU>
                 {
+                    new BTU { Value = "7000 BTU" },
                     new BTU { Value = "9000 BTU" },
+                    new BTU { Value = "10000 BTU" },
                     new BTU { Value = "12000 BTU" },
+                    new BTU { Value = "13000 BTU" },
+                    new BTU { Value = "14000 BTU" },
+                    new BTU { Value = "16000 BTU" },
                     new BTU { Value = "18000 BTU" },
+                    new BTU { Value = "20000 BTU" },
+                    new BTU { Value = "22000 BTU" },
                     new BTU { Value = "24000 BTU" },
                     new BTU { Value = "30000 BTU" },
-                    new BTU { Value = "36000 BTU" }
+                    new BTU { Value = "36000 BTU" },
+                    new BTU { Value = "42000 BTU" },
+                    new BTU { Value = "45000 BTU" },
+                    new BTU { Value = "48000 BTU" },
+                    new BTU { Value = "50000 BTU" },
+                    new BTU { Value = "54000 BTU" },
+                    new BTU { Value = "55000 BTU" },
+                    new BTU { Value = "60000 BTU" },
+                    new BTU { Value = "66000 BTU" },
+                    new BTU { Value = "72000 BTU" },
+                    new BTU { Value = "90000 BTU" }
                 };
                 await context.BTUs.AddRangeAsync(btus);
             }
@@ -130,12 +147,17 @@ namespace BGClima.API.Data
             {
                 productTypes = new List<ProductType>
                 {
-                    new ProductType { Name = "Стандартен климатик" },
-                    new ProductType { Name = "Инверторен климатик" },
-                    new ProductType { Name = "Мулти сплит система" },
-                    new ProductType { Name = "Канален климатик" },
-                    new ProductType { Name = "Касетъчен климатик" },
-                    new ProductType { Name = "Топлинна помпа" }
+                    new ProductType { Name = "Климатици стенен тип" },
+                    new ProductType { Name = "Климатици колонен тип" },
+                    new ProductType { Name = "Климатици канален тип" },
+                    new ProductType { Name = "Климатици касетъчен тип" },
+                    new ProductType { Name = "Климатици подов тип" },
+                    new ProductType { Name = "Климатици подово - таванен тип" },
+                    new ProductType { Name = "VRF / VRV" },
+                    new ProductType { Name = "Мобилни / преносими климатици" },
+                    new ProductType { Name = "Термопомпени системи" },
+                    new ProductType { Name = "Мултисплит системи" },
+                    new ProductType { Name = "БГКЛИМА тръбни топлообменници" }
                 };
                 await context.ProductTypes.AddRangeAsync(productTypes);
             }
@@ -155,7 +177,7 @@ namespace BGClima.API.Data
             var btu12000 = allBtus.First(b => b.Value == "12000 BTU");
             var energyClassAplusplus = allEnergyClasses.First(e => e.Class == "A++");
             var energyClassAplusplusplus = allEnergyClasses.First(e => e.Class == "A+++");
-            var inverterType = allProductTypes.First(t => t.Name == "Инверторен климатик");
+            var inverterType = allProductTypes.First(t => t.Name == "Климатици стенен тип");
 
             // Seed Products
             var products = new List<Product>
@@ -202,7 +224,7 @@ namespace BGClima.API.Data
             var greeBrand = allBrands.First(b => b.Name == "Gree");
             var btu18000 = allBtus.First(b => b.Value == "18000 BTU");
             var energyClassAplus = allEnergyClasses.First(e => e.Class == "A+");
-            var standardType = allProductTypes.First(t => t.Name == "Стандартен климатик");
+            var standardType = allProductTypes.First(t => t.Name == "Климатици стенен тип");
 
             products.Add(new Product
             {
