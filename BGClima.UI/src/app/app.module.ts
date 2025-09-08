@@ -48,9 +48,8 @@ import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { ImageService } from './services/image.service';
 import { PromoProductsComponent } from './pages/promo-products/promo-products.component';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { SharedModule } from './shared/shared.module';
+
 import { CompareComponent } from './pages/compare/compare.component';
 
 @NgModule({
@@ -99,8 +98,6 @@ import { CompareComponent } from './pages/compare/compare.component';
     MaterialModule,
     CommonModule,
     SharedModule,
-    MatButtonModule,
-    MatIconModule
   ],
   providers: [
     AuthService,
