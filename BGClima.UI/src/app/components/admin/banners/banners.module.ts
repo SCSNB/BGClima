@@ -12,12 +12,12 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { SharedModule } from '../../../shared/shared.module';
 import { BannersComponent } from './banners.component';
 import { BannerDialogComponent } from './banner-dialog/banner-dialog.component';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 const routes: Routes = [
-  {
+  { 
     path: '',
     component: BannersComponent
   }

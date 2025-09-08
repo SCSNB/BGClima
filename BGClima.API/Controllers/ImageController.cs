@@ -1,19 +1,31 @@
-using Microsoft.AspNetCore.Mvc;
 using BGClima.Application.Services;
+using BGClima.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BGClima.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+//[EnableCors] // Enable CORS for this controller
+//[Produces("application/json")]
 //[Authorize]
 public class ImageController : ControllerBase
 {
     private readonly IImageService _imageService;
+    private readonly ILogger<ImageController> _logger;
+    private readonly BGClimaContext _context;
 
-    public ImageController(IImageService imageService)
+    public ImageController(
+        IImageService imageService,
+        ILogger<ImageController> logger,
+        BGClimaContext context)
     {
         _imageService = imageService;
+        _logger = logger;
+        _context = context;
     }
 
 
@@ -79,6 +91,70 @@ public class ImageController : ControllerBase
         }
 
         return Ok(new { results = uploadResults });
+    }
+
+    /// <summary>
+    /// Deletes an image by its ID
+    /// </summary>
+    /// <param name="id">The ID of the image to delete</param>
+    /// <returns>No content if successful</returns>
+    /// <summary>
+    /// Deletes an image by its ID
+    /// </summary>
+    /// <param name="id">The ID of the image to delete</param>
+    /// <returns>No content if successful</returns>
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    //[EnableCors("AllowAll")]
+    public async Task<IActionResult> DeleteImage(int id)
+    {
+        _logger.LogInformation("DeleteImage called with ID: {ImageId}", id);
+        
+        try
+        {
+            var image = await _context.ProductImages.FindAsync(id);
+            if (image == null)
+            {
+                _logger.LogWarning("Image with ID {ImageId} not found", id);
+                return NotFound(new { error = $"Image with ID {id} not found" });
+            }
+
+            // Delete the blob from storage
+            var result = await _imageService.DeleteImageAsync(image.ImageUrl);
+            if (!result)
+            {
+                // Log warning but continue to delete the database record
+                _logger.LogWarning("Failed to delete image from storage: {ImageUrl}", image.ImageUrl);
+            }
+
+            // Remove from database
+            _context.ProductImages.Remove(image);
+            await _context.SaveChangesAsync();
+            
+            _logger.LogInformation("Image with ID {ImageId} deleted successfully", id);
+            return Ok(new { message = "Image deleted successfully" });
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError(dbEx, "Database error while deleting image with ID {ImageId}", id);
+            return StatusCode(500, new { 
+                error = "A database error occurred while deleting the image", 
+                details = dbEx.InnerException?.Message ?? dbEx.Message 
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error deleting image with ID {ImageId}", id);
+            return StatusCode(500, new { 
+                error = "An unexpected error occurred while deleting the image", 
+                details = ex.Message 
+            });
+        }
     }
 
     private static bool IsValidImageFile(IFormFile file)

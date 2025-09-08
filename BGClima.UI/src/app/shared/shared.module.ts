@@ -33,8 +33,6 @@ import { FilterDialogComponent } from './components/filter-dialog/filter-dialog.
   ],
   exports: [
     // Material Modules
-    MatButtonModule,
-    MatDialogModule,
     MatMenuModule,
     MatSelectModule,
     MatOptionModule,

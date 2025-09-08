@@ -1,4 +1,4 @@
-using BGClima.API.Data;
+﻿using BGClima.API.Data;
 using BGClima.Domain.Entities;
 using BGClima.Domain.Interfaces;
 using BGClima.Infrastructure.Data;
@@ -132,18 +132,22 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 // Enable detailed errors and sensitive data logging in development
 // Note: Removed AddDatabaseDeveloperPageExceptionFilter as it's not available in the current context
 
-// Add CORS policy
+// Add CORS policy with explicit origins and credentials
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngularDev",
-        policy => policy
-            .WithOrigins(
-                "http://localhost:4200", // Angular dev server (default port)
-                "https://bgclima.fly.dev" // Production Fly.io URL (same origin)
-            )
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials());
+    var origins = builder.Environment.IsDevelopment()
+        ? new[] { "http://localhost:4200" }
+        : new[] { "https://bgclima.fly.dev" };
+
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins(origins)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials()
+              .WithExposedHeaders("Content-Disposition")
+              .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
+    });
 });
 
 var app = builder.Build();
@@ -172,30 +176,53 @@ else
     app.UseHttpsRedirection();
 }
 
-app.UseDefaultFiles();
-app.UseStaticFiles();
+// The order of middleware is important here
 app.UseRouting();
-app.UseCors("AllowAngularDev");
 
-// Add authentication and authorization middleware
+// CORS must be after UseRouting and before any other middleware
+app.UseCors();
+
+// Add CORS headers to responses
+app.Use(async (context, next) =>
+{
+    var origin = context.Request.Headers["Origin"];
+    
+    if (!string.IsNullOrEmpty(origin) && 
+        (origin.ToString().StartsWith("http://localhost:") || 
+         origin.ToString().StartsWith("https://bgclima.fly.dev")))
+    {
+        context.Response.Headers.Add("Access-Control-Allow-Origin", origin);
+        context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
+    }
+    
+    await next();
+});
+
+// Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+// Static files should come after routing
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
-// Log all registered routes
+// Configure endpoints and log all registered routes
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
-
-    // Log all registered routes
-    var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    var source = endpoints.DataSources.First();
-    foreach (var endpoint in source.Endpoints.OfType<RouteEndpoint>())
+    
+    // Log all registered routes in development
+    if (app.Environment.IsDevelopment())
     {
-        var routePattern = endpoint.RoutePattern.RawText;
-        var httpMethod = endpoint.Metadata.OfType<HttpMethodMetadata>().FirstOrDefault()?.HttpMethods.FirstOrDefault() ?? "(any)";
-        logger.LogInformation($"Registered route: {httpMethod} {routePattern}");
+        var logger = app.Logger;
+        var source = endpoints.DataSources.First();
+        foreach (var endpoint in source.Endpoints.OfType<RouteEndpoint>())
+        {
+            var routePattern = endpoint.RoutePattern.RawText;
+            var httpMethods = endpoint.Metadata.OfType<HttpMethodMetadata>().FirstOrDefault()?.HttpMethods;
+            var methods = httpMethods != null ? string.Join(", ", httpMethods) : "(any)";
+            logger.LogInformation($"Registered route: {methods} {routePattern}");
+        }
     }
 });
 
