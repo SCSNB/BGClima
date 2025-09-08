@@ -169,204 +169,72 @@ export class ProductCategoryComponent implements OnInit {
   }
 
   loadProducts(category: string): void {
-    // Ако категорията е от термопомпените секции, филтрираме клиентски по атрибути
-    const heatPumpCategories = new Set<string>([
-      'termopompeni-sistemi',
-      'multisplit-sistemi',
-      'bgclima-toploobmennici'
-    ]);
-
-    if (heatPumpCategories.has(category)) {
-      this.productService.getProducts().subscribe(data => {
-        const tokens = this.getHeatPumpTokens(category);
-        const filtered = data.filter(p => {
-          const attrs = p?.attributes || [];
-          return attrs.some(a => {
-            const key = (a.attributeKey || '').toLowerCase();
-            const val = (a.attributeValue || '').toString().toLowerCase();
-            return tokens.some(t => key.includes(t) || val.includes(t));
-          });
-        });
-
-        const withCardData: ProductCard[] = filtered.map((p: ProductDto) => {
-          const priceEur = this.toEur(p.price);
-          const oldPriceEur = this.toEur(p.oldPrice ?? undefined);
-          const badges: Badge[] = [];
-          if (p.isNew) badges.push({ text: 'НОВО', bg: '#FF4D8D', color: '#fff' });
-          if (p.isOnSale) badges.push({ text: 'ПРОМО', bg: '#E6003E', color: '#fff' });
-          if (this.hasWifi(p)) badges.push({ text: 'WiFi', bg: '#3B82F6', color: '#fff' });
-
-          const btuThousands = this.getBtuInThousands(p);
-          const cooling = this.getMaxMinNomMax(p, 'Отдавана мощност на охлаждане (Мин./Ном./Макс)') || p.coolingCapacity || '';
-          const heating = this.getMaxMinNomMax(p, 'Отдавана мощност на отопление (Мин./Ном./Макс)') || p.heatingCapacity || '';
-
-          const specs: Spec[] = [
-            { icon: 'bolt', label: 'Мощност', value: btuThousands > 0 ? String(btuThousands) : '' },
-            { icon: 'ac_unit', label: 'Охлаждане', value: cooling },
-            { icon: 'wb_sunny', label: 'Отопление', value: heating },
-          ];
-          // Добавяме Енергиен клас за всички, освен за тръбни топлообменници
-          if (category !== 'bgclima-toploobmennici') {
-            const eclass = p.energyClass?.class || '';
-            if (eclass) {
-              specs.splice(1, 0, { icon: 'eco', label: 'Енергиен клас', value: eclass });
-            }
-          }
-          return { ...p, badges, specs, priceEur, oldPriceEur } as ProductCard;
-        });
-
-        this.allProducts = withCardData;
-        this.filteredProducts = [...withCardData];
-        this.maxPrice = this.computeMaxPrice(withCardData);
-      });
-      return;
-    }
-
-    // Вземаме всички продукти и филтрираме клиентски по атрибута "Тип на инсталация" според категорията
-    this.productService.getProducts().subscribe(data => {
-      const keyNeedle = 'тип на инстала';
-      const tokens = this.getInstallTokens(category);
-      const filtered = data.filter(p => {
-        if (!Array.isArray(p.attributes)) return false;
-        return p.attributes!.some(a => {
-          const key = (a.attributeKey || '').toLowerCase();
-          const val = (a.attributeValue || '').toString().toLowerCase().trim();
-          if (!key.includes(keyNeedle) || !val) return false;
-          return tokens.some(t => val === t || val.includes(t));
-        });
-      });
-
-      // Обогатяваме продуктите с badges, EUR цени и specs (1:1 като offers)
-      const withCardData: ProductCard[] = filtered.map((p: ProductDto) => {
+    this.productService.getProductsByCategory(category).subscribe(products => {
+      const withCardData: ProductCard[] = products.map((p: ProductDto) => {
         const priceEur = this.toEur(p.price);
         const oldPriceEur = this.toEur(p.oldPrice ?? undefined);
-
         const badges: Badge[] = [];
         if (p.isNew) badges.push({ text: 'НОВО', bg: '#FF4D8D', color: '#fff' });
         if (p.isOnSale) badges.push({ text: 'ПРОМО', bg: '#E6003E', color: '#fff' });
         if (this.hasWifi(p)) badges.push({ text: 'WiFi', bg: '#3B82F6', color: '#fff' });
 
-        const btuThousands = this.getBtuInThousands(p);
+        const btuThousands = this.getBtuInThousands(p); // 9, 12, 18 ...
         const cooling = this.getMaxMinNomMax(p, 'Отдавана мощност на охлаждане (Мин./Ном./Макс)') || p.coolingCapacity || '';
         const heating = this.getMaxMinNomMax(p, 'Отдавана мощност на отопление (Мин./Ном./Макс)') || p.heatingCapacity || '';
 
-        const specs: Spec[] = [
-          { icon: 'bolt', label: 'Мощност', value: btuThousands > 0 ? String(btuThousands) : '' },
-          { icon: 'ac_unit', label: 'Охлаждане', value: cooling },
-          { icon: 'wb_sunny', label: 'Отопление', value: heating },
-        ];
-        // Добавяме Енергиен клас за всички, освен за тръбни топлообменници
-        if (category !== 'bgclima-toploobmennici') {
-          const eclass = p.energyClass?.class || '';
-          if (eclass) {
-            specs.splice(1, 0, { icon: 'eco', label: 'Енергиен клас', value: eclass });
-          }
-        }
-
-        return { ...p, badges, specs, priceEur, oldPriceEur } as ProductCard;
+        return {
+          ...p,
+          priceEur,
+          oldPriceEur,
+          badges,
+          specs: [
+            { icon: 'bolt', label: 'Мощност', value: btuThousands > 0 ? String(btuThousands) : '' },
+            { icon: 'eco', label: 'Клас', value: p.energyClass?.class || '' },
+            { icon: 'ac_unit', label: 'Охлаждане', value: cooling },
+            { icon: 'wb_sunny', label: 'Отопление', value: heating }
+          ].filter(s => s.value) // премахни празни стойности
+        } as ProductCard;
       });
 
       this.allProducts = withCardData;
       this.filteredProducts = [...withCardData];
-      this.maxPrice = this.computeMaxPrice(withCardData);
+      this.maxPrice = this.computeMaxPrice(this.allProducts);
+      this.minPrice = 0; // Reset min price
+
+      // Reset filters with new price range
+      this.currentFilters = {
+        brands: [],
+        price: { lower: 0, upper: this.maxPrice },
+        energyClasses: [],
+        btus: [],
+        roomSizeRanges: [],
+        powerKws: []
+      };
+
+      // Apply any existing sort
+      this.applySorting();
     });
   }
 
-  // Допустими стойности за атрибута "Тип на инсталация" по страница/категория
-  private getInstallTokens(category: string): string[] {
-    switch (category) {
-      case 'stenen-tip':
-        return ['стенен тип', 'стенен', 'настенен', 'настен'];
-      case 'kolonen-tip':
-        return ['колонен тип', 'колонен'];
-      case 'kanalen-tip':
-        return ['канален тип', 'канален'];
-      case 'kasetachen-tip':
-        return ['касетъчен тип', 'касетъчен', 'касетен'];
-      case 'podov-tip':
-        return ['подов тип', 'подов'];
-      case 'podovo-tavanen-tip':
-        return ['подово - таванен тип', 'подово-таванен тип', 'подово - таванен', 'подово-таванен', 'таванен-подов'];
-      case 'vrf-vrv':
-        return ['vrf', 'vrv'];
-      case 'mobilni-prenosimi':
-        return ['мобилен', 'мобилни', 'преносим', 'преносими'];
-      default:
-        return [];
+  // === Compare actions ===
+  isCompared(id: number): boolean {
+    return this.compareService.isSelected(id);
+  }
+
+  onCompareClick(event: MouseEvent, product: ProductDto) {
+    // предотвратяваме навигацията от линка на картата
+    event.preventDefault();
+    event.stopPropagation();
+    const res = this.compareService.toggle(product);
+    if (!res.ok && res.reason) {
+      this.snackBar.open(res.reason, 'OK', { duration: 2500 });
+      return;
     }
+    const msg = res.selected ? 'Добавено за сравнение' : 'Премахнато от сравнение';
+    this.snackBar.open(msg, 'OK', { duration: 1200 });
   }
 
-  // Безопасно връща BTU в хиляди (напр. 9000 -> 9). Ако стойността съдържа текст, се парсират само цифрите.
-  getBtuInThousands(p: ProductDto): number {
-    const raw = p?.btu?.value ?? '';
-    const digitsOnly = (typeof raw === 'string') ? raw.replace(/\D+/g, '') : String(raw);
-    const n = parseInt(digitsOnly, 10);
-    if (isNaN(n) || n <= 0) return 0;
-    return Math.round(n / 1000);
-  }
-
-  getBtuInThousandsRobust(p: ProductDto): string {
-    const btuInThousands = this.getBtuInThousands(p);
-    return btuInThousands > 0 ? `${btuInThousands}k` : 'N/A';
-  }
-
-  // Извлича максималната стойност от атрибут във формат "Мин./Ном./Макс" и я форматира
-  private getMaxMinNomMax(p: ProductDto, fullKey: string): string {
-    const attrs = p?.attributes || [];
-    const found = attrs.find(a => (a.attributeKey || '').trim() === fullKey.trim());
-    const raw = found?.attributeValue?.toString();
-    if (!raw) return '';
-
-    try {
-      const matches = raw.match(/(\d+[\.,]?\d*)/g);
-      if (matches && matches.length >= 3) {
-        const nums = matches.map(v => parseFloat(v.replace(',', '.')));
-        const max = Math.max(...nums);
-        return max.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
-      }
-    } catch {
-      // ignore
-    }
-    return raw;
-  }
-
-  // Определя дали продуктът поддържа WiFi по ключ/стойност в атрибутите
-  hasWifi(p: ProductDto): boolean {
-    const attrs = p?.attributes || [];
-
-    const isAffirmative = (v: string) => {
-      const val = (v || '').toString().toLowerCase().trim();
-      return val === 'да' || val === 'yes' || val === 'true' || val === 'wifi_yes' || val === 'da';
-    };
-
-    // 1) Търсим изрично Wi‑Fi модул със стойност "да"
-    const explicitWifi = attrs.find(a => {
-      const key = (a.attributeKey || '').toLowerCase();
-      return (key.includes('wi-fi') || key.includes('wifi')) && (key.includes('модул') || key.includes('module'));
-    });
-    if (explicitWifi && isAffirmative(String(explicitWifi.attributeValue))) {
-      return true;
-    }
-
-    // 2) Алтернативно: точният ключ "Wi-Fi модул в комплекта"
-    const exactWifi = attrs.find(a => (a.attributeKey || '').trim() === 'Wi-Fi модул в комплекта');
-    if (exactWifi && isAffirmative(String(exactWifi.attributeValue))) {
-      return true;
-    }
-
-    // 3) Ако няма изричен модул с "да", проверяваме АКЦЕНТИ да съдържат Wi‑Fi
-    const accentMentionsWifi = attrs.some(a => {
-      const keyUp = (a.attributeKey || '').toUpperCase();
-      if (!(keyUp === 'АКЦЕНТИ' || keyUp.includes('АКЦЕНТ'))) return false;
-      const val = (a.attributeValue || '').toString().toLowerCase();
-      return val.includes('wi-fi') || val.includes('wifi');
-    });
-    if (accentMentionsWifi) return true;
-
-    return false;
-  }
-
-  applyFilters(filters: any): void {
+  public applyFilters(filters: any): void {
     this.currentFilters = filters;
     
     // Филтриране по марка, цена, енергиен клас, BTU (в хиляди) и площ на помещението
@@ -487,35 +355,73 @@ export class ProductCategoryComponent implements OnInit {
     this.categoryTitle = categoryMap[category] || 'Продукти';
   }
 
-  // Токени за филтриране по термопомпени/мултисплит/топлообменни системи
-  private getHeatPumpTokens(category: string): string[] {
-    switch (category) {
-      case 'termopompeni-sistemi':
-        return ['термопомпен', 'термопомпена', 'термопомпи', 'heat pump', 'heat-pump'];
-      case 'multisplit-sistemi':
-        return ['мултисплит', 'multi split', 'multi-split', 'multisplit'];
-      case 'bgclima-toploobmennici':
-        return ['топлообмен', 'топлообменник', 'топлообменници', 'heat exchanger'];
-      default:
-        return [];
-    }
+  // Безопасно връща BTU в хиляди (напр. 9000 -> 9). Ако стойността съдържа текст, се парсират само цифрите.
+  getBtuInThousands(p: ProductDto): number {
+    const raw = p?.btu?.value ?? '';
+    const digitsOnly = (typeof raw === 'string') ? raw.replace(/\D+/g, '') : String(raw);
+    const n = parseInt(digitsOnly, 10);
+    if (isNaN(n) || n <= 0) return 0;
+    return Math.round(n / 1000);
   }
 
-  // === Compare actions ===
-  isCompared(id: number): boolean {
-    return this.compareService.isSelected(id);
+  getBtuInThousandsRobust(p: ProductDto): string {
+    const btuInThousands = this.getBtuInThousands(p);
+    return btuInThousands > 0 ? `${btuInThousands}k` : 'N/A';
   }
 
-  onCompareClick(event: MouseEvent, product: ProductDto) {
-    // предотвратяваме навигацията от линка на картата
-    event.preventDefault();
-    event.stopPropagation();
-    const res = this.compareService.toggle(product);
-    if (!res.ok && res.reason) {
-      this.snackBar.open(res.reason, 'OK', { duration: 2500 });
-      return;
+  // Извлича максималната стойност от атрибут във формат "Мин./Ном./Макс" и я форматира
+  private getMaxMinNomMax(p: ProductDto, fullKey: string): string {
+    const attrs = p?.attributes || [];
+    const found = attrs.find(a => (a.attributeKey || '').trim() === fullKey.trim());
+    const raw = found?.attributeValue?.toString();
+    if (!raw) return '';
+
+    try {
+      const matches = raw.match(/(\d+[\.,]?\d*)/g);
+      if (matches && matches.length >= 3) {
+        const nums = matches.map(v => parseFloat(v.replace(',', '.')));
+        const max = Math.max(...nums);
+        return max.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+      }
+    } catch {
+      // ignore
     }
-    const msg = res.selected ? 'Добавено за сравнение' : 'Премахнато от сравнение';
-    this.snackBar.open(msg, 'OK', { duration: 1200 });
+    return raw;
+  }
+
+  // Определя дали продуктът поддържа WiFi по ключ/стойност в атрибутите
+  hasWifi(p: ProductDto): boolean {
+    const attrs = p?.attributes || [];
+
+    const isAffirmative = (v: string) => {
+      const val = (v || '').toString().toLowerCase().trim();
+      return val === 'да' || val === 'yes' || val === 'true' || val === 'wifi_yes' || val === 'da';
+    };
+
+    // 1) Търсим изрично Wi‑Fi модул със стойност "да"
+    const explicitWifi = attrs.find(a => {
+      const key = (a.attributeKey || '').toLowerCase();
+      return (key.includes('wi-fi') || key.includes('wifi')) && (key.includes('модул') || key.includes('module'));
+    });
+    if (explicitWifi && isAffirmative(String(explicitWifi.attributeValue))) {
+      return true;
+    }
+
+    // 2) Алтернативно: точният ключ "Wi-Fi модул в комплекта"
+    const exactWifi = attrs.find(a => (a.attributeKey || '').trim() === 'Wi-Fi модул в комплекта');
+    if (exactWifi && isAffirmative(String(exactWifi.attributeValue))) {
+      return true;
+    }
+
+    // 3) Ако няма изричен модул с "да", проверяваме АКЦЕНТИ да съдържат Wi‑Fi
+    const accentMentionsWifi = attrs.some(a => {
+      const keyUp = (a.attributeKey || '').toUpperCase();
+      if (!(keyUp === 'АКЦЕНТИ' || keyUp.includes('АКЦЕНТ'))) return false;
+      const val = (a.attributeValue || '').toString().toLowerCase();
+      return val.includes('wi-fi') || val.includes('wifi');
+    });
+    if (accentMentionsWifi) return true;
+
+    return false;
   }
 }
