@@ -98,7 +98,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   // Хелпър: дали текущата категория е термопомпена секция
   isHeatPumpCategory(): boolean {
     const c = (this.currentCategory || '').trim();
-    // Мултисплит системи се третират като климатици
+    // Мултисплит системи и хиперинвертори се третират като климатици
     return c === 'termopompeni-sistemi' || c === 'bgclima-toploobmennici';
   }
 
@@ -107,14 +107,15 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   // Бърза навигация по типове климатици (от ПРОДУКТИ > Климатици)
   private acCategories = [
     { slug: 'stenen-tip', label: 'Климатици стенен тип' },
+    { slug: 'podov-tip', label: 'Климатици подов тип' },
+    { slug: 'hiperinvertori', label: 'Хиперинвертори' },
     { slug: 'kolonen-tip', label: 'Климатици колонен тип' },
     { slug: 'multisplit-sistemi', label: 'Мулти сплит системи' },
-    { slug: 'kanalen-tip', label: 'Климатици канален тип' },
     { slug: 'kasetachen-tip', label: 'Климатици касетъчен тип' },
-    { slug: 'podov-tip', label: 'Климатици подов тип' },
+    { slug: 'kanalen-tip', label: 'Климатици канален тип' },
     { slug: 'podovo-tavanen-tip', label: 'Климатици подово - таванен тип' },
-    { slug: 'vrf-vrv', label: 'VRF / VRV' },
-    { slug: 'mobilni-prenosimi', label: 'Мобилни / преносими климатици' }
+    { slug: 'mobilni-prenosimi', label: 'Мобилни / преносими климатици' },
+    { slug: 'vrf-vrv', label: 'VRF / VRV' }
   ];
 
   // ПРОДУКТИ > Термопомпи
@@ -125,7 +126,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
 
   get isHeatPumpSection(): boolean {
     const hpSet = new Set(['termopompeni-sistemi', 'bgclima-toploobmennici']);
-    return hpSet.has(this.currentCategory);
+    return hpSet.has(this.currentCategory) || this.currentCategory === 'multisplit-sistemi';
   }
 
   // Специален флаг за страницата БГКЛИМА тръбни топлообменници
