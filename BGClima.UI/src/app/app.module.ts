@@ -23,6 +23,7 @@ import { RouterModule } from '@angular/router';
 
 // Material Module
 import { MaterialModule } from './shared/material.module';
+import { CalculatorComponent } from './pages/calculator/calculator.component';
 
 // Services and Interceptors
 import { AuthService } from './services/auth.service';
@@ -46,6 +47,11 @@ import { MaintenanceComponent } from './components/maintenance/maintenance.compo
 import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { ImageService } from './services/image.service';
+import { PromoProductsComponent } from './pages/promo-products/promo-products.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { SharedModule } from './shared/shared.module';
+import { CompareComponent } from './pages/compare/compare.component';
 
 @NgModule({
   declarations: [
@@ -76,9 +82,12 @@ import { ImageService } from './services/image.service';
     ProductCategoryComponent,
     ProductFiltersComponent,
     MaintenanceComponent,
+    PromoProductsComponent,
+    CompareComponent,
+    FormatLabelPipe,
     ProductDetailsComponent,
-    FormatLabelPipe
-   ],
+    CalculatorComponent
+  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -88,7 +97,10 @@ import { ImageService } from './services/image.service';
     AppRoutingModule,
     RouterModule,
     MaterialModule,
-    CommonModule
+    CommonModule,
+    SharedModule,
+    MatButtonModule,
+    MatIconModule
   ],
   providers: [
     AuthService,
@@ -98,6 +110,10 @@ import { ImageService } from './services/image.service';
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true } }
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [
+    ProductDialogComponent,
+    BannerDialogComponent
+  ]
 })
 export class AppModule { }

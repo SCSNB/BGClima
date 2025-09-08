@@ -21,6 +21,10 @@ import { ProductDetailsComponent } from './pages/product-details/product-details
 import { VentilationDesignComponent } from './components/ventilation-design/ventilation-design.component';
 import { VentilationInstallationComponent } from './components/ventilation-installation/ventilation-installation.component';
 import { ProductCategoryComponent } from './components/product-category/product-category.component';
+import { PromoProductsComponent } from './pages/promo-products/promo-products.component';
+import { CompareComponent } from './pages/compare/compare.component';
+import { CalculatorComponent } from './pages/calculator/calculator.component';
+import { CompareGuard } from './guards/compare.guard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -50,7 +54,9 @@ const routes: Routes = [
   { path: 'ventilation-installation', component: VentilationInstallationComponent },
   { path: 'product/:id', component: ProductDetailsComponent },
   { path: 'products/:category', component: ProductCategoryComponent },
-  { path: 'promo', loadComponent: () => import('./pages/promo-products/promo-products.component').then(m => m.PromoProductsComponent) },
+  { path: 'promo', component: PromoProductsComponent },
+  { path: 'calculator', component: CalculatorComponent },
+  { path: 'compare', component: CompareComponent, canActivate: [CompareGuard] },
   // Redirect empty path to home
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   // Catch-all route for any undefined routes

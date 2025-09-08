@@ -2,6 +2,42 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
+/* Глобален стил за всички snackbar-и */
+.mat-mdc-snack-bar-container {
+  --mdc-snackbar-container-color: #ffffff; /* Бял фон */
+  --mdc-snackbar-supporting-text-color: #000000; /* Черен текст */
+  
+  .mdc-snackbar__surface {
+    border: 1px solid #e0e0e0; /* Лека граница за по-добра видимост */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Лека сянка за дълбочина */
+  }
+  
+  /* Стил за бутона за затваряне */
+  .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled) {
+    color: #1976d2; /* Син цвят за бутона */
+  }
+}
+
+/* Стил за snackbar с тип грешка (ако се използва) */
+.mat-mdc-snack-bar-container.error-snackbar {
+  --mdc-snackbar-container-color: #ffebee; /* Светлочервен фон за грешки */
+  --mdc-snackbar-supporting-text-color: #c62828; /* Тъмночервен текст за грешки */
+  
+  .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled) {
+    color: #c62828;
+  }
+}
+
+/* Стил за snackbar с успех */
+.mat-mdc-snack-bar-container.success-snackbar {
+  --mdc-snackbar-container-color: #e8f5e9; /* Светлозелен фон за успех */
+  --mdc-snackbar-supporting-text-color: #2e7d32; /* Тъмнозелен текст за успех */
+  
+  .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled) {
+    color: #2e7d32;
+  }
+}
+
 html, body { 
   height: 100%; 
   margin: 0;
@@ -368,5 +404,40 @@ html, body {
     grid-template-columns: 1fr;
     padding: 15px 5px;
     gap: 20px;
+  }
+}
+
+/* Mobile filters dialog container – full-screen look */
+.mobile-filters-dialog-container {
+  .mat-dialog-container {
+    padding: 0 !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+  }
+}
+
+/* ===== Global desktop override for product-category sort button ===== */
+@media (min-width: 992px) {
+  /* Shrink label text reliably (MDC label inside Angular Material button) */
+  app-product-category .desktop-header .desktop-actions button.custom-sort-btn[mat-flat-button] .mdc-button__label {
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    text-transform: none !important;
+  }
+
+  /* Button sizing */
+  app-product-category .desktop-header .desktop-actions button.custom-sort-btn[mat-flat-button] {
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 16px !important;
+    border-radius: 18px !important;
+  }
+
+  /* Icon sizing */
+  app-product-category .desktop-header .desktop-actions button.custom-sort-btn[mat-flat-button] .mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    margin-left: 4px !important;
   }
 }
