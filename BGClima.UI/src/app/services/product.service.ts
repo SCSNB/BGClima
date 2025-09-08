@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { tap, map, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface BrandDto {
@@ -124,8 +124,30 @@ export class ProductService {
     console.log('Fetching products from:', this.baseUrl);
     return this.http.get<ProductDto[]>(this.baseUrl).pipe(
       tap({
-        next: (products) => console.log('Received products:', products),
-        error: (err) => console.error('Error fetching products:', err)
+        next: (products) => {
+          console.log(`Successfully fetched ${products?.length || 0} products`);
+          if (products && products.length > 0) {
+            console.log('Sample product:', {
+              id: products[0].id,
+              name: products[0].name,
+              productType: products[0].productType,
+              brand: products[0].brand
+            });
+          }
+        },
+        error: (err) => {
+          console.error('Error fetching products:', err);
+          console.error('Error details:', {
+            status: err.status,
+            statusText: err.statusText,
+            url: err.url,
+            error: err.error
+          });
+        }
+      }),
+      catchError(err => {
+        console.error('Failed to fetch products:', err);
+        return of([]); // Return empty array on error to prevent breaking the app
       })
     );
   }
@@ -198,15 +220,62 @@ export class ProductService {
   }
 
   getProductsByCategory(category: string): Observable<ProductDto[]> {
-    return this.http.get<ProductDto[]>(`${this.baseUrl}/category/${category}`).pipe(
-      tap({
-        next: (products) => console.log(`Fetched ${products.length} products for category ${category}`),
-        error: (err) => console.error(`Error fetching products for category ${category}:`, err)
+    console.log(`Getting products for category: ${category}`);
+  
+    // Map URL segments to product type names - updated to match the database
+    const categoryToTypeMap: {[key: string]: string} = {
+      'stenen-tip': 'Климатици стенен тип',
+      'kolonen-tip': 'Климатици колонен тип',
+      'kanalen-tip': 'Климатици канален тип',
+      'kasetachen-tip': 'Климатици касетъчен тип',
+      'podov-tip': 'Климатици подов тип',
+      'podovo-tavanen-tip': 'Климатици подово-таванен тип',
+      'vrf-vrv': 'VRF / VRV',
+      'mobilni-prenosimi': 'Мобилни / преносими климатици',
+      'termopompeni-sistemi': 'Термопомпени системи',
+      'multisplit-sistemi': 'Мултисплит системи',
+      'bgclima-toploobmennici': 'БГКЛИМА тръбни топлообменници'
+    };
+  
+    const targetType = categoryToTypeMap[category];
+  
+    if (!targetType) {
+      console.warn(`No product type mapping found for category: ${category}`);
+      return this.getProducts();
+    }
+
+    console.log(`Mapped category '${category}' to type: '${targetType}'`);
+
+    // First get all products
+    return this.getProducts().pipe(
+      tap(products => {
+        console.log(`Total products received: ${products.length}`);
+        // Log all unique product types for debugging
+        const types = [...new Set(products.map(p => p.productType?.name))];
+        console.log('Available product types:', types);
+      }),
+      map(products => {
+        // Filter products by productType name (case insensitive and trimmed)
+        const filtered = products.filter(p => 
+          p.productType?.name?.trim().toLowerCase() === targetType.trim().toLowerCase()
+        );
+        
+        console.log(`Found ${filtered.length} products for type: '${targetType}'`);
+        if (filtered.length === 0) {
+          console.warn('No products found for the specified type. Available types:', 
+            [...new Set(products.map(p => p.productType?.name))]
+          );
+        }
+        
+        return filtered;
+      }),
+      catchError(err => {
+        console.error(`Error filtering products for type '${targetType}':`, err);
+        return of([]);
       })
     );
   }
 
-  // Admin stats (counts)
   getAdminStats(): Observable<{ totalProducts: number } & Record<string, any>> {
     return this.http.get<{ totalProducts: number } & Record<string, any>>(`${this.baseUrl}/admin/stats`).pipe(
       tap({

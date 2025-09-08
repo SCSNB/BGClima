@@ -81,7 +81,9 @@
               </div>
             </div>
             <div class="offer-card-brand-row">
-              <span class="brand-text">{{ product.brand?.name }}</span>
+              <div class="brand-text-container">
+                <span class="brand-text">{{ product.brand?.name }}</span>
+              </div>
               <button class="compare-btn" type="button"
                       [class.selected]="isCompared(product.id)"
                       (click)="onCompareClick($event, product)">

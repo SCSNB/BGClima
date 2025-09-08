@@ -1022,17 +1022,22 @@ app-product-category .desktop-actions,
     justify-content: space-between;
     margin: 5px 0;
     width: 100%;
-
-    .brand-text {
-      color: #E6003E;
-      font-size: 12px;
-      font-weight: 600;
+    
+    /* Центриран бранд текст спрямо бутона, без увеличен размер */
+    .brand-text-container {
       flex: 1;
       text-align: center;
-      display: block;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      margin-right: 8px;
+      
+      .brand-text {
+        color: #E6003E;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+      }
     }
     .compare-btn {
       margin-left: auto;
