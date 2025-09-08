@@ -44,6 +44,53 @@ html, body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
+/* Fix: prevent double vertical scrollbar (body + content) */
+html, body {
+  overflow: hidden; /* Disable native page scroll */
+}
+
+/* Make the Material container the single scroll host */
+.mat-sidenav-container, mat-sidenav-container {
+  height: 100vh !important;
+}
+
+.mat-sidenav-content, .mat-drawer-content {
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+  /* Firefox: hide scrollbar by default */
+  scrollbar-width: none;
+}
+
+/* Firefox: show thin scrollbar on hover */
+.mat-sidenav-content:hover, .mat-drawer-content:hover {
+  scrollbar-width: thin;
+}
+
+/* WebKit (Chrome, Edge, Safari): hide by default */
+.mat-sidenav-content::-webkit-scrollbar,
+.mat-drawer-content::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+/* WebKit: show on hover with styling */
+.mat-sidenav-content:hover::-webkit-scrollbar,
+.mat-drawer-content:hover::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.mat-sidenav-content:hover::-webkit-scrollbar-track,
+.mat-drawer-content:hover::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.05);
+}
+
+.mat-sidenav-content:hover::-webkit-scrollbar-thumb,
+.mat-drawer-content:hover::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.3);
+  border-radius: 8px;
+}
+
 :root {
   --primary-color: #1976d2;
   --accent-color: #ff4081;

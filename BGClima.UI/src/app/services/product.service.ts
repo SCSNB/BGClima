@@ -304,11 +304,12 @@ export class ProductService {
       'kanalen-tip': 'Климатици канален тип',
       'kasetachen-tip': 'Климатици касетъчен тип',
       'podov-tip': 'Климатици подов тип',
-      'podovo-tavanen-tip': 'Климатици подово-таванен тип',
+      'podovo-tavanen-tip': 'Климатици подово - таванен тип',
       'vrf-vrv': 'VRF / VRV',
       'mobilni-prenosimi': 'Мобилни / преносими климатици',
       'termopompeni-sistemi': 'Термопомпени системи',
       'multisplit-sistemi': 'Мултисплит системи',
+      'hiperinvertori': 'Хиперинвертори',
       'bgclima-toploobmennici': 'БГКЛИМА тръбни топлообменници'
     };
   

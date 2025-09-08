@@ -251,7 +251,7 @@ export class ProductCategoryComponent implements OnInit {
     );
 
     const isToploobmennici = (this.currentCategory || '').trim() === 'bgclima-toploobmennici';
-    const isHeatPumpCategory = new Set(['termopompeni-sistemi','multisplit-sistemi']).has(this.currentCategory); // изключваме топлообменници
+    const isHeatPumpCategory = new Set(['termopompeni-sistemi']).has(this.currentCategory); // изключваме топлообменници и третираме мултисплит като климатици
     const selectedPowerKwNum = new Set<number>((selectedPowerKws || []).map(v => Number(v)).filter(n => !isNaN(n)));
 
     // Apply filters
@@ -321,8 +321,7 @@ export class ProductCategoryComponent implements OnInit {
     this.applySorting();
   }
 
-  // Извлича максималната стойност (kW) от атрибут "Отдавана мощност на отопление (Мин./Ном./Макс)"
-  // Връща число (kW) или null ако липсва/невалидно
+  // Извлича максималната стойност от атрибут във формат "Мин./Ном./Макс" и я форматира
   private getHeatingPowerMaxKw(p: ProductDto): number | null {
     const attrs = p?.attributes || [];
     const fullKey = 'Отдавана мощност на отопление (Мин./Ном./Макс)';
@@ -349,6 +348,7 @@ export class ProductCategoryComponent implements OnInit {
       'mobilni-prenosimi': 'Мобилни / преносими климатици',
       'termopompeni-sistemi': 'Термопомпени системи',
       'multisplit-sistemi': 'Мултисплит системи',
+      'hiperinvertori': 'Хиперинвертори',
       'bgclima-toploobmennici': 'БГКЛИМА тръбни топлообменници'
     };
 

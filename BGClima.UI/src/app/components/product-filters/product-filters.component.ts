@@ -98,7 +98,8 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   // Хелпър: дали текущата категория е термопомпена секция
   isHeatPumpCategory(): boolean {
     const c = (this.currentCategory || '').trim();
-    return c === 'termopompeni-sistemi' || c === 'multisplit-sistemi' || c === 'bgclima-toploobmennici';
+    // Мултисплит системи се третират като климатици
+    return c === 'termopompeni-sistemi' || c === 'bgclima-toploobmennici';
   }
 
   selectedSort: string = 'name-asc';
@@ -107,6 +108,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   private acCategories = [
     { slug: 'stenen-tip', label: 'Климатици стенен тип' },
     { slug: 'kolonen-tip', label: 'Климатици колонен тип' },
+    { slug: 'multisplit-sistemi', label: 'Мулти сплит системи' },
     { slug: 'kanalen-tip', label: 'Климатици канален тип' },
     { slug: 'kasetachen-tip', label: 'Климатици касетъчен тип' },
     { slug: 'podov-tip', label: 'Климатици подов тип' },
@@ -118,12 +120,11 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   // ПРОДУКТИ > Термопомпи
   private heatPumpCategories = [
     { slug: 'termopompeni-sistemi', label: 'Термопомпени системи' },
-    { slug: 'multisplit-sistemi', label: 'Мултисплит системи' },
     { slug: 'bgclima-toploobmennici', label: 'БГКЛИMA тръбни топлообменници' }
   ];
 
   get isHeatPumpSection(): boolean {
-    const hpSet = new Set(['termopompeni-sistemi', 'multisplit-sistemi', 'bgclima-toploobmennici']);
+    const hpSet = new Set(['termopompeni-sistemi', 'bgclima-toploobmennici']);
     return hpSet.has(this.currentCategory);
   }
 

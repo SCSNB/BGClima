@@ -157,6 +157,7 @@ namespace BGClima.API.Data
                     new ProductType { Name = "Мобилни / преносими климатици" },
                     new ProductType { Name = "Термопомпени системи" },
                     new ProductType { Name = "Мултисплит системи" },
+                    new ProductType { Name = "Хиперинвертори" },
                     new ProductType { Name = "БГКЛИМА тръбни топлообменници" }
                 };
                 await context.ProductTypes.AddRangeAsync(productTypes);
@@ -180,80 +181,83 @@ namespace BGClima.API.Data
             var inverterType = allProductTypes.First(t => t.Name == "Климатици стенен тип");
 
             // Seed Products
-            var products = new List<Product>
+            if (!await context.Products.AnyAsync())
             {
-                new Product
+                var products = new List<Product>
                 {
-                    Name = "Daikin FTXB-E/RXB-E",
-                    Description = "Инверторен климатик с висок енергиен клас A++",
-                    BrandId = daikinBrand.Id,
-                    BTUId = btu9000.Id,
-                    EnergyClassId = energyClassAplusplus.Id,
-                    ProductTypeId = inverterType.Id,
-                    Price = 1299.00m,
-                    OldPrice = 1399.00m,
-                    StockQuantity = 10,
+                    new Product
+                    {
+                        Name = "Daikin FTXB-E/RXB-E",
+                        Description = "Инверторен климатик с висок енергиен клас A++",
+                        BrandId = daikinBrand.Id,
+                        BTUId = btu9000.Id,
+                        EnergyClassId = energyClassAplusplus.Id,
+                        ProductTypeId = inverterType.Id,
+                        Price = 1299.00m,
+                        OldPrice = 1399.00m,
+                        StockQuantity = 10,
+                        IsActive = true,
+                        IsFeatured = true,
+                        IsOnSale = true,
+                        IsNew = true,
+                        Sku = "DAI-FTXBE-9000",
+                        ImageUrl = "/images/daikin-ftxbe-rxbe.jpg",
+                    },
+                    new Product
+                    {
+                        Name = "Mitsubishi Electric MSZ-LN35VG2B / MUZ-LN35VG2",
+                        Description = "Сензорен инверторен климатик с висок енергиен клас A+++",
+                        BrandId = mitsubishiBrand.Id,
+                        BTUId = btu12000.Id,
+                        EnergyClassId = energyClassAplusplusplus.Id,
+                        ProductTypeId = inverterType.Id,
+                        Price = 1599.00m,
+                        OldPrice = 1699.00m,
+                        StockQuantity = 5,
+                        IsActive = true,
+                        IsFeatured = true,
+                        IsOnSale = false,
+                        IsNew = true,
+                        Sku = "MIT-LN35VG2",
+                        ImageUrl = "/images/mitsubishi-ln35vg2.jpg"
+                    }
+                };
+
+                // Add more products for variety
+                var greeBrand = allBrands.First(b => b.Name == "Gree");
+                var btu18000 = allBtus.First(b => b.Value == "18000 BTU");
+                var energyClassAplus = allEnergyClasses.First(e => e.Class == "A+");
+                var standardType = allProductTypes.First(t => t.Name == "Климатици стенен тип");
+
+                products.Add(new Product
+                {
+                    Name = "Gree Breezeless 18",
+                    Description = "Стандартен климатик с тиха работа и високо качество",
+                    BrandId = greeBrand.Id,
+                    BTUId = btu18000.Id,
+                    EnergyClassId = energyClassAplus.Id,
+                    ProductTypeId = standardType.Id,
+                    Price = 899.00m,
+                    OldPrice = 999.00m,
+                    StockQuantity = 15,
                     IsActive = true,
-                    IsFeatured = true,
+                    IsFeatured = false,
                     IsOnSale = true,
-                    IsNew = true,
-                    Sku = "DAI-FTXBE-9000",
-                    ImageUrl = "/images/daikin-ftxbe-rxbe.jpg",
-                },
-                new Product
-                {
-                    Name = "Mitsubishi Electric MSZ-LN35VG2B / MUZ-LN35VG2",
-                    Description = "Сензорен инверторен климатик с висок енергиен клас A+++",
-                    BrandId = mitsubishiBrand.Id,
-                    BTUId = btu12000.Id,
-                    EnergyClassId = energyClassAplusplusplus.Id,
-                    ProductTypeId = inverterType.Id,
-                    Price = 1599.00m,
-                    OldPrice = 1699.00m,
-                    StockQuantity = 5,
-                    IsActive = true,
-                    IsFeatured = true,
-                    IsOnSale = false,
-                    IsNew = true,
-                    Sku = "MIT-LN35VG2",
-                    ImageUrl = "/images/mitsubishi-ln35vg2.jpg"
-                }
-            };
+                    IsNew = false,
+                    Sku = "GREE-BREEZE-18",
+                    ImageUrl = "/images/gree-breezeless-18.jpg"
+                });
 
-            // Add more products for variety
-            var greeBrand = allBrands.First(b => b.Name == "Gree");
-            var btu18000 = allBtus.First(b => b.Value == "18000 BTU");
-            var energyClassAplus = allEnergyClasses.First(e => e.Class == "A+");
-            var standardType = allProductTypes.First(t => t.Name == "Климатици стенен тип");
-
-            products.Add(new Product
-            {
-                Name = "Gree Breezeless 18",
-                Description = "Стандартен климатик с тиха работа и високо качество",
-                BrandId = greeBrand.Id,
-                BTUId = btu18000.Id,
-                EnergyClassId = energyClassAplus.Id,
-                ProductTypeId = standardType.Id,
-                Price = 899.00m,
-                OldPrice = 999.00m,
-                StockQuantity = 15,
-                IsActive = true,
-                IsFeatured = false,
-                IsOnSale = true,
-                IsNew = false,
-                Sku = "GREE-BREEZE-18",
-                ImageUrl = "/images/gree-breezeless-18.jpg"
-            });
-
-            await context.Products.AddRangeAsync(products);
-            await context.SaveChangesAsync();
+                await context.Products.AddRangeAsync(products);
+                await context.SaveChangesAsync();
+            }
 
             // Prepare all related data in memory to minimize database calls
             var productImages = new List<ProductImage>();
             var productAttributes = new List<ProductAttribute>();
 
             // Images for Daikin product
-            var daikinProduct = products[0];
+            var daikinProduct = await context.Products.FirstOrDefaultAsync(p => p.Name == "Daikin FTXB-E/RXB-E");
             productImages.AddRange(new[]
             {
                 new ProductImage
@@ -275,7 +279,7 @@ namespace BGClima.API.Data
             });
 
             // Images for Mitsubishi product
-            var mitsubishiProduct = products[1];
+            var mitsubishiProduct = await context.Products.FirstOrDefaultAsync(p => p.Name == "Mitsubishi Electric MSZ-LN35VG2B / MUZ-LN35VG2");
             productImages.AddRange(new[]
             {
                 new ProductImage
@@ -297,7 +301,7 @@ namespace BGClima.API.Data
             });
 
             // Images for Gree product
-            var greeProduct = products[2];
+            var greeProduct = await context.Products.FirstOrDefaultAsync(p => p.Name == "Gree Breezeless 18");
             productImages.AddRange(new[]
             {
                 new ProductImage
