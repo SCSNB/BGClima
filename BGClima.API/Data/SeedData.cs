@@ -143,25 +143,39 @@ namespace BGClima.API.Data
             }
 
             // Seed Product Types
-            if (!await context.ProductTypes.AnyAsync())
+            var requiredProductTypes = new List<string>
             {
-                productTypes = new List<ProductType>
-                {
-                    new ProductType { Name = "Климатици стенен тип" },
-                    new ProductType { Name = "Климатици колонен тип" },
-                    new ProductType { Name = "Климатици канален тип" },
-                    new ProductType { Name = "Климатици касетъчен тип" },
-                    new ProductType { Name = "Климатици подов тип" },
-                    new ProductType { Name = "Климатици подово - таванен тип" },
-                    new ProductType { Name = "VRF / VRV" },
-                    new ProductType { Name = "Мобилни / преносими климатици" },
-                    new ProductType { Name = "Термопомпени системи" },
-                    new ProductType { Name = "Мултисплит системи" },
-                    new ProductType { Name = "Хиперинвертори" },
-                    new ProductType { Name = "БГКЛИМА тръбни топлообменници" }
-                };
-                await context.ProductTypes.AddRangeAsync(productTypes);
+                "Климатици стенен тип",
+                "Климатици колонен тип",
+                "Климатици канален тип",
+                "Климатици касетъчен тип",
+                "Климатици подов тип",
+                "Климатици подово - таванен тип",
+                "VRF / VRV",
+                "Мобилни / преносими климатици",
+                "Термопомпени системи",
+                "Мултисплит системи",
+                "Хиперинвертори",
+                "БГКЛИМА тръбни топлообменници"
+            };
+
+            // Get existing product types
+            var existingTypes = await context.ProductTypes.Select(p => p.Name).ToListAsync();
+
+            // Add missing types
+            var missingTypes = requiredProductTypes
+                .Where(type => !existingTypes.Contains(type))
+                .Select(type => new ProductType { Name = type })
+                .ToList();
+
+            if (missingTypes.Any())
+            {
+                await context.ProductTypes.AddRangeAsync(missingTypes);
+                await context.SaveChangesAsync();
             }
+
+            // Get all product types for reference
+            productTypes = await context.ProductTypes.ToListAsync();
 
             // Single SaveChanges for all reference data
             await context.SaveChangesAsync();
