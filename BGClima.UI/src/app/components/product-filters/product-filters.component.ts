@@ -113,8 +113,10 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     { slug: 'podovo-tavanen-tip', label: 'Климатици подово - таванен тип' },
     { slug: 'vrf-vrv', label: 'VRF / VRV' },
     { slug: 'mobilni-prenosimi', label: 'Мобилни / преносими климатици' },
-    { slug: 'multisplit-sistemi', label: 'Мултисплит системи' }
+    { slug: 'multisplit-sistemi', label: 'Мултисплит системи' },
+    { slug: 'hiperinvertori', label: 'Хиперинвертори' }
   ];
+  
 
   // ПРОДУКТИ > Термопомпи
   private heatPumpCategories = [

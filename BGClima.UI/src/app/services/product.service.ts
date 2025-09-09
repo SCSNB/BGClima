@@ -307,6 +307,7 @@ export class ProductService {
       'podovo-tavanen-tip': 'Климатици подово-таванен тип',
       'vrf-vrv': 'VRF / VRV',
       'mobilni-prenosimi': 'Мобилни / преносими климатици',
+      'hiperinvertori': 'Хиперинвертори',
       'termopompeni-sistemi': 'Термопомпени системи',
       'multisplit-sistemi': 'Мултисплит системи',
       'bgclima-toploobmennici': 'БГКЛИМА тръбни топлообменници'
