@@ -204,25 +204,7 @@ app.Use(async (context, next) =>
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Configure endpoints and log all registered routes
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-    
-    // Log all registered routes in development
-    if (app.Environment.IsDevelopment())
-    {
-        var logger = app.Logger;
-        var source = endpoints.DataSources.First();
-        foreach (var endpoint in source.Endpoints.OfType<RouteEndpoint>())
-        {
-            var routePattern = endpoint.RoutePattern.RawText;
-            var httpMethods = endpoint.Metadata.OfType<HttpMethodMetadata>().FirstOrDefault()?.HttpMethods;
-            var methods = httpMethods != null ? string.Join(", ", httpMethods) : "(any)";
-            logger.LogInformation($"Registered route: {methods} {routePattern}");
-        }
-    }
-});
+app.MapControllers();
 
 app.MapFallbackToFile("index.html");
 
