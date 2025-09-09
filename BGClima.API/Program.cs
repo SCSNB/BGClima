@@ -21,6 +21,10 @@ if (builder.Environment.IsDevelopment())
 {
     builder.WebHost.UseUrls("http://localhost:5000");
 }
+else
+{
+    builder.WebHost.UseUrls("http://0.0.0.0:8080");
+}
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
