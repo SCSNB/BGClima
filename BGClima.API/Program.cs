@@ -21,10 +21,6 @@ if (builder.Environment.IsDevelopment())
 {
     builder.WebHost.UseUrls("http://localhost:5000");
 }
-else
-{
-    builder.WebHost.UseUrls("http://0.0.0.0:8080");
-}
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -181,7 +177,8 @@ else
     app.UseHttpsRedirection();
 }
 
-// The order of middleware is important here
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.UseRouting();
 
 // CORS must be after UseRouting and before any other middleware
@@ -206,10 +203,6 @@ app.Use(async (context, next) =>
 // Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Static files should come after routing
-app.UseDefaultFiles();
-app.UseStaticFiles();
 
 // Configure endpoints and log all registered routes
 app.UseEndpoints(endpoints =>
