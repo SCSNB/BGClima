@@ -158,8 +158,8 @@ var dbContext = scope.ServiceProvider.GetRequiredService<BGClimaContext>();
 dbContext.Database.Migrate();
 //Apply migrations and seed sample data
 
-await SeedData.SeedIdentityDataAsync(scope.ServiceProvider);
-await SeedData.SeedAsync(dbContext);
+//await SeedData.SeedIdentityDataAsync(scope.ServiceProvider);
+//await SeedData.SeedAsync(dbContext);
 
 
 // Configure the HTTP request pipeline.
