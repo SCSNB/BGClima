@@ -153,9 +153,10 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 //Apply pending migrations on startup
-using var scope = app.Services.CreateScope();
-var dbContext = scope.ServiceProvider.GetRequiredService<BGClimaContext>();
-dbContext.Database.Migrate();
+// Comment migrations
+//using var scope = app.Services.CreateScope();
+//var dbContext = scope.ServiceProvider.GetRequiredService<BGClimaContext>();
+//dbContext.Database.Migrate();
 //Apply migrations and seed sample data
 
 //await SeedData.SeedIdentityDataAsync(scope.ServiceProvider);
