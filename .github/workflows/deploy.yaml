@@ -1,10 +1,9 @@
-name: Build .NET API & Angular
+name: Build and Deploy
 
 on:
   push:
     branches:
       - main
-      - upload_images
   pull_request:
     branches:
       - main
@@ -12,7 +11,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    outputs:
+      build_success: ${{ steps.build_status.outputs.success }}
+    
     steps:
       # 1️⃣ Check out the repository
       - name: Checkout code
@@ -66,7 +67,20 @@ jobs:
         working-directory: ./BGClima.API
         run: dotnet publish -c Release -o ${{ github.workspace }}/publish
 
-      # 8️⃣ Deploy to Fly.io
+      # Set build status for next job
+      - name: Set build status
+        id: build_status
+        run: echo "success=true" >> $GITHUB_OUTPUT
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main' && needs.build.outputs.build_success == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
       - name: Install Fly.io CLI
         uses: superfly/flyctl-actions/setup-flyctl@master
 
