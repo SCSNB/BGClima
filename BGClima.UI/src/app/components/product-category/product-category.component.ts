@@ -381,8 +381,11 @@ export class ProductCategoryComponent implements OnInit {
       const matches = raw.match(/(\d+[\.,]?\d*)/g);
       if (matches && matches.length >= 3) {
         const nums = matches.map(v => parseFloat(v.replace(',', '.')));
-        const max = Math.max(...nums);
-        return max.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+        // Номиналната стойност е втората в реда Мин./Ном./Макс
+        const nominal = nums[1];
+        if (isFinite(nominal)) {
+          return nominal.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+        }
       }
     } catch {
       // ignore

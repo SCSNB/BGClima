@@ -310,8 +310,8 @@ export class PromoProductsComponent implements OnInit {
         const matches = value.match(/(\d+[\.,]?\d*)/g);
         if (matches && matches.length >= 3) {
           const values = matches.map(v => parseFloat(v.replace(',', '.')));
-          const max = Math.max(...values);
-          return max.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+          const nominal = values[1];
+          return nominal.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
         }
         return value;
       }

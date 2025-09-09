@@ -93,7 +93,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Extract maximum value from a string in format "Min/Nom/Max"
+  // Extract nominal (second) value from a string in format "Min/Nom/Max"
   private getMaxValue(valueString: string | undefined | null): string {
     if (!valueString) return '0';
     
@@ -103,9 +103,10 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       if (matches && matches.length >= 3) {
         // Convert to numbers, handle both comma and dot as decimal separator
         const values = matches.map(v => parseFloat(v.replace(',', '.')));
-        const max = Math.max(...values);
+        // Nominal is the second value (Min, Nom, Max)
+        const nominal = values[1];
         // Format the number with comma as decimal separator
-        return max.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+        return nominal.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
       }
     } catch (e) {
       console.error('Error parsing value:', valueString, e);
@@ -126,7 +127,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
 
     // Helper function to format BTU value - shows only whole numbers
     const formatBtuValue = (btuValue: string | undefined): string => {
-      if (!btuValue) return '0';
+      if (!btuValue) return '';
       
       // Extract numeric value from string (e.g., '9000 BTU' -> '9000')
       const btuMatch = btuValue.toString().match(/(\d+(\.\d+)?)/);
@@ -146,26 +147,26 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       },
       { 
         label: 'Клас', 
-        value: this.product.energyClass?.class || getAttr('Клас') || 'A+', 
+        value: this.product.energyClass?.class || getAttr('Клас') || '', 
         icon: 'eco' 
       },
       { 
         label: 'Охлаждане', 
-        value: this.getMaxValue(getAttr('Отдавана мощност на охлаждане (Мин./Ном./Макс)')) || 
-               this.product.coolingCapacity || 
-               getAttr('Охлаждане') || 
-               '0', 
+        value: this.getMaxValue(getAttr('Отдавана мощност на охлаждане (Мин./Ном./Макс)')) ||
+               this.product.coolingCapacity ||
+               getAttr('Охлаждане') ||
+               '', 
         icon: 'ac_unit' 
       },
       { 
         label: 'Отопление', 
-        value: this.getMaxValue(getAttr('Отдавана мощност на отопление (Мин./Ном./Макс)')) || 
-               this.product.heatingCapacity || 
-               getAttr('Отопление') || 
-               '0', 
+        value: this.getMaxValue(getAttr('Отдавана мощност на отопление (Мин./Ном./Макс)')) ||
+               this.product.heatingCapacity ||
+               getAttr('Отопление') ||
+               '', 
         icon: 'wb_sunny' 
       }
-    ];
+    ].filter(s => !!(s.value && String(s.value).trim().length > 0));
 
     return specs;
   }

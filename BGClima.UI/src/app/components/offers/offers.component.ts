@@ -97,13 +97,13 @@ export class OffersComponent implements OnInit {
         
         if (found?.attributeValue) {
           const value = found.attributeValue.toString();
-          // Try to extract max value from Min/Nom/Max format
+          // Try to extract nominal (second) value from Min/Nom/Max format
           const matches = value.match(/(\d+[\.,]?\d*)/g);
           if (matches && matches.length >= 3) {
             const values = matches.map(v => parseFloat(v.replace(',', '.')));
-            const max = Math.max(...values);
+            const nominal = values[1];
             // Format with comma as decimal separator and remove trailing .0 if any
-            return max.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+            return nominal.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
           }
           return value; // Return original if parsing fails
         }
@@ -145,10 +145,10 @@ export class OffersComponent implements OnInit {
         const btuThousands = parseInt(btuStr.replace(/\D+/g, ''), 10) || 0;
         return [
           { label: 'Мощност', value: btuThousands > 0 ? String(btuThousands) : '', icon: 'bolt' },
-          { label: 'Клас', value: p.energyClass?.class || getAttr('Клас') || 'A+', icon: 'eco' },
+          { label: 'Клас', value: p.energyClass?.class || getAttr('Клас') || '', icon: 'eco' },
           { label: 'Охлаждане', value: getAttr('Охлаждане') || '', icon: 'ac_unit' },
           { label: 'Отопление', value: getAttr('Отопление') || '', icon: 'wb_sunny' }
-        ];
+        ].filter(s => !!(s.value && String(s.value).trim().length > 0));
       })()
     };
   }
