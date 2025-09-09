@@ -61,7 +61,7 @@
 </header>
 
 <!-- NAVBAR -->
-<mat-sidenav-container class="main-container">
+<mat-sidenav-container class="main-container" [class.no-internal-scroll]="!isAdminOrLoginRoute()">
   <mat-sidenav #sidenav mode="over" class="mobile-sidenav" *ngIf="!isAdminOrLoginRoute()">
 
 
