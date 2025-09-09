@@ -251,7 +251,7 @@ export class ProductCategoryComponent implements OnInit {
     );
 
     const isToploobmennici = (this.currentCategory || '').trim() === 'bgclima-toploobmennici';
-    const isHeatPumpCategory = new Set(['termopompeni-sistemi','multisplit-sistemi']).has(this.currentCategory); // изключваме топлообменници
+    const isHeatPumpCategory = new Set(['termopompeni-sistemi']).has(this.currentCategory); // multisplit вече е към климатици
     const selectedPowerKwNum = new Set<number>((selectedPowerKws || []).map(v => Number(v)).filter(n => !isNaN(n)));
 
     // Apply filters
