@@ -61,7 +61,7 @@
 </header>
 
 <!-- NAVBAR -->
-<mat-sidenav-container class="main-container">
+<mat-sidenav-container class="main-container" [class.no-internal-scroll]="!isAdminOrLoginRoute()">
   <mat-sidenav #sidenav mode="over" class="mobile-sidenav" *ngIf="!isAdminOrLoginRoute()">
 
 
@@ -78,13 +78,15 @@
         </mat-expansion-panel-header>
         <div class="submenu-items">
           <a mat-list-item routerLink="/products/stenen-tip" (click)="sidenav.close()">Климатици стенен тип</a>
-          <a mat-list-item routerLink="/products/kolonen-tip" (click)="sidenav.close()">Климатици колонен тип</a>
-          <a mat-list-item routerLink="/products/kanalen-tip" (click)="sidenav.close()">Климатици канален тип</a>
-          <a mat-list-item routerLink="/products/kasetachen-tip" (click)="sidenav.close()">Климатици касетъчен тип</a>
           <a mat-list-item routerLink="/products/podov-tip" (click)="sidenav.close()">Климатици подов тип</a>
-          <a mat-list-item routerLink="/products/podovo-tavanen-tip" (click)="sidenav.close()">Климатици подово - таванен тип</a>
+          <a mat-list-item routerLink="/products/hiperinvertori" (click)="sidenav.close()">Хиперинвертори</a>
+          <a mat-list-item routerLink="/products/kolonen-tip" (click)="sidenav.close()">Климатици колонен тип</a>
+          <a mat-list-item routerLink="/products/multisplit-sistemi" (click)="sidenav.close()">Мулти сплит системи</a>
+          <a mat-list-item routerLink="/products/kasetachen-tip" (click)="sidenav.close()">Климатици касетъчен тип</a>
+          <a mat-list-item routerLink="/products/kanalen-tip" (click)="sidenav.close()">Климатици канален тип</a>
+          <a mat-list-item routerLink="/products/podovo-tavanen-tip" (click)="sidenav.close()">Подово - таванен тип</a>
+          <a mat-list-item routerLink="/products/mobilni-prenosimi" (click)="sidenav.close()">Мобилни / преносими</a>
           <a mat-list-item routerLink="/products/vrf-vrv" (click)="sidenav.close()">VRF / VRV</a>
-          <a mat-list-item routerLink="/products/mobilni-prenosimi" (click)="sidenav.close()">Мобилни / преносими климатици</a>
         </div>
       </mat-expansion-panel>
 
@@ -99,7 +101,6 @@
         </mat-expansion-panel-header>
         <div class="submenu-items">
           <a mat-list-item routerLink="/products/termopompeni-sistemi" (click)="sidenav.close()">Термопомпени системи</a>
-          <a mat-list-item routerLink="/products/multisplit-sistemi" (click)="sidenav.close()">Мултисплит системи</a>
           <a mat-list-item routerLink="/products/bgclima-toploobmennici" (click)="sidenav.close()">БГКЛИМА тръбни топлообменници</a>
         </div>
       </mat-expansion-panel>

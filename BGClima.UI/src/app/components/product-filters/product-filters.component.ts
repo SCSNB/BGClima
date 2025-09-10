@@ -98,7 +98,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   // Хелпър: дали текущата категория е термопомпена секция
   isHeatPumpCategory(): boolean {
     const c = (this.currentCategory || '').trim();
-    return c === 'termopompeni-sistemi' || c === 'multisplit-sistemi' || c === 'bgclima-toploobmennici';
+    return c === 'termopompeni-sistemi' || c === 'bgclima-toploobmennici';
   }
 
   selectedSort: string = 'name-asc';
@@ -106,24 +106,26 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   // Бърза навигация по типове климатици (от ПРОДУКТИ > Климатици)
   private acCategories = [
     { slug: 'stenen-tip', label: 'Климатици стенен тип' },
-    { slug: 'kolonen-tip', label: 'Климатици колонен тип' },
-    { slug: 'kanalen-tip', label: 'Климатици канален тип' },
-    { slug: 'kasetachen-tip', label: 'Климатици касетъчен тип' },
     { slug: 'podov-tip', label: 'Климатици подов тип' },
-    { slug: 'podovo-tavanen-tip', label: 'Климатици подово - таванен тип' },
-    { slug: 'vrf-vrv', label: 'VRF / VRV' },
-    { slug: 'mobilni-prenosimi', label: 'Мобилни / преносими климатици' }
+    { slug: 'hiperinvertori', label: 'Хиперинвертори' },
+    { slug: 'kolonen-tip', label: 'Климатици колонен тип' },
+    { slug: 'multisplit-sistemi', label: 'Мулти сплит системи' },
+    { slug: 'kasetachen-tip', label: 'Климатици касетъчен тип' },
+    { slug: 'kanalen-tip', label: 'Климатици канален тип' },
+    { slug: 'podovo-tavanen-tip', label: 'Подово - таванен тип' },
+    { slug: 'mobilni-prenosimi', label: 'Мобилни / преносими' },
+    { slug: 'vrf-vrv', label: 'VRF / VRV' }
   ];
+  
 
   // ПРОДУКТИ > Термопомпи
   private heatPumpCategories = [
     { slug: 'termopompeni-sistemi', label: 'Термопомпени системи' },
-    { slug: 'multisplit-sistemi', label: 'Мултисплит системи' },
     { slug: 'bgclima-toploobmennici', label: 'БГКЛИMA тръбни топлообменници' }
   ];
 
   get isHeatPumpSection(): boolean {
-    const hpSet = new Set(['termopompeni-sistemi', 'multisplit-sistemi', 'bgclima-toploobmennici']);
+    const hpSet = new Set(['termopompeni-sistemi', 'bgclima-toploobmennici']);
     return hpSet.has(this.currentCategory);
   }
 

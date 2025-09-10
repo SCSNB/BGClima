@@ -251,7 +251,7 @@ export class ProductCategoryComponent implements OnInit {
     );
 
     const isToploobmennici = (this.currentCategory || '').trim() === 'bgclima-toploobmennici';
-    const isHeatPumpCategory = new Set(['termopompeni-sistemi','multisplit-sistemi']).has(this.currentCategory); // изключваме топлообменници
+    const isHeatPumpCategory = new Set(['termopompeni-sistemi']).has(this.currentCategory); // multisplit вече е към климатици
     const selectedPowerKwNum = new Set<number>((selectedPowerKws || []).map(v => Number(v)).filter(n => !isNaN(n)));
 
     // Apply filters
@@ -347,6 +347,7 @@ export class ProductCategoryComponent implements OnInit {
       'podovo-tavanen-tip': 'Климатици подово - таванен тип',
       'vrf-vrv': 'VRF / VRV',
       'mobilni-prenosimi': 'Мобилни / преносими климатици',
+      'hiperinvertori': 'Хиперинвертори',
       'termopompeni-sistemi': 'Термопомпени системи',
       'multisplit-sistemi': 'Мултисплит системи',
       'bgclima-toploobmennici': 'БГКЛИМА тръбни топлообменници'
@@ -380,8 +381,11 @@ export class ProductCategoryComponent implements OnInit {
       const matches = raw.match(/(\d+[\.,]?\d*)/g);
       if (matches && matches.length >= 3) {
         const nums = matches.map(v => parseFloat(v.replace(',', '.')));
-        const max = Math.max(...nums);
-        return max.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+        // Номиналната стойност е втората в реда Мин./Ном./Макс
+        const nominal = nums[1];
+        if (isFinite(nominal)) {
+          return nominal.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+        }
       }
     } catch {
       // ignore

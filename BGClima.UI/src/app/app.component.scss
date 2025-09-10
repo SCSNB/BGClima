@@ -827,6 +827,15 @@ body {
   height: 100%;
 }
 
+/* Apply single-scroll only on non-admin/login routes */
+.main-container.no-internal-scroll {
+  height: auto; /* allow page (body) to own the scroll */
+}
+
+.main-container.no-internal-scroll ::ng-deep .mat-sidenav-content {
+  overflow: visible !important; /* prevent inner scrollbar */
+}
+
 @media (max-width: 900px) {
     header.main-header .header-top .logo-search .search-bar {
     display: none !important; // Force hide original search bar on mobile

@@ -152,16 +152,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-//Apply pending migrations on startup
-// Comment migrations
-//using var scope = app.Services.CreateScope();
-//var dbContext = scope.ServiceProvider.GetRequiredService<BGClimaContext>();
-//dbContext.Database.Migrate();
-//Apply migrations and seed sample data
-
-//await SeedData.SeedIdentityDataAsync(scope.ServiceProvider);
-//await SeedData.SeedAsync(dbContext);
-
+//using IServiceScope scope = await Seed(app);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -188,15 +179,15 @@ app.UseCors();
 app.Use(async (context, next) =>
 {
     var origin = context.Request.Headers["Origin"];
-    
-    if (!string.IsNullOrEmpty(origin) && 
-        (origin.ToString().StartsWith("http://localhost:") || 
+
+    if (!string.IsNullOrEmpty(origin) &&
+        (origin.ToString().StartsWith("http://localhost:") ||
          origin.ToString().StartsWith("https://bgclima.fly.dev")))
     {
         context.Response.Headers.Add("Access-Control-Allow-Origin", origin);
         context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
     }
-    
+
     await next();
 });
 
@@ -209,3 +200,15 @@ app.MapControllers();
 app.MapFallbackToFile("index.html");
 
 app.Run();
+
+static async Task<IServiceScope> Seed(WebApplication app)
+{
+    var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<BGClimaContext>();
+    dbContext.Database.Migrate();
+    //Apply migrations and seed sample data
+
+    await SeedData.SeedIdentityDataAsync(scope.ServiceProvider);
+    await SeedData.SeedAsync(dbContext);
+    return scope;
+}
