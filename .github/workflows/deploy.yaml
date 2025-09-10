@@ -1,10 +1,9 @@
-name: Build and Deploy
+name: Build .NET API & Angular
 
 on:
   push:
     branches:
       - main
-      - hyper-inverters
   pull_request:
     branches:
       - main
@@ -12,9 +11,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    outputs:
-      build_success: ${{ steps.build_status.outputs.success }}
-    
+
     steps:
       # 1️⃣ Check out the repository
       - name: Checkout code
@@ -46,9 +43,13 @@ jobs:
       # 5️⃣ Copy Angular dist to .NET wwwroot
       - name: Copy Angular build to API wwwroot
         run: |
-          echo "Copying Angular dist into API..."
+          echo "Contents of dist directory:"
+          ls -la ./BGClima.UI/dist/
+          echo "Copying files..."
           rm -rf ./BGClima.API/wwwroot/*
           cp -r ./BGClima.UI/dist/bgclima.ui/* ./BGClima.API/wwwroot/
+          echo "Files copied to wwwroot:"
+          ls -la ./BGClima.API/wwwroot/
 
       # 6️⃣ Restore & build .NET API
       - name: Restore .NET dependencies
@@ -64,40 +65,13 @@ jobs:
         working-directory: ./BGClima.API
         run: dotnet publish -c Release -o ${{ github.workspace }}/publish
 
-      # 8️⃣ Upload artifact for next job
-      - name: Upload published app
-        uses: actions/upload-artifact@v3
-        with:
-          name: published-app
-          path: ${{ github.workspace }}/publish
-
-      # Mark success
-      - name: Set build status
-        id: build_status
-        run: echo "success=true" >> $GITHUB_OUTPUT
-
-  deploy:
-    needs: build
-    if: needs.build.outputs.build_success == 'true'
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # 1️⃣ Download published app
-      - name: Download published app
-        uses: actions/download-artifact@v3
-        with:
-          name: published-app
-          path: ./publish
-
-      # 2️⃣ Install Fly.io CLI
+      # 8️⃣ Deploy to Fly.io (ONLY on push to main)
       - name: Install Fly.io CLI
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: superfly/flyctl-actions/setup-flyctl@master
 
-      # 3️⃣ Deploy with Flyctl (from publish folder)
       - name: Deploy to Fly.io
-        run: flyctl deploy --remote-only --local-only --path ./publish
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
