@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-	  - hyper-inverters
+      - hyper-inverters
   pull_request:
     branches:
       - main
