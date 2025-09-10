@@ -152,9 +152,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-//Apply pending migrations on startup
 //using IServiceScope scope = await Seed(app);
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -170,7 +168,8 @@ else
     app.UseHttpsRedirection();
 }
 
-// The order of middleware is important here
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.UseRouting();
 
 // CORS must be after UseRouting and before any other middleware
@@ -196,29 +195,7 @@ app.Use(async (context, next) =>
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Static files should come after routing
-app.UseDefaultFiles();
-app.UseStaticFiles();
-
-// Configure endpoints and log all registered routes
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-
-    // Log all registered routes in development
-    if (app.Environment.IsDevelopment())
-    {
-        var logger = app.Logger;
-        var source = endpoints.DataSources.First();
-        foreach (var endpoint in source.Endpoints.OfType<RouteEndpoint>())
-        {
-            var routePattern = endpoint.RoutePattern.RawText;
-            var httpMethods = endpoint.Metadata.OfType<HttpMethodMetadata>().FirstOrDefault()?.HttpMethods;
-            var methods = httpMethods != null ? string.Join(", ", httpMethods) : "(any)";
-            logger.LogInformation($"Registered route: {methods} {routePattern}");
-        }
-    }
-});
+app.MapControllers();
 
 app.MapFallbackToFile("index.html");
 
