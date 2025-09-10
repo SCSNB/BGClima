@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - hyper-inverters
   pull_request:
     branches:
       - main
@@ -61,16 +60,13 @@ jobs:
         working-directory: ./BGClima.API
         run: dotnet build --no-restore --configuration Release
 
-      # 7️⃣ Publish .NET API
-      - name: Publish .NET API
-        working-directory: ./BGClima.API
-        run: dotnet publish -c Release -o ${{ github.workspace }}/publish
-
-      # 8️⃣ Deploy to Fly.io
+    # 8️⃣ Deploy to Fly.io (ONLY on push to main)
       - name: Install Fly.io CLI
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Deploy to Fly.io
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
