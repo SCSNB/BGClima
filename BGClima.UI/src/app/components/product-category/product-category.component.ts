@@ -179,8 +179,31 @@ export class ProductCategoryComponent implements OnInit {
         if (this.hasWifi(p)) badges.push({ text: 'WiFi', bg: '#3B82F6', color: '#fff' });
 
         const btuThousands = this.getBtuInThousands(p); // 9, 12, 18 ...
-        const cooling = this.getMaxMinNomMax(p, 'Отдавана мощност на охлаждане (Мин./Ном./Макс)') || p.coolingCapacity || '';
-        const heating = this.getMaxMinNomMax(p, 'Отдавана мощност на отопление (Мин./Ном./Макс)') || p.heatingCapacity || '';
+        const isHeatPump = !!p?.productType?.name && p.productType.name.toLowerCase().includes('термопомп');
+        const coolingAttrKey = 'Отдавана мощност на охлаждане (Мин./Ном./Макс)';
+        const heatingAttrKey = 'Отдавана мощност на отопление (Мин./Ном./Макс)';
+
+        const extractNominalNumeric = (raw: string): string => {
+          if (!raw) return '';
+          const matches = raw.match(/(\d+[\.,]?\d*)/g);
+          if (matches && matches.length >= 3) {
+            const nums = matches.map(v => parseFloat(v.replace(',', '.')));
+            const nominal = nums[1];
+            return nominal.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+          }
+          if (matches && matches.length === 1) {
+            const v = parseFloat(matches[0].replace(',', '.'));
+            return v.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+          }
+          return raw;
+        };
+
+        const findAttr = (key: string) => (p.attributes || []).find(a => (a.attributeKey || '').trim() === key)?.attributeValue?.toString() || '';
+        const coolingRaw = findAttr(coolingAttrKey) || p.coolingCapacity || '';
+        const heatingRaw = findAttr(heatingAttrKey) || p.heatingCapacity || '';
+
+        const cooling = isHeatPump ? extractNominalNumeric(coolingRaw) : (this.getMaxMinNomMax(p, coolingAttrKey) || p.coolingCapacity || '');
+        const heating = isHeatPump ? extractNominalNumeric(heatingRaw) : (this.getMaxMinNomMax(p, heatingAttrKey) || p.heatingCapacity || '');
 
         return {
           ...p,
