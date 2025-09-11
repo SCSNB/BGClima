@@ -1,12 +1,41 @@
 .dashboard-content {
   padding: 2em;
 }
+.dashboard-content h1 {
+  text-align: center;
+  margin: 0 0 1rem;
+  font-weight: 600;
+}
 .stats-cards {
   display: flex;
   flex-wrap: wrap;
   gap: 1em;
+  justify-content: center;
 }
 mat-card {
-  flex: 1 1 200px;
-  min-width: 200px;
-} 
+  /* Make cards compact so they don't span whole rows */
+  flex: 0 1 320px;
+  min-width: 260px;
+  max-width: 360px;
+
+  border-radius: 12px;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  cursor: pointer;
+
+  /* Keep a pleasant elevation */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+mat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.18), 0 4px 6px rgba(0,0,0,0.12);
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  mat-card {
+    flex: 1 1 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+}
