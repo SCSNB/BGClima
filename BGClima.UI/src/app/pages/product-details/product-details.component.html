@@ -121,7 +121,7 @@
   <!-- Tabs -->
   <div class="product-tabs">
     <div class="tabs-header">
-      <ng-container *ngFor="let tab of tabs; let i = index">
+      <ng-container *ngFor="let tab of getTabs(); let i = index">
         <button 
           *ngIf="tab !== 'Доставка' && tab !== 'Гаранция'"
           [class.active]="activeTab === i"
@@ -149,7 +149,7 @@
       </div>
 
       <!-- Specifications Tab -->
-      <div *ngIf="activeTab === 1" class="tab-pane">
+      <div *ngIf="!isHeatExchangerType() && activeTab === 1" class="tab-pane">
         <div class="main-specs">
           <!-- Main Specifications -->
           <div class="specs-section">

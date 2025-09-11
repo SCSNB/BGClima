@@ -47,6 +47,8 @@ export class OffersComponent implements OnInit {
     const oldBgn = p.oldPrice ?? null;
     const oldEur = oldBgn != null ? this.toEur(oldBgn) : null;
 
+    const isHeatPump = !!p?.productType?.name && p.productType.name.toLowerCase().includes('термопомп');
+
     const getAttr = (key: string): string => {
       const normalizedKey = key.trim().toLowerCase();
       
@@ -97,15 +99,22 @@ export class OffersComponent implements OnInit {
         
         if (found?.attributeValue) {
           const value = found.attributeValue.toString();
-          // Try to extract nominal (second) value from Min/Nom/Max format
+          // Extract numbers
           const matches = value.match(/(\d+[\.,]?\d*)/g);
           if (matches && matches.length >= 3) {
             const values = matches.map(v => parseFloat(v.replace(',', '.')));
             const nominal = values[1];
-            // Format with comma as decimal separator and remove trailing .0 if any
-            return nominal.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+            const formatted = nominal.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+            // Always show nominal only (no units) for cards
+            return formatted;
           }
-          return value; // Return original if parsing fails
+          // If only one numeric value exists (e.g., '- / 5.96 / -') treat it as nominal
+          if (matches && matches.length === 1) {
+            const val = parseFloat(matches[0].replace(',', '.'));
+            const formatted = val.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+            return formatted;
+          }
+          return value; // Fallback
         }
       }
       

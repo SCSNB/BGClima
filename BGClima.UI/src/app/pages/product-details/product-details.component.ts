@@ -38,6 +38,17 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   expandedGroups = new Set<string>();
   tabs = ['Описание', 'Спецификации'];
   
+  // Връща true ако продуктът е "БГКЛИМА тръбни топлообменници"
+  isHeatExchangerType(): boolean {
+    const typeName = this.product?.productType?.name?.toLowerCase() || '';
+    return typeName.includes('топлообменници') || typeName.includes('бгклима тръбни');
+  }
+
+  // Динамични табове спрямо типа продукт
+  getTabs(): string[] {
+    return this.isHeatExchangerType() ? ['Описание'] : this.tabs;
+  }
+  
   // Check if product has Wi-Fi module
   hasWifiModule(): boolean {
     if (!this.product?.attributes) return false;
@@ -95,7 +106,8 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
 
   // Extract nominal (second) value from a string in format "Min/Nom/Max"
   private getMaxValue(valueString: string | undefined | null): string {
-    if (!valueString) return '0';
+    // Ако липсва входна стойност, връщаме празен стринг, за да не се показва икона със стойност 0
+    if (!valueString) return '';
     
     try {
       // Match numbers in the format "Min/Nom/Max" or "Min - Nom - Max"
@@ -107,6 +119,11 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
         const nominal = values[1];
         // Format the number with comma as decimal separator
         return nominal.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+      }
+      // Ако има само една стойност (често при термопомпи: "- / 5.96 / - kW"), приемаме, че тя е номиналната
+      if (matches && matches.length === 1) {
+        const val = parseFloat(matches[0].replace(',', '.'));
+        return val.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
       }
     } catch (e) {
       console.error('Error parsing value:', valueString, e);
@@ -124,6 +141,10 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       );
       return (found?.attributeValue || '').toString();
     };
+
+    // Определяне дали продуктът е термопомпа
+    const isHeatPump = !!this.product?.productType?.name &&
+      this.product.productType.name.toLowerCase().includes('термопомп');
 
     // Helper function to format BTU value - shows only whole numbers
     const formatBtuValue = (btuValue: string | undefined): string => {
@@ -152,18 +173,30 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       },
       { 
         label: 'Охлаждане', 
-        value: this.getMaxValue(getAttr('Отдавана мощност на охлаждане (Мин./Ном./Макс)')) ||
-               this.product.coolingCapacity ||
-               getAttr('Охлаждане') ||
-               '', 
+        value: (() => {
+                 if (isHeatPump) {
+                   const nominal = this.getMaxValue(getAttr('Отдавана мощност на охлаждане (Мин./Ном./Макс)'));
+                   if (nominal && nominal.trim()) {
+                     return `${nominal}`;
+                   }
+                 }
+                 // Show value only if the exact attribute is present; otherwise hide
+                 return this.getMaxValue(getAttr('Отдавана мощност на охлаждане (Мин./Ном./Макс)'));
+               })(), 
         icon: 'ac_unit' 
       },
       { 
         label: 'Отопление', 
-        value: this.getMaxValue(getAttr('Отдавана мощност на отопление (Мин./Ном./Макс)')) ||
-               this.product.heatingCapacity ||
-               getAttr('Отопление') ||
-               '', 
+        value: (() => {
+                 if (isHeatPump) {
+                   const nominal = this.getMaxValue(getAttr('Отдавана мощност на отопление (Мин./Ном./Макс)'));
+                   if (nominal && nominal.trim()) {
+                     return `${nominal}`;
+                   }
+                 }
+                 // Show value only if the exact attribute is present; otherwise hide
+                 return this.getMaxValue(getAttr('Отдавана мощност на отопление (Мин./Ном./Макс)'));
+               })(), 
         icon: 'wb_sunny' 
       }
     ].filter(s => !!(s.value && String(s.value).trim().length > 0));
@@ -180,12 +213,77 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     
     console.log('Всички атрибути на продукта:', this.product.attributes);
     
+    // Определяне дали продуктът е термопомпа
+    const isHeatPump = !!this.product?.productType?.name &&
+      this.product.productType.name.toLowerCase().includes('термопомп');
+    
     // Debug Wi-Fi module value
     const wifiAttr = this.product.attributes?.find(a => a.attributeKey && a.attributeKey.toLowerCase().includes('wi-fi'));
     console.log('Wi-Fi атрибут:', wifiAttr);
     
     // Използваме точните ключове от данните
-    const specs = [
+    // Ако е термопомпа, дефинираме специфичен набор от характеристики
+    const specs = isHeatPump ? [
+      // Основни характеристики (Heat Pump specific)
+      {
+        label: 'Wi-Fi модул в комплекта',
+        key: 'Wi-Fi модул в комплекта',
+        getValue: () => {
+          // Намираме точния атрибут по ключ
+          const wifiAttr = this.product?.attributes?.find(a => 
+            a.attributeKey && a.attributeKey.trim() === 'Wi-Fi модул в комплекта'
+          );
+          
+          // Ако намерим атрибута, връщаме неговата стойност
+          if (wifiAttr) {
+            console.log('Намерен Wi-Fi атрибут:', wifiAttr);
+            return wifiAttr.attributeValue?.toString() || null;
+          }
+          
+          // Ако не намерим по точен ключ, опитваме с по-обхватен търсене
+          const anyWifiAttr = this.product?.attributes?.find(a => 
+            a.attributeKey && (
+              a.attributeKey.toLowerCase().includes('wi-fi') ||
+              a.attributeKey.includes('WiFi') ||
+              a.attributeKey.includes('WLAN')
+            )
+          );
+          
+          if (anyWifiAttr) {
+            console.log('Намерен Wi-Fi атрибут чрез обхватно търсене:', anyWifiAttr);
+            return anyWifiAttr.attributeValue?.toString() || null;
+          }
+          
+          return null;
+        }
+      },
+      { label: 'Отдавана мощност на охлаждане (Мин./Ном./Макс)', key: 'Отдавана мощност на охлаждане (Мин./Ном./Макс)' },
+      { label: 'Отдавана мощност на отопление (Мин./Ном./Макс)', key: 'Отдавана мощност на отопление (Мин./Ном./Макс)' },
+      { label: 'Консумирана мощност на охлаждане (Мин./Ном./Макс)', key: 'Консумирана мощност на охлаждане (Мин./Ном./Макс)' },
+      { label: 'Консумирана мощност на отопление (Мин./Ном./Макс)', key: 'Консумирана мощност на отопление (Мин./Ном./Макс)' },
+      { label: 'EER (хладилен коефициент на охлаждане)', key: 'EER (хладилен коефициент на охлаждане)' },
+      { label: 'COP (коефициент на трансф. отопление)', key: 'COP (коефициент на трансф. отопление)' },
+      { label: 'Работна температура на охлаждане', key: 'Работна температура на охлаждане' },
+      { label: 'Работна температура на отопление', key: 'Работна температура на отопление' },
+      { label: 'Температура на циркулиращата вода (охлаждане)', key: 'Температура на циркулиращата вода (охлаждане)' },
+      { label: 'Температура на циркулиращата вода (отопление)', key: 'Температура на циркулиращата вода (отопление)' },
+      { label: 'Вместимост на вградения бойлер', key: 'Вместимост на вградения бойлер' },
+      { label: 'Гаранция', key: 'Гаранция' },
+      { label: 'Хладилен агент', key: 'Хладилен агент' },
+      { label: 'Захранване (Фаза/Честота/Напрежение)', key: 'Захранване (Фаза/Честота/Напрежение)' },
+
+      // Вътрешно тяло
+      { label: 'Размери (вътрешно тяло)', key: 'Размери вътрешно тяло' },
+      { label: 'Тегло (вътрешно тяло)', key: 'Тегло вътрешно тяло' },
+      { label: 'Ниво на шум при охлаждане (вътрешно тяло) (Високо/Ном./Ниско/Безшумно)', key: 'Ниво на шум при охлаждане вътрешно тяло (Високо/Ном./Ниско/Безшумно)' },
+      { label: 'Ниво на шум при отопление (вътрешно тяло) (Високо/Ном./Ниско/Безшумно)', key: 'Ниво на шум при отопление вътрешно тяло (Високо/Ном./Ниско/Безшумно)' },
+
+      // Външно тяло
+      { label: 'Размери (външно тяло)', key: 'Размери външно тяло' },
+      { label: 'Тегло (външно тяло)', key: 'Тегло външно тяло' },
+      { label: 'Ниво на шум при охлаждане (външно тяло) (Високо/Ном./Ниско/Безшумно)', key: 'Ниво на шум при охлаждане външно тяло (Високо/Ном./Ниско/Безшумно)' },
+      { label: 'Ниво на шум при отопление (външно тяло) (Високо/Ном./Ниско/Безшумно)', key: 'Ниво на шум при отопление външно тяло (Високо/Ном./Ниско/Безшумно)' }
+    ] : [
       // Main Specifications
       {
         label: 'Wi-Fi модул в комплекта',

@@ -273,6 +273,7 @@ export class PromoProductsComponent implements OnInit {
   // Mirror OffersComponent attribute parsing
   private getAttrFormatted(p: ProductDto, key: string): string {
     const normalizedKey = key.trim().toLowerCase();
+    const isHeatPump = !!p?.productType?.name && p.productType.name.toLowerCase().includes('термопомп');
 
     if (normalizedKey === 'btu') {
       if (p.btu?.value) {
@@ -311,7 +312,14 @@ export class PromoProductsComponent implements OnInit {
         if (matches && matches.length >= 3) {
           const values = matches.map(v => parseFloat(v.replace(',', '.')));
           const nominal = values[1];
-          return nominal.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+          const formatted = nominal.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+          return formatted;
+        }
+        // Single numeric case like '- / 5.96 / -'
+        if (matches && matches.length === 1) {
+          const val = parseFloat(matches[0].replace(',', '.'));
+          const formatted = val.toFixed(1).replace(/\.?0+$/, '').replace('.', ',');
+          return formatted;
         }
         return value;
       }
