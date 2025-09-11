@@ -38,6 +38,17 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   expandedGroups = new Set<string>();
   tabs = ['Описание', 'Спецификации'];
   
+  // Връща true ако продуктът е "БГКЛИМА тръбни топлообменници"
+  isHeatExchangerType(): boolean {
+    const typeName = this.product?.productType?.name?.toLowerCase() || '';
+    return typeName.includes('топлообменници') || typeName.includes('бгклима тръбни');
+  }
+
+  // Динамични табове спрямо типа продукт
+  getTabs(): string[] {
+    return this.isHeatExchangerType() ? ['Описание'] : this.tabs;
+  }
+  
   // Check if product has Wi-Fi module
   hasWifiModule(): boolean {
     if (!this.product?.attributes) return false;
@@ -95,7 +106,8 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
 
   // Extract nominal (second) value from a string in format "Min/Nom/Max"
   private getMaxValue(valueString: string | undefined | null): string {
-    if (!valueString) return '0';
+    // Ако липсва входна стойност, връщаме празен стринг, за да не се показва икона със стойност 0
+    if (!valueString) return '';
     
     try {
       // Match numbers in the format "Min/Nom/Max" or "Min - Nom - Max"
@@ -168,10 +180,8 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
                      return `${nominal}`;
                    }
                  }
-                 return this.getMaxValue(getAttr('Отдавана мощност на охлаждане (Мин./Ном./Макс)')) ||
-                        this.product.coolingCapacity ||
-                        getAttr('Охлаждане') ||
-                        '';
+                 // Show value only if the exact attribute is present; otherwise hide
+                 return this.getMaxValue(getAttr('Отдавана мощност на охлаждане (Мин./Ном./Макс)'));
                })(), 
         icon: 'ac_unit' 
       },
@@ -184,10 +194,8 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
                      return `${nominal}`;
                    }
                  }
-                 return this.getMaxValue(getAttr('Отдавана мощност на отопление (Мин./Ном./Макс)')) ||
-                        this.product.heatingCapacity ||
-                        getAttr('Отопление') ||
-                        '';
+                 // Show value only if the exact attribute is present; otherwise hide
+                 return this.getMaxValue(getAttr('Отдавана мощност на отопление (Мин./Ном./Макс)'));
                })(), 
         icon: 'wb_sunny' 
       }
