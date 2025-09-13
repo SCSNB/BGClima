@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -313,7 +313,8 @@ namespace BGClima.Infrastructure.Migrations
                     ImageUrl = table.Column<string>(type: "text", nullable: false),
                     AltText = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     DisplayOrder = table.Column<int>(type: "integer", nullable: false),
-                    IsPrimary = table.Column<bool>(type: "boolean", nullable: false)
+                    IsPrimary = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    IsDescription = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {

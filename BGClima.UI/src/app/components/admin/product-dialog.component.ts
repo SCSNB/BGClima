@@ -369,18 +369,6 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
     this.attributes.splice(index, 1);
   }
 
-  // Image management methods
-  addImageFromUrl(): void {
-    if (this.newImageUrl && !this.images.some(img => img.url === this.newImageUrl)) {
-      this.images.push({
-        url: this.newImageUrl,
-        isPrimary: this.images.length === 0, // First image is primary by default
-        isNew: true // Mark as new (not yet uploaded to blob storage)
-      });
-      this.newImageUrl = '';
-    }
-  }
-
   onFileSelected(event: any): void {
     const files: FileList = event.target.files;
     if (files && files.length > 0) {
