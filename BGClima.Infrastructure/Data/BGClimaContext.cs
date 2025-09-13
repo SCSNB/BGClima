@@ -19,7 +19,6 @@ namespace BGClima.Infrastructure.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductAttribute> ProductAttributes { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
-        public DbSet<ProductDescriptionImage> ProductDescriptionImages { get; set; }
         public DbSet<Banner> Banners { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -100,18 +99,20 @@ namespace BGClima.Infrastructure.Data
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // Конфигурация на ProductImage
             modelBuilder.Entity<ProductImage>(entity =>
             {
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.AltText).HasMaxLength(255);
+                entity.Property(e => e.ImageUrl).IsRequired();
+                entity.Property(e => e.AltText).HasMaxLength(500);
+                entity.Property(e => e.DisplayOrder).IsRequired();
+                entity.Property(e => e.IsPrimary).IsRequired().HasDefaultValue(false);
+                entity.Property(e => e.IsDescription).IsRequired().HasDefaultValue(false);
 
                 entity.HasOne(pi => pi.Product)
                     .WithMany(p => p.Images)
                     .HasForeignKey(pi => pi.ProductId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
-
 
             modelBuilder.Entity<Banner>(entity =>
             {

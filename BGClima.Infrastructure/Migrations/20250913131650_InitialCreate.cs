@@ -311,9 +311,10 @@ namespace BGClima.Infrastructure.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ProductId = table.Column<int>(type: "integer", nullable: false),
                     ImageUrl = table.Column<string>(type: "text", nullable: false),
-                    AltText = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    AltText = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     DisplayOrder = table.Column<int>(type: "integer", nullable: false),
-                    IsPrimary = table.Column<bool>(type: "boolean", nullable: false)
+                    IsPrimary = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    IsDescription = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
