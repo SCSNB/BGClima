@@ -1,34 +1,36 @@
 <!-- HEADER -->
 <header class="main-header" *ngIf="!isAdminOrLoginRoute()">
   <div class="header-top">
-    <div class="logo-search">
-      <div class="logo-block">
-        <a routerLink="/" class="logo-link">
-          <img src="assets/logo.png" alt="БГ Клима" class="logo-image">
-          <div class="logo-subtitle">КЛИМАТИЗАЦИЯ И ВЕНТИЛАЦИЯ</div>
-        </a>
+    <div class="header-container">
+      <div class="logo-search">
+        <div class="logo-block">
+          <a routerLink="/" class="logo-link">
+            <img src="assets/logo.png" alt="БГ Клима" class="logo-image">
+            <div class="logo-subtitle">КЛИМАТИЗАЦИЯ И ВЕНТИЛАЦИЯ</div>
+          </a>
+        </div>
+        <div class="search-bar">
+          <mat-form-field appearance="outline" class="search-white-bg">
+            <input matInput type="text" placeholder="Търси продукт...">
+            <button mat-icon-button matSuffix><mat-icon>search</mat-icon></button>
+          </mat-form-field>
+        </div>
       </div>
-      <div class="search-bar">
-        <mat-form-field appearance="outline" class="search-white-bg">
-          <input matInput type="text" placeholder="Търси продукт...">
-          <button mat-icon-button matSuffix><mat-icon>search</mat-icon></button>
-        </mat-form-field>
+      <div class="header-actions">
+        <div class="phone-block">
+          <span class="phone-number"><mat-icon>call</mat-icon> 042 / 638 248</span>
+          <span class="phone-desc">Безплатна консултация</span>
+        </div>
+        <button mat-icon-button aria-label="Калкулатор" class="desktop-only" routerLink="/calculator">
+          <mat-icon>calculate</mat-icon>
+        </button>
+        <button mat-icon-button aria-label="Сравняване" class="desktop-only"
+                (click)="goToCompare()"
+                [matBadge]="compareCount$ | async" [matBadgeHidden]="(compareCount$ | async) === 0"
+                matBadgeColor="warn" matBadgePosition="above after" [matBadgeOverlap]="false">
+          <mat-icon>swap_vert</mat-icon>
+        </button>
       </div>
-    </div>
-    <div class="header-actions">
-      <div class="phone-block">
-        <span class="phone-number"><mat-icon>call</mat-icon> 042 / 638 248</span>
-        <span class="phone-desc">Безплатна консултация</span>
-      </div>
-      <button mat-icon-button aria-label="Калкулатор" class="desktop-only" routerLink="/calculator">
-        <mat-icon>calculate</mat-icon>
-      </button>
-      <button mat-icon-button aria-label="Сравняване" class="desktop-only"
-              (click)="goToCompare()"
-              [matBadge]="compareCount$ | async" [matBadgeHidden]="(compareCount$ | async) === 0"
-              matBadgeColor="warn" matBadgePosition="above after" [matBadgeOverlap]="false">
-        <mat-icon>swap_vert</mat-icon>
-      </button>
     </div>
   </div>
 

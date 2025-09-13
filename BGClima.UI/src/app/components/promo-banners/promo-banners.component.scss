@@ -11,6 +11,7 @@
       display: grid;
       grid-template-columns: 1.5fr 1fr;
       gap: 20px;
+      align-items: stretch; /* make left item stretch to right column height */
   
       @media (max-width: 768px) {
         grid-template-columns: 1fr;
@@ -37,37 +38,41 @@
       .banner-image {
         width: 100%;
         height: 100%;
-        object-fit: contain;
+        object-fit: contain; /* avoid cropping */
         object-position: center;
         display: block;
-        background-color: #f8f9fa; /* Light gray background for any empty space */
+        background-color: #ffffff; /* match page background */
       }
   
       &.main-left {
-        height: 600px;
+        /* Match the full height of the right column (3 stacked banners) */
+        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: #f8f9fa; /* Match the image background */
+        background-color: #ffffff; /* match page background */
         
         @media (max-width: 768px) {
-          height: 350px;
+          /* On mobile the grid is 1 column, keep a ratio */
+          height: auto;
+          aspect-ratio: 16 / 9;
         }
       }
   
       &.small {
-        height: calc((600px - 20px) / 3);
+        /* Keep the small banners consistent with a ratio */
+        aspect-ratio: 16 / 9;
         margin-bottom: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: #f8f9fa; /* Match the image background */
+        background-color: #ffffff; /* match page background */
         
         @media (max-width: 768px) {
-          height: 200px;
+          aspect-ratio: 16 / 9;
           margin-bottom: 15px;
         }
-  
+
         &:last-child {
           margin-bottom: 0;
         }
@@ -77,6 +82,7 @@
     .right-banners {
       display: flex;
       flex-direction: column;
+      gap: 10px;
     }
   }
   
