@@ -26,9 +26,9 @@
       </div>
       
       <!-- Thumbnail Gallery -->
-      <div class="thumbnail-gallery" *ngIf="product.images && product.images.length > 1">
+      <div class="thumbnail-gallery" *ngIf="getThumbnailImages().length > 0">
         <div 
-          *ngFor="let img of product.images" 
+          *ngFor="let img of getThumbnailImages()" 
           class="thumbnail-item"
           [class.active]="selectedImage === getImageUrl(img.url || img.imageUrl || img.path || img)"
           (click)="selectImage(img)">
@@ -137,8 +137,8 @@
       <div *ngIf="activeTab === 0" class="tab-pane">
         <h3 class="description-title">Описание на продукта</h3>
         <div class="description-container">
-          <div class="description-images-gallery" *ngIf="product.descriptionImages && product.descriptionImages.length > 0">
-            <div *ngFor="let img of product.descriptionImages" class="description-image-item">
+          <div class="description-images-gallery" *ngIf="getDescriptionImages().length > 0">
+            <div *ngFor="let img of getDescriptionImages()" class="description-image-item">
               <img [src]="img.imageUrl" [alt]="img.altText || product.name">
             </div>
           </div>

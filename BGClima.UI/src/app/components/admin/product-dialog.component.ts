@@ -519,58 +519,6 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  addDescriptionImage(): void {
-    if (this.newDescriptionImageUrl && !this.descriptionImages.some(img => img.imageUrl === this.newDescriptionImageUrl)) {
-      this.descriptionImages.push({
-        imageUrl: this.newDescriptionImageUrl,
-        altText: ''
-      });
-      this.newDescriptionImageUrl = '';
-    }
-  }
-
-  removeDescriptionImage(index: number): void {
-    console.log('removeDescriptionImage called with index:', index);
-    const imageToRemove = this.descriptionImages[index];
-    if (!imageToRemove) {
-      console.error('No image found at index:', index);
-      return;
-    }
-    // Show confirmation dialog
-    if (!confirm('Сигурни ли сте, че искате да изтриете това изображение?')) {
-      console.log('Deletion cancelled by user');
-      return;
-    }
-    // If this is a server-side image (has an ID), delete it from the server
-    if (imageToRemove.id) {
-      console.log('Deleting server-side image with ID:', imageToRemove.id);
-      this.isUploading = true;
-      this.productService.deleteImage(imageToRemove.id).subscribe({
-        next: () => {
-          console.log('Description image deleted successfully');
-          this.descriptionImages.splice(index, 1);
-          this.snackBar.open('Снимката беше изтрита успешно', 'OK', { duration: 3000 });
-        },
-        error: (err: Error) => {
-          console.error('Error deleting description image:', err);
-          this.snackBar.open(
-            `Грешка при изтриване на описателното изображение: ${err.message || 'Неизвестна грешка'}`,
-            'Затвори',
-            { duration: 5000, panelClass: ['error-snackbar'] }
-          );
-        },
-        complete: () => {
-          console.log('Delete request completed');
-          this.isUploading = false;
-        }
-      });
-    } else {
-      // For client-side images, just remove from UI
-      console.log('Removing client-side image from UI');
-      this.descriptionImages.splice(index, 1);
-      this.snackBar.open('Снимката беше премахната', 'OK', { duration: 3000 });
-    }
-  }
 
   cancel(): void {
     this.cleanupObjectUrls();
