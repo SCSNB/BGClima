@@ -41,7 +41,6 @@ namespace BGClima.API.Controllers
                     .Include(p => p.ProductType)
                     .Include(p => p.Attributes)
                     .Include(p => p.Images)
-                    .Include(p => p.DescriptionImages)
                     .AsQueryable();
 
                 // Филтриране
@@ -93,7 +92,6 @@ namespace BGClima.API.Controllers
                     .Include(p => p.ProductType)
                     .Include(p => p.Attributes)
                     .Include(p => p.Images)
-                    .Include(p => p.DescriptionImages)
                     .AsQueryable();
 
                 // Филтриране
@@ -205,7 +203,6 @@ namespace BGClima.API.Controllers
                     .Include(p => p.ProductType)
                     .Include(p => p.Attributes)
                     .Include(p => p.Images)
-                    .Include(p => p.DescriptionImages)
                     .FirstOrDefaultAsync(p => p.Id == id);
 
                 if (product == null)
@@ -239,7 +236,6 @@ namespace BGClima.API.Controllers
                 // Ensure collections
                 product.Attributes ??= new List<ProductAttribute>();
                 product.Images ??= new List<ProductImage>();
-                product.DescriptionImages ??= new List<ProductDescriptionImage>();
 
                 // Attach back-references and add to context
                 foreach (var attr in product.Attributes)
@@ -247,10 +243,6 @@ namespace BGClima.API.Controllers
                     attr.Product = product;
                 }
                 foreach (var img in product.Images)
-                {
-                    img.Product = product;
-                }
-                foreach (var img in product.DescriptionImages)
                 {
                     img.Product = product;
                 }
@@ -281,7 +273,6 @@ namespace BGClima.API.Controllers
                 var existingProduct = await _context.Products
                     .Include(p => p.Attributes)
                     .Include(p => p.Images)
-                    .Include(p => p.DescriptionImages)
                     .FirstOrDefaultAsync(p => p.Id == id);
 
                 if (existingProduct == null)
@@ -351,21 +342,6 @@ namespace BGClima.API.Controllers
                         _context.ProductImages.Add(img);
                     }
                     existingProduct.Images = newImages;
-                }
-
-                // Обновяване на изображенията към описанието
-                if (updateProductDto.DescriptionImages != null)
-                {
-                    // Изтриваме старите изображения
-                    _context.ProductDescriptionImages.RemoveRange(existingProduct.DescriptionImages);
-                    
-                    // Добавяме новите/актуализирани изображения
-                    foreach (var imgDto in updateProductDto.DescriptionImages)
-                    {
-                        var newImg = _mapper.Map<ProductDescriptionImage>(imgDto);
-                        newImg.ProductId = existingProduct.Id;
-                        existingProduct.DescriptionImages.Add(newImg);
-                    }
                 }
 
                 await _context.SaveChangesAsync();
