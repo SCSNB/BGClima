@@ -46,32 +46,6 @@
       </mat-select>
     </mat-form-field>
 
-    <div class="form-group full">
-      <h3>Снимки към описанието</h3>
-      <div class="add-image-form">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>URL на снимка за описание</mat-label>
-          <input matInput [(ngModel)]="newDescriptionImageUrl" [ngModelOptions]="{standalone: true}" placeholder="https://example.com/image.jpg" (keyup.enter)="addDescriptionImage()">
-          <button mat-icon-button matSuffix (click)="addDescriptionImage()" [disabled]="!newDescriptionImageUrl" matTooltip="Добави снимка">
-            <mat-icon>add_photo_alternate</mat-icon>
-          </button>
-        </mat-form-field>
-        <button mat-stroked-button color="primary" class="add-image-btn" (click)="addDescriptionImage()" [disabled]="!newDescriptionImageUrl">
-          <mat-icon>add</mat-icon>
-          Добави снимка
-        </button>
-      </div>
-      <div class="images-list">
-        <div *ngFor="let img of descriptionImages; let i = index" class="image-item">
-          <img [src]="img.imageUrl" [alt]="'Снимка към описание ' + (i + 1)">
-          <div class="image-actions">
-            <button mat-icon-button color="warn" (click)="removeDescriptionImage(i)" matTooltip="Изтрий">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <mat-form-field appearance="outline" class="full">
       <mat-label>Описание</mat-label>
@@ -97,14 +71,18 @@
         <div *ngFor="let img of images; let i = index" class="image-item" [class.primary]="img.isPrimary">
           <img [src]="img.url" [alt]="'Снимка ' + (i + 1)">
           <div class="image-actions">
-            <button mat-icon-button color="primary" (click)="setPrimaryImage(i)" matTooltip="Направи основна">
+            <button mat-icon-button [color]="img.isPrimary ? 'accent' : 'primary'" (click)="setPrimaryImage(i)" matTooltip="{{ img.isPrimary ? 'Основна снимка' : 'Направи основна' }}">
               <mat-icon>star</mat-icon>
+            </button>
+            <button mat-icon-button [color]="img.isDescription ? 'accent' : 'primary'" (click)="toggleDescriptionImage(i)" matTooltip="{{ img.isDescription ? 'Снимка към описание' : 'Добави към описание' }}">
+              <mat-icon>description</mat-icon>
             </button>
             <button mat-icon-button color="warn" (click)="removeImage(i)" matTooltip="Изтрий">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
           <div class="primary-badge" *ngIf="img.isPrimary">Основна</div>
+          <div class="description-badge" *ngIf="img.isDescription">Описание</div>
         </div>
       </div>
     </div>

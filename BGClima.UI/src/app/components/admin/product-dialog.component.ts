@@ -74,6 +74,7 @@ export interface ProductDialogData {
       padding: 0.5rem;
       background: #fff;
       transition: all 0.2s;
+      overflow: hidden;
     }
 
     .image-item.primary {
@@ -105,6 +106,23 @@ export interface ProductDialogData {
       font-size: 0.7rem;
       padding: 0.1rem 0.5rem;
       border-radius: 10px;
+      z-index: 1;
+      font-weight: 500;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    
+    .description-badge {
+      position: absolute;
+      top: 2.5rem;
+      right: 0.5rem;
+      background: #4caf50;
+      color: white;
+      font-size: 0.7rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 10px;
+      z-index: 1;
+      font-weight: 500;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
 
     .add-image-btn {
@@ -162,12 +180,12 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
   editingAttributeIndex: number | null = null;
   title = '';
   // Store both the file object and its preview URL
-  images: { file?: File, url: string, isPrimary: boolean, isNew: boolean }[] = [];
+  images: { file?: File, url: string, isPrimary: boolean, isNew: boolean, isDescription: boolean }[] = [];
+  descriptionImages: { id?: number, imageUrl: string, altText?: string }[] = [];
   newImageUrl: string = '';
+  newDescriptionImageUrl: string = '';
   uploadProgress: number = 0;
   isUploading: boolean = false;
-  descriptionImages: { id?: number, imageUrl: string }[] = [];
-  newDescriptionImageUrl: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -219,11 +237,21 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
         isVisible: attr.isVisible
       })) || [];
 
+      // Load existing attributes
+      this.attributes = (this.data.product.attributes || []).map(attr => ({
+        attributeKey: attr.attributeKey,
+        attributeValue: attr.attributeValue,
+        displayOrder: attr.displayOrder,
+        groupName: attr.groupName,
+        isVisible: attr.isVisible
+      }));
+
       // Load existing images
       if (this.data.product.images && this.data.product.images.length > 0) {
         this.images = this.data.product.images.map(img => ({
           url: img.imageUrl,
           isPrimary: img.isPrimary,
+          isDescription: img.isDescription || false,
           isNew: false // These are existing images from the server
         }));
       } else if (this.data.product.imageUrl) {
@@ -231,18 +259,10 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
         this.images = [{
           url: this.data.product.imageUrl,
           isPrimary: true,
+          isDescription: false,
           isNew: false
         }];
       }
-
-      // Load existing description images
-      if (this.data.product.descriptionImages && this.data.product.descriptionImages.length > 0) {
-        this.descriptionImages = this.data.product.descriptionImages.map(img => ({
-          id: img.id,
-          imageUrl: img.imageUrl
-        }));
-      }
-    } else {
       this.title = 'Добавяне на нов продукт';
     }
   }
@@ -296,7 +316,8 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
           imageUrl: img.url,
           altText: `Снимка на ${this.form.get('name')?.value || 'продукт'}`,
           displayOrder: index,
-          isPrimary: img.isPrimary
+          isPrimary: img.isPrimary,
+          isDescription: img.isDescription || false
         })),
         descriptionImages: this.descriptionImages.map((img, index) => ({
           id: img.id || 0,
@@ -389,7 +410,8 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
           file: file, // Store the actual File object
           url: objectUrl, // Use object URL for preview
           isPrimary: this.images.length === 0, // First image is primary by default
-          isNew: true // Mark as new (not yet uploaded to blob storage)
+          isNew: true, // Mark as new (not yet uploaded to blob storage)
+          isDescription: false // Default to not a description image
         });
         this.uploadProgress = ((i + 1) / files.length) * 100;
       } catch (error) {
@@ -491,11 +513,17 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
     this.images[index].isPrimary = true;
   }
 
-  // Description Image management methods
+  toggleDescriptionImage(index: number): void {
+    if (index >= 0 && index < this.images.length) {
+      this.images[index].isDescription = !this.images[index].isDescription;
+    }
+  }
+
   addDescriptionImage(): void {
     if (this.newDescriptionImageUrl && !this.descriptionImages.some(img => img.imageUrl === this.newDescriptionImageUrl)) {
       this.descriptionImages.push({
-        imageUrl: this.newDescriptionImageUrl
+        imageUrl: this.newDescriptionImageUrl,
+        altText: ''
       });
       this.newDescriptionImageUrl = '';
     }
@@ -504,14 +532,15 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
   removeDescriptionImage(index: number): void {
     console.log('removeDescriptionImage called with index:', index);
     const imageToRemove = this.descriptionImages[index];
-    console.log('Image to remove:', imageToRemove);
-    
+    if (!imageToRemove) {
+      console.error('No image found at index:', index);
+      return;
+    }
     // Show confirmation dialog
     if (!confirm('Сигурни ли сте, че искате да изтриете това изображение?')) {
       console.log('Deletion cancelled by user');
       return;
     }
-    
     // If this is a server-side image (has an ID), delete it from the server
     if (imageToRemove.id) {
       console.log('Deleting server-side image with ID:', imageToRemove.id);
