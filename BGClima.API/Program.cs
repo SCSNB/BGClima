@@ -152,7 +152,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-//using IServiceScope scope = await Seed(app);
+using IServiceScope scope = await Seed(app);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
