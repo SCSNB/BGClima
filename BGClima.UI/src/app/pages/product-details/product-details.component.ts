@@ -1,13 +1,10 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, ViewportScroller } from '@angular/common';
-import { ActivatedRoute, NavigationEnd, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ProductService, ProductDto } from '../../services/product.service';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { trigger, state, style, animate, transition } from '@angular/animations';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-product-details',
@@ -42,6 +39,14 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   isHeatExchangerType(): boolean {
     const typeName = this.product?.productType?.name?.toLowerCase() || '';
     return typeName.includes('топлообменници') || typeName.includes('бгклима тръбни');
+  }
+
+  getDescriptionImages() {
+    return this.product?.images?.filter(img => img.isDescription) || [];
+  }
+
+  getThumbnailImages() {
+    return this.product?.images?.filter(img => !img.isDescription) || [];
   }
 
   // Динамични табове спрямо типа продукт

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BGClima.Infrastructure.Migrations
 {
     [DbContext(typeof(BGClimaContext))]
-    [Migration("20250825163741_InitialCreate")]
+    [Migration("20250913131650_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -241,8 +241,8 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.Property<string>("AltText")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("integer");
@@ -251,8 +251,15 @@ namespace BGClima.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsDescription")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<bool>("IsPrimary")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");

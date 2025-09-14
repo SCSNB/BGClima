@@ -22,5 +22,6 @@ namespace BGClima.Domain.Entities
 
         public int DisplayOrder { get; set; } = 0;
         public bool IsPrimary { get; set; } = false;
+        public bool IsDescription { get; set; } = false;
     }
 }

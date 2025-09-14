@@ -7,5 +7,6 @@ namespace BGClima.API.DTOs
         public string AltText { get; set; }
         public int DisplayOrder { get; set; }
         public bool IsPrimary { get; set; }
+        public bool IsDescription { get; set; }
     }
 }

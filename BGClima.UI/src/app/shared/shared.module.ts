@@ -17,8 +17,6 @@ import { FilterDialogComponent } from './components/filter-dialog/filter-dialog.
 
 @NgModule({
   imports: [
-    CommonModule,
-    FormsModule,
     // Material Modules
     MatButtonModule,
     MatDialogModule,
@@ -32,7 +30,6 @@ import { FilterDialogComponent } from './components/filter-dialog/filter-dialog.
     MatSliderModule
   ],
   exports: [
-    // Material Modules
     MatMenuModule,
     MatSelectModule,
     MatOptionModule,

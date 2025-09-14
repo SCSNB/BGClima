@@ -228,34 +228,6 @@ namespace BGClima.Infrastructure.Migrations
                     b.ToTable("ProductAttributes");
                 });
 
-            modelBuilder.Entity("BGClima.Domain.Entities.ProductDescriptionImage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AltText")
-                        .HasColumnType("text");
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductDescriptionImages");
-                });
-
             modelBuilder.Entity("BGClima.Domain.Entities.ProductImage", b =>
                 {
                     b.Property<int>("Id")
@@ -266,8 +238,8 @@ namespace BGClima.Infrastructure.Migrations
 
                     b.Property<string>("AltText")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("integer");
@@ -276,8 +248,15 @@ namespace BGClima.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsDescription")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<bool>("IsPrimary")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
@@ -547,17 +526,6 @@ namespace BGClima.Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("BGClima.Domain.Entities.ProductDescriptionImage", b =>
-                {
-                    b.HasOne("BGClima.Domain.Entities.Product", "Product")
-                        .WithMany("DescriptionImages")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("BGClima.Domain.Entities.ProductImage", b =>
                 {
                     b.HasOne("BGClima.Domain.Entities.Product", "Product")
@@ -633,8 +601,6 @@ namespace BGClima.Infrastructure.Migrations
             modelBuilder.Entity("BGClima.Domain.Entities.Product", b =>
                 {
                     b.Navigation("Attributes");
-
-                    b.Navigation("DescriptionImages");
 
                     b.Navigation("Images");
                 });

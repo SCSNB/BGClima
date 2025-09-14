@@ -59,6 +59,5 @@ namespace BGClima.Domain.Entities
         // Navigation properties
         public virtual ICollection<ProductAttribute> Attributes { get; set; } = new List<ProductAttribute>();
         public virtual ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
-        public virtual ICollection<ProductDescriptionImage> DescriptionImages { get; set; } = new List<ProductDescriptionImage>();
     }
 }
