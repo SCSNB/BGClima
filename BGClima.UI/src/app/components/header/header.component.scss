@@ -135,7 +135,11 @@ body {
     text-align: left;
     line-height: 1.1;
     text-transform: uppercase;
-    white-space: normal;
+    /* Keep on a single line under the logo */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
   }
   .main-header .header-icons {
     display: flex;
@@ -193,6 +197,11 @@ body {
   text-align: center;
   white-space: normal;
   line-height: 1.1;
+  /* Keep on a single line under the logo */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 .header-top .phone-block .phone-desc {
   margin-top: 2rem !important;

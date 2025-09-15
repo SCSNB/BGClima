@@ -48,16 +48,16 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 12px;
-    padding: 20px 0;
+    padding: 20px 15px; // match horizontal padding with special offers container
     justify-items: stretch;
     align-items: stretch;
-    max-width: 1400px;
+    max-width: 1200px; // align width with "Специални предложения"
     margin: 0 auto;
     width: 100%;
     
     @media (max-width: 1200px) {
       grid-template-columns: repeat(3, 1fr);
-      padding: 20px 10px;
+      padding: 20px 15px;
       max-width: 1200px;
     }
     

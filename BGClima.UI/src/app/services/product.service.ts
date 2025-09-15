@@ -298,8 +298,9 @@ export class ProductService {
     console.log(`Getting products for category: ${category}`);
   
     // Map URL segments to product type names - updated to match the database
-    const categoryToTypeMap: {[key: string]: string} = {
-      'stenen-tip': 'Климатици стенен тип',
+    // Note: Some categories (e.g. 'stenen-tip') should include multiple product types
+    const categoryToTypeMap: { [key: string]: string | string[] } = {
+      'stenen-tip': ['Климатици стенен тип', 'Хиперинвертори'],
       'kolonen-tip': 'Климатици колонен тип',
       'kanalen-tip': 'Климатици канален тип',
       'kasetachen-tip': 'Климатици касетъчен тип',
@@ -312,15 +313,16 @@ export class ProductService {
       'multisplit-sistemi': 'Мултисплит системи',
       'bgclima-toploobmennici': 'БГКЛИМА тръбни топлообменници'
     };
-  
-    const targetType = categoryToTypeMap[category];
-  
-    if (!targetType) {
+
+    const mapping = categoryToTypeMap[category];
+
+    if (!mapping) {
       console.warn(`No product type mapping found for category: ${category}`);
       return this.getProducts();
     }
-
-    console.log(`Mapped category '${category}' to type: '${targetType}'`);
+  
+    const targetTypes: string[] = Array.isArray(mapping) ? mapping : [mapping];
+    console.log(`Mapped category '${category}' to type(s):`, targetTypes);
 
     // First get all products
     return this.getProducts().pipe(
@@ -332,21 +334,23 @@ export class ProductService {
       }),
       map(products => {
         // Filter products by productType name (case insensitive and trimmed)
-        const filtered = products.filter(p => 
-          p.productType?.name?.trim().toLowerCase() === targetType.trim().toLowerCase()
-        );
-        
-        console.log(`Found ${filtered.length} products for type: '${targetType}'`);
+        const targetSet = new Set(targetTypes.map(t => t.trim().toLowerCase()))
+        const filtered = products.filter(p => {
+          const n = p.productType?.name?.trim().toLowerCase();
+          return !!n && targetSet.has(n);
+        });
+
+        console.log(`Found ${filtered.length} products for type(s):`, targetTypes);
         if (filtered.length === 0) {
-          console.warn('No products found for the specified type. Available types:', 
+          console.warn('No products found for the specified type(s). Available types:', 
             [...new Set(products.map(p => p.productType?.name))]
           );
         }
-        
+
         return filtered;
       }),
       catchError(err => {
-        console.error(`Error filtering products for type '${targetType}':`, err);
+        console.error(`Error filtering products for type(s) '${targetTypes.join(', ')}':`, err);
         return of([]);
       })
     );
