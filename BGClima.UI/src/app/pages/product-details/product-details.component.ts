@@ -41,6 +41,22 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     return typeName.includes('топлообменници') || typeName.includes('бгклима тръбни');
   }
 
+  // Показва лентата "Безплатен стандартен монтаж" за подходящи типове продукти
+  shouldShowFreeInstall(): boolean {
+    const typeName = this.product?.productType?.name?.toLowerCase() || '';
+    if (!typeName) return false;
+    const keywords = [
+      'стенен',
+      'стенен тип',
+      'хиперинвертор',
+      'колонен',
+      'колона',
+      'подов',
+      'подов тип'
+    ];
+    return keywords.some(k => typeName.includes(k));
+  }
+
   getDescriptionImages() {
     return this.product?.images?.filter(img => img.isDescription) || [];
   }
