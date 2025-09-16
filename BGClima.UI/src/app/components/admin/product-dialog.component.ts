@@ -273,7 +273,7 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
     }
 
     if (this.images.length === 0) {
-      alert('Моля, добавете поне една снимка към продукта');
+      this.snackBar.open('Моля, добавете поне една снимка към продукта', 'Разбрах', { duration: 5000 });
       return;
     }
 
@@ -281,27 +281,34 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
       this.isUploading = true;
       
       // Upload new images first
-      for (const img of this.images) {
-        if (img.isNew && img.file) {
+      const uploadPromises = this.images
+        .filter(img => img.isNew && img.file)
+        .map(async (img) => {
           try {
-            const uploadedUrl = await this.uploadSingleFile(img.file);
+            const uploadedUrl = await this.imageService.uploadSingleFile(img.file!);
             const oldUrl = img.url;
-            img.url = uploadedUrl; // Update URL to the final blob URL
+            img.url = uploadedUrl;
             img.isNew = false;
             
             // Clean up the old blob URL if it was a blob URL
             if (oldUrl.startsWith('blob:')) {
               URL.revokeObjectURL(oldUrl);
             }
+            return true;
           } catch (error) {
             console.error('Error uploading image:', error);
-            alert(`Грешка при качване на снимка: ${img.file?.name || 'неизвестен файл'}`);
-            this.isUploading = false;
-            return;
+            this.snackBar.open(
+              `Грешка при качване на снимка: ${img.file?.name || 'неизвестен файл'}`,
+              'Затвори',
+              { duration: 5000, panelClass: 'error-snackbar' }
+            );
+            throw error;
           }
-        }
-      }
+        });
 
+      // Wait for all uploads to complete
+      await Promise.all(uploadPromises);
+      
       const primaryImage = this.images.find(img => img.isPrimary) || this.images[0];
       
       const productData: any = {
@@ -425,48 +432,7 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
   }
 
   private uploadSingleFile(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      // For now, we'll use a placeholder URL until the backend endpoint is implemented
-      // TODO: Replace with actual Azure Storage upload endpoint
-      const xhr = new XMLHttpRequest();
-      
-      xhr.upload.addEventListener('progress', (e) => {
-        if (e.lengthComputable) {
-          const progress = (e.loaded / e.total) * 100;
-          this.uploadProgress = progress;
-        }
-      });
-
-      xhr.onreadystatechange = () => {
-        if (xhr.readyState === 4) {
-          if (xhr.status === 200) {
-            try {
-              const response = JSON.parse(xhr.responseText);
-              resolve(response.imageUrl || response.url);
-            } catch (error) {
-              reject(error);
-            }
-          } else {
-            reject(new Error(`Upload failed with status ${xhr.status}`));
-          }
-        }
-      };
-
-      // Upload to the image controller endpoint
-      const uploadUrl = environment.production ? '/api/image/upload' : `${environment.apiUrl}/api/image/upload`;
-      xhr.open('POST', uploadUrl);
-      
-      // Add authentication header
-      const token = localStorage.getItem('token');
-      if (token) {
-        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-      }
-      
-      xhr.send(formData);
-    });
+    return this.imageService.uploadSingleFile(file);
   }
 
   removeImage(index: number): void {

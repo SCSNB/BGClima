@@ -16,6 +16,37 @@ export class ImageService {
     private snackBar: MatSnackBar
   ) {}
 
+  uploadSingleFile(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      this.http.post<{ url: string }>(`${this.apiUrl}/image/upload`, formData, {
+        reportProgress: true,
+        observe: 'events'
+      }).subscribe({
+        next: (event: any) => {
+          if (event.type === 4) { // HttpEventType.Response
+            if (event.body && event.body.imageUrl) {
+              resolve(event.body.imageUrl);
+            } else {
+              reject(new Error('Invalid response from server'));
+            }
+          }
+        },
+        error: (error) => {
+          console.error('Error uploading file:', error);
+          this.snackBar.open(
+            'Грешка при качване на файла. Моля, опитайте отново.',
+            'Затвори',
+            { duration: 5000, panelClass: 'error-snackbar' }
+          );
+          reject(error);
+        }
+      });
+    });
+  }
+
   deleteImage(imageId: number): Observable<void> {
     if (!imageId) {
       const error = new Error('Invalid image ID');

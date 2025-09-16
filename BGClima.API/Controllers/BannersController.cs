@@ -1,11 +1,9 @@
 using AutoMapper;
 using BGClima.API.DTOs;
+using BGClima.Application.Services;
 using BGClima.Domain.Entities;
 using BGClima.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace BGClima.API.Controllers
 {
@@ -15,11 +13,19 @@ namespace BGClima.API.Controllers
     {
         private readonly IBannerRepository _bannerRepository;
         private readonly IMapper _mapper;
+        private readonly IImageService _imageService;
+        private readonly ILogger<BannersController> _logger;
 
-        public BannersController(IBannerRepository bannerRepository, IMapper mapper)
+        public BannersController(
+            IBannerRepository bannerRepository,
+            IImageService imageService,
+            ILogger<BannersController> logger,
+            IMapper mapper)
         {
             _bannerRepository = bannerRepository ?? throw new ArgumentNullException(nameof(bannerRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _imageService = imageService ?? throw new ArgumentNullException(nameof(_imageService));
+            _logger = logger;
         }
 
         // GET: api/banners
@@ -105,7 +111,7 @@ namespace BGClima.API.Controllers
                 {
                     return BadRequest(new { Message = "ID в URL-то не съответства на ID в данните за банер." });
                 }
-                
+
                 // Ensure the DTO has the correct ID from the route
                 bannerDto.Id = id;
 
@@ -118,20 +124,20 @@ namespace BGClima.API.Controllers
                 // Update only the properties that were provided in the DTO
                 if (bannerDto.Name != null)
                     existingBanner.Name = bannerDto.Name;
-                    
+
                 if (bannerDto.ImageUrl != null)
                     existingBanner.ImageUrl = bannerDto.ImageUrl;
-                    
+
                 if (bannerDto.TargetUrl != null) // This allows setting TargetUrl to null if needed
                     existingBanner.TargetUrl = bannerDto.TargetUrl;
-                    
+
                 if (bannerDto.DisplayOrder != 0)
                     existingBanner.DisplayOrder = bannerDto.DisplayOrder;
-                    
+
                 // For boolean and enum values, we need to explicitly check if they were provided
                 if (bannerDto.IsActive != existingBanner.IsActive)
                     existingBanner.IsActive = bannerDto.IsActive;
-                    
+
                 if (bannerDto.Type != existingBanner.Type)
                     existingBanner.Type = bannerDto.Type;
 
@@ -143,8 +149,9 @@ namespace BGClima.API.Controllers
             {
                 // Log the full exception for debugging
                 Console.WriteLine($"Error updating banner: {ex}");
-                return StatusCode(500, new { 
-                    Message = $"Грешка при обновяване на банер с ID {id}.", 
+                return StatusCode(500, new
+                {
+                    Message = $"Грешка при обновяване на банер с ID {id}.",
                     Error = ex.Message,
                     Details = ex.StackTrace
                 });
@@ -161,6 +168,14 @@ namespace BGClima.API.Controllers
                 if (banner == null)
                 {
                     return NotFound(new { Message = $"Банер с ID {id} не е намерен." });
+                }
+
+                // Delete the blob from storage
+                var result = await _imageService.DeleteImageAsync(banner.ImageUrl);
+                if (!result)
+                {
+                    // Log warning but continue to delete the database record
+                    _logger.LogError("Failed to delete image from storage: {ImageUrl}", banner.ImageUrl);
                 }
 
                 await _bannerRepository.DeleteBannerAsync(id);

@@ -1,9 +1,10 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BannerType } from 'src/app/models/banner.model';
 import { BannerService, BannerDto } from 'src/app/services/banner.service';
+import { ImageService } from 'src/app/services/image.service';
 
 export interface BannerDialogData {
   mode: 'create' | 'edit';
@@ -26,12 +27,15 @@ export class BannerDialogComponent implements OnInit {
     { value: 3, viewValue: 'Дясно среда' },
     { value: 4, viewValue: 'Дясно долу' }
   ];
+  @ViewChild('fileInput') fileInput!: ElementRef;
   imagePreview: string | ArrayBuffer | null = null;
   isEditMode = false;
+  selectedFile: File | null = null;
 
   constructor(
     private fb: FormBuilder,
     private bannerService: BannerService,
+    private imageService: ImageService,
     private dialogRef: MatDialogRef<BannerDialogComponent>,
     private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: BannerDialogData
@@ -66,8 +70,8 @@ export class BannerDialogComponent implements OnInit {
     const file = input.files[0];
     
     // Validate file type
-    if (!file.type.match(/image\/(jpeg|jpg|png|gif)$/)) {
-      this.snackBar.open('Моля, изберете валиден файл с изображение (JPEG, JPG, PNG, GIF)', 'Затвори', {
+    if (!file.type.match(/image\/(jpeg|jpg|png|gif|webp)$/i)) {
+      this.snackBar.open('Моля, изберете валиден файл с изображение (JPEG, JPG, PNG, GIF, WebP)', 'Затвори', {
         duration: 5000,
         panelClass: 'error-snackbar'
       });
@@ -75,21 +79,22 @@ export class BannerDialogComponent implements OnInit {
     }
     
     // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      this.snackBar.open('Файлът е твърде голям. Максималният размер е 5MB.', 'Затвори', {
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      this.snackBar.open(`Файлът е твърде голям. Максималният размер е 5MB. Избраният файл е ${(file.size / (1024 * 1024)).toFixed(2)}MB.`, 'Затвори', {
         duration: 5000,
         panelClass: 'error-snackbar'
       });
       return;
     }
     
+    this.selectedFile = file;
+    
     // Create preview
     const reader = new FileReader();
     reader.onload = () => {
       this.imagePreview = reader.result as string;
-      this.bannerForm.patchValue({
-        imageUrl: reader.result as string
-      });
+      this.bannerForm.get('imageUrl')?.setValue('file-uploaded');
       this.bannerForm.get('imageUrl')?.markAsDirty();
     };
     reader.onerror = (error) => {
@@ -100,9 +105,6 @@ export class BannerDialogComponent implements OnInit {
       });
     };
     reader.readAsDataURL(file);
-    
-    // TODO: Implement file upload to server here
-    // After upload, update the imageUrl with the returned URL
   }
 
   private handleSuccess(action: string): void {
@@ -117,23 +119,37 @@ export class BannerDialogComponent implements OnInit {
   private handleError(error: any): void {
     console.error('Error saving banner:', error);
     const errorMessage = error.error?.message || 'Възникна грешка при запазване на банера';
-    this.snackBar.open(
-      errorMessage,
-      'Затвори',
-      { duration: 5000, panelClass: 'error-snackbar' }
-    );
+    this.snackBar.open(errorMessage, 'Затвори', { duration: 5000, panelClass: 'error-snackbar' });
+    this.isSubmitting = false;
   }
 
-  onSubmit(): void {
-    if (this.bannerForm.invalid || this.isSubmitting) {
+  private uploadImageAndSave(): void {
+    if (!this.selectedFile) {
+      this.saveBanner();
       return;
     }
 
     this.isSubmitting = true;
-    const formValue = this.bannerForm.value;
     
-    // Prepare the banner data
-    const bannerData: Partial<BannerDto> = {
+    this.imageService.uploadSingleFile(this.selectedFile)
+      .then((imageUrl) => {
+        this.bannerForm.patchValue({ imageUrl });
+        this.saveBanner();
+      })
+      .catch((error) => {
+        console.error('Error uploading image:', error);
+        this.snackBar.open(
+          'Грешка при качване на изображението. Моля, опитайте отново.',
+          'Затвори',
+          { duration: 5000, panelClass: 'error-snackbar' }
+        );
+        this.isSubmitting = false;
+      });
+  }
+
+  private saveBanner(): void {
+    const formValue = this.bannerForm.value;
+    const bannerData: Omit<BannerDto, 'id'> = {
       name: formValue.name,
       imageUrl: formValue.imageUrl,
       targetUrl: formValue.targetUrl || undefined,
@@ -142,20 +158,43 @@ export class BannerDialogComponent implements OnInit {
       type: formValue.type
     };
 
-    if (this.isEditMode && this.data.banner?.id) {
-      // Include the ID in the banner data for the update
-      bannerData.id = this.data.banner.id;
-      this.bannerService.updateBanner(this.data.banner.id, bannerData).subscribe({
-        next: () => this.handleSuccess('обновен'),
-        error: (error) => this.handleError(error),
-        complete: () => this.isSubmitting = false
-      });
+    const operation = this.isEditMode && this.data.banner?.id
+      ? this.bannerService.updateBanner(this.data.banner.id, bannerData)
+      : this.bannerService.createBanner(bannerData);
+
+    operation.subscribe({
+      next: () => {
+        this.snackBar.open(
+          this.isEditMode ? 'Банерът е обновен успешно!' : 'Банерът е създаден успешно!',
+          'OK',
+          { duration: 3000 }
+        );
+        this.dialogRef.close(true);
+      },
+      error: (error) => {
+        console.error('Error saving banner:', error);
+        this.snackBar.open(
+          'Възникна грешка при запазване на банера. Моля, опитайте отново.',
+          'Затвори',
+          { duration: 5000, panelClass: 'error-snackbar' }
+        );
+        this.isSubmitting = false;
+      }
+    });
+  }
+
+  onSubmit(): void {
+    if (this.bannerForm.invalid || this.isSubmitting) {
+      return;
+    }
+
+    this.isSubmitting = true;
+    
+    // If we have a new file or creating a new banner, upload the image first
+    if (this.selectedFile || !this.isEditMode) {
+      this.uploadImageAndSave();
     } else {
-      this.bannerService.createBanner(bannerData as Omit<BannerDto, 'id'>).subscribe({
-        next: () => this.handleSuccess('създаден'),
-        error: (error) => this.handleError(error),
-        complete: () => this.isSubmitting = false
-      });
+      this.saveBanner();
     }
   }
 
