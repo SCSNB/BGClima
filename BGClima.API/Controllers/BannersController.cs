@@ -3,6 +3,7 @@ using BGClima.API.DTOs;
 using BGClima.Application.Services;
 using BGClima.Domain.Entities;
 using BGClima.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BGClima.API.Controllers
@@ -79,6 +80,7 @@ namespace BGClima.API.Controllers
 
         // POST: api/banners
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<BannerDto>> CreateBanner([FromBody] BannerDto bannerDto)
         {
             try
@@ -102,6 +104,7 @@ namespace BGClima.API.Controllers
 
         // PUT: api/banners/5
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateBanner(int id, [FromBody] BannerDto bannerDto)
         {
             try
@@ -160,6 +163,7 @@ namespace BGClima.API.Controllers
 
         // DELETE: api/banners/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteBanner(int id)
         {
             try

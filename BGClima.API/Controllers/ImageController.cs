@@ -1,5 +1,6 @@
 using BGClima.Application.Services;
 using BGClima.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,9 +8,7 @@ namespace BGClima.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-//[EnableCors] // Enable CORS for this controller
-//[Produces("application/json")]
-//[Authorize]
+[Authorize]
 public class ImageController : ControllerBase
 {
     private readonly IImageService _imageService;
