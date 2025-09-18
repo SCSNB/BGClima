@@ -107,7 +107,6 @@ public class ImageController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    //[EnableCors("AllowAll")]
     public async Task<IActionResult> DeleteImage(int id)
     {
         _logger.LogInformation("DeleteImage called with ID: {ImageId}", id);
