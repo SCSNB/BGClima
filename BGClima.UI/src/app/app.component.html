@@ -11,9 +11,41 @@
         </div>
         <div class="search-bar">
           <mat-form-field appearance="outline" class="search-white-bg">
-            <input matInput type="text" placeholder="Търси продукт...">
-            <button mat-icon-button matSuffix><mat-icon>search</mat-icon></button>
+            <input matInput 
+                   type="text" 
+                   placeholder="Търси продукт..." 
+                   [(ngModel)]="searchQuery"
+                   (input)="onSearchInput($event)"
+                   (focus)="onSearchFocus()"
+                   (blur)="onSearchBlur()">
+            <button mat-icon-button matSuffix (click)="clearSearch()" *ngIf="searchQuery">
+              <mat-icon>clear</mat-icon>
+            </button>
+            <button mat-icon-button matSuffix *ngIf="!searchQuery">
+              <mat-icon>search</mat-icon>
+            </button>
           </mat-form-field>
+          
+          <!-- Search Results Dropdown -->
+          <div class="search-dropdown" *ngIf="isSearchDropdownVisible && searchResults.length > 0">
+            <div class="search-result-item" 
+                 *ngFor="let result of searchResults" 
+                 (click)="selectSearchResult(result)">
+              <div class="result-image">
+                <img [src]="result.imageUrl || 'assets/no-image-placeholder.png'" 
+                     [alt]="result.name" 
+                     onerror="this.src='assets/no-image-placeholder.png'">
+              </div>
+              <div class="result-content">
+                <div class="result-name">{{ result.name }}</div>
+                <div class="result-brand" *ngIf="result.brand">{{ result.brand }}</div>
+                <div class="result-price">
+                  <span class="current-price">{{ result.price | currency:'BGN':'symbol':'1.2-2' }}</span>
+                  <span class="old-price" *ngIf="result.oldPrice">{{ result.oldPrice | currency:'BGN':'symbol':'1.2-2' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="header-actions">
@@ -56,9 +88,41 @@
   <!-- MOBILE SEARCH BAR -->
   <div class="mobile-search-container" *ngIf="isMobileSearchVisible">
     <mat-form-field appearance="outline" class="search-mobile">
-      <input matInput type="text" placeholder="Търси продукт...">
-      <button mat-icon-button matSuffix><mat-icon>search</mat-icon></button>
+      <input matInput 
+             type="text" 
+             placeholder="Търси продукт..." 
+             [(ngModel)]="searchQuery"
+             (input)="onSearchInput($event)"
+             (focus)="onSearchFocus()"
+             (blur)="onSearchBlur()">
+      <button mat-icon-button matSuffix (click)="clearSearch()" *ngIf="searchQuery">
+        <mat-icon>clear</mat-icon>
+      </button>
+      <button mat-icon-button matSuffix *ngIf="!searchQuery">
+        <mat-icon>search</mat-icon>
+      </button>
     </mat-form-field>
+    
+    <!-- Mobile Search Results Dropdown -->
+    <div class="search-dropdown mobile-search-dropdown" *ngIf="isSearchDropdownVisible && searchResults.length > 0">
+      <div class="search-result-item" 
+           *ngFor="let result of searchResults" 
+           (click)="selectSearchResult(result)">
+        <div class="result-image">
+          <img [src]="result.imageUrl || 'assets/no-image-placeholder.png'" 
+               [alt]="result.name" 
+               onerror="this.src='assets/no-image-placeholder.png'">
+        </div>
+        <div class="result-content">
+          <div class="result-name">{{ result.name }}</div>
+          <div class="result-brand" *ngIf="result.brand">{{ result.brand }}</div>
+          <div class="result-price">
+            <span class="current-price">{{ result.price | currency:'BGN':'symbol':'1.2-2' }}</span>
+            <span class="old-price" *ngIf="result.oldPrice">{{ result.oldPrice | currency:'BGN':'symbol':'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </header>
 

@@ -2,10 +2,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AuthService } from './services/auth.service';
 import { Router, NavigationEnd, Event } from '@angular/router';
-import { filter } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { filter, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
 import { CompareService } from './services/compare.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { SearchService, SearchResult } from './services/search.service';
 
 @Component({
   selector: 'app-root',
@@ -21,6 +22,12 @@ export class AppComponent implements OnInit {
   isAuthenticated = false;
   isAdmin = false;
   currentUrl: string = '';
+  
+  // Search functionality
+  searchQuery = '';
+  searchResults: SearchResult[] = [];
+  isSearchDropdownVisible = false;
+  private searchSubject = new Subject<string>();
   
   // Mock products data
   products = [
@@ -78,7 +85,8 @@ export class AppComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private compareService: CompareService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private searchService: SearchService
   ) {
     // Subscribe to router events to keep track of the current URL
     this.router.events.pipe(
@@ -120,6 +128,16 @@ export class AppComponent implements OnInit {
       this.isAuthenticated = !!user;
       this.isAdmin = this.authService.isAdmin();
     });
+
+    // Setup search functionality
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(query => this.searchService.searchProducts(query))
+    ).subscribe(results => {
+      this.searchResults = results;
+      this.isSearchDropdownVisible = results.length > 0;
+    });
   }
 
   logout(): void {
@@ -134,5 +152,37 @@ export class AppComponent implements OnInit {
   // Навигация към сравнение (валидацията е в CompareGuard)
   goToCompare(): void {
     this.router.navigate(['/compare']);
+  }
+
+  // Search functionality methods
+  onSearchInput(event: any): void {
+    const query = event.target.value;
+    this.searchQuery = query;
+    this.searchSubject.next(query);
+  }
+
+  onSearchFocus(): void {
+    if (this.searchQuery && this.searchResults.length > 0) {
+      this.isSearchDropdownVisible = true;
+    }
+  }
+
+  onSearchBlur(): void {
+    // Delay hiding to allow clicking on results
+    setTimeout(() => {
+      this.isSearchDropdownVisible = false;
+    }, 200);
+  }
+
+  selectSearchResult(result: SearchResult): void {
+    this.router.navigate(['/product', result.id]);
+    this.isSearchDropdownVisible = false;
+    this.searchQuery = '';
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.searchResults = [];
+    this.isSearchDropdownVisible = false;
   }
 }
