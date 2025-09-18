@@ -84,7 +84,11 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"] ?? "your-super-secret-key-with-at-least-32-characters");
+var jwtSecret = builder.Configuration.GetValue<string>("JWT_SECRET_KEY") ??
+Environment.GetEnvironmentVariable("JWT_SECRET_KEY") ??
+jwtSettings["SecretKey"] ?? "your-super-secret-key-with-at-least-32-characters";
+var key = Encoding.ASCII.GetBytes(jwtSecret);
+Console.WriteLine($"JWT Secret: {jwtSecret}");
 
 builder.Services.AddAuthentication(options =>
 {
