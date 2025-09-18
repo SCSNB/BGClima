@@ -149,7 +149,7 @@ export class BannerDialogComponent implements OnInit {
 
   private saveBanner(): void {
     const formValue = this.bannerForm.value;
-    const bannerData: Omit<BannerDto, 'id'> = {
+    const bannerData: Partial<BannerDto> = {
       name: formValue.name,
       imageUrl: formValue.imageUrl,
       targetUrl: formValue.targetUrl || undefined,
@@ -158,29 +158,39 @@ export class BannerDialogComponent implements OnInit {
       type: formValue.type
     };
 
-    const operation = this.isEditMode && this.data.banner?.id
-      ? this.bannerService.updateBanner(this.data.banner.id, bannerData)
-      : this.bannerService.createBanner(bannerData);
+    const handleSuccess = (action: string) => {
+      this.snackBar.open(
+        action === 'updated' ? 'Банерът е обновен успешно!' : 'Банерът е създаден успешно!',
+        'OK',
+        { duration: 3000 }
+      );
+      this.dialogRef.close(true);
+      this.isSubmitting = false;
+    };
 
-    operation.subscribe({
-      next: () => {
-        this.snackBar.open(
-          this.isEditMode ? 'Банерът е обновен успешно!' : 'Банерът е създаден успешно!',
-          'OK',
-          { duration: 3000 }
-        );
-        this.dialogRef.close(true);
-      },
-      error: (error) => {
-        console.error('Error saving banner:', error);
-        this.snackBar.open(
-          'Възникна грешка при запазване на банера. Моля, опитайте отново.',
-          'Затвори',
-          { duration: 5000, panelClass: 'error-snackbar' }
-        );
-        this.isSubmitting = false;
-      }
-    });
+    const handleError = (error: any) => {
+      console.error('Error saving banner:', error);
+      this.snackBar.open(
+        'Възникна грешка при запазване на банера. Моля, опитайте отново.',
+        'Затвори',
+        { duration: 5000, panelClass: 'error-snackbar' }
+      );
+      this.isSubmitting = false;
+    };
+
+    // If we're in edit mode, include the ID in the banner data
+    if (this.isEditMode && this.data.banner?.id) {
+      bannerData.id = this.data.banner.id;
+      this.bannerService.updateBanner(this.data.banner.id, bannerData).subscribe({
+        next: () => handleSuccess('updated'),
+        error: handleError
+      });
+    } else {
+      this.bannerService.createBanner(bannerData as Omit<BannerDto, 'id'>).subscribe({
+        next: () => handleSuccess('created'),
+        error: handleError
+      });
+    }
   }
 
   onSubmit(): void {

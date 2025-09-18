@@ -4,6 +4,7 @@ import { Observable, catchError, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,8 @@ export class ImageService {
 
   constructor(
     private http: HttpClient,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private authService: AuthService
   ) {}
 
   uploadSingleFile(file: File): Promise<string> {
@@ -21,7 +23,16 @@ export class ImageService {
       const formData = new FormData();
       formData.append('file', file);
 
-      this.http.post<{ url: string }>(`${this.apiUrl}/image/upload`, formData, {
+      const token = this.authService.getToken();
+      let headers = new HttpHeaders();
+      debugger;
+      
+      if (token) {
+        headers = headers.set('Authorization', `Bearer ${token}`);
+      }
+
+      this.http.post<{ imageUrl: string }>(`${this.apiUrl}/image/upload`, formData, {
+        headers: headers,
         reportProgress: true,
         observe: 'events'
       }).subscribe({
@@ -57,10 +68,20 @@ export class ImageService {
     
     console.log(`Deleting image with ID: ${imageId}`);
     const url = `${this.apiUrl}/image/${imageId}`;
-    
-    debugger;
-    // Make the DELETE request
-    return this.http.delete(url, { observe: 'response' }).pipe(
+  
+  // Get the auth token
+  const token = this.authService.getToken();
+  let headers = new HttpHeaders();
+  
+  if (token) {
+    headers = headers.set('Authorization', `Bearer ${token}`);
+  }
+  
+  // Make the DELETE request with auth headers
+  return this.http.delete(url, { 
+    headers: headers,
+    observe: 'response' 
+  }).pipe(
       map((response: HttpResponse<any>) => {
         if (response.status === 200) {
           return;
@@ -87,17 +108,5 @@ export class ImageService {
         return throwError(() => error);
       })
     );
-  }
-
-  private extractBlobName(imageUrl: string): string | null {
-    try {
-      const url = new URL(imageUrl);
-      // Get the last part of the path which contains the blob name
-      const pathParts = url.pathname.split('/');
-      return pathParts[pathParts.length - 1];
-    } catch (e) {
-      console.error('Error parsing image URL:', e);
-      return null;
-    }
   }
 }

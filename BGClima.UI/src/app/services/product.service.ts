@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, forkJoin, of, throwError } from 'rxjs';
-import { tap, switchMap,map, catchError } from 'rxjs/operators';
+import { tap, switchMap, map, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { ImageService } from './image.service';
+import { AuthService } from './auth.service';
 
 export interface BrandDto {
   id: number;
@@ -121,8 +122,19 @@ export class ProductService {
 
   constructor(
     private http: HttpClient,
-    private imageService: ImageService
+    private imageService: ImageService,
+    private authService: AuthService
   ) {}
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    if (!token) {
+      throw new Error('No authentication token available');
+    }
+    let headers = new HttpHeaders();
+
+    return headers.set('Authorization', `Bearer ${token}`);
+  }
 
   getProducts(): Observable<ProductDto[]> {
     console.log('Fetching products from:', this.baseUrl);
@@ -173,11 +185,23 @@ export class ProductService {
   }
 
   create(dto: CreateProductDto): Observable<ProductDto> {
-    return this.http.post<ProductDto>(this.baseUrl, dto);
+    var headers = this.getAuthHeaders()
+    return this.http.post<ProductDto>(this.baseUrl, dto, {headers}).pipe(
+      catchError((error: HttpErrorResponse) => {
+        console.error('Error creating product:', error);
+        return throwError(() => new Error(error.error?.message || 'Failed to create product'));
+      })
+    );
   }
 
   update(id: number, dto: CreateProductDto): Observable<void> {
-    return this.http.put<void>(`${this.baseUrl}/${id}`, dto);
+    var headers = this.getAuthHeaders()
+    return this.http.put<void>(`${this.baseUrl}/${id}`, dto, {headers}).pipe(
+      catchError((error: HttpErrorResponse) => {
+        console.error(`Error updating product ${id}:`, error);
+        return throwError(() => new Error(error.error?.message || 'Failed to update product'));
+      })
+    );
   }
 
   delete(id: number): Observable<void> {
@@ -187,17 +211,10 @@ export class ProductService {
     return this.getProduct(id).pipe(
       tap(product => console.log(`Fetched product ${id} for deletion with ${product.images?.length || 0} images`)),
       switchMap(product => {
-        // Collect all image IDs that need to be deleted
         const deleteObservables: Observable<void>[] = [];
+        const headers = this.getAuthHeaders();
         
-        // Note: Main image is stored with the product, we don't have an ID for it
-        // We'll need to delete it using the URL if needed
-        if (product.imageUrl) {
-          console.log(`Main image URL will be handled by the product deletion: ${product.imageUrl}`);
-          // We'll handle the main image deletion separately if needed
-        }
-        
-        // Add product images
+        // Add product images to deletion queue
         if (product.images && product.images.length > 0) {
           console.log(`Scheduling deletion of ${product.images.length} product images`);
           product.images.forEach((image, index) => {
@@ -208,19 +225,14 @@ export class ProductService {
           });
         }
         
-        // Add description images if they exist
+        // Add description images to deletion queue if they exist
         if (product.descriptionImages && product.descriptionImages.length > 0) {
           console.log(`Scheduling deletion of ${product.descriptionImages.length} description images`);
           product.descriptionImages.forEach((img, index) => {
             console.log(`[${index + 1}/${product.descriptionImages!.length}] Deleting description image with ID: ${img.id}`);
-            const headers = new HttpHeaders({
-              'Content-Type': 'application/json'
-            });
-            const options = {
-              headers: headers,
-              withCredentials: true
-            };
-            deleteObservables.push(this.http.delete<void>(`${this.apiUrl}/images/${img.id}`, options));
+            deleteObservables.push(
+              this.http.delete<void>(`${this.apiUrl}/images/${img.id}`, { headers })
+            );
           });
         }
         
@@ -229,28 +241,28 @@ export class ProductService {
           console.log(`Waiting for ${deleteObservables.length} images to be deleted...`);
           return forkJoin(deleteObservables).pipe(
             tap(() => console.log(`All images deleted, now deleting product ${id}`)),
-            switchMap(() => this.http.delete<void>(`${this.baseUrl}/${id}`)),
+            switchMap(() => this.http.delete<void>(`${this.baseUrl}/${id}`, { headers })),
             tap(() => console.log(`Product ${id} deleted successfully`)),
-            catchError(error => {
+            catchError((error: HttpErrorResponse) => {
               console.error(`Error during image deletion for product ${id}:`, error);
-              throw new Error('Грешка при изтриване на снимките. Моля, опитайте отново.');
+              return throwError(() => new Error(error.error?.message || 'Грешка при изтриване на снимките. Моля, опитайте отново.'));
             })
           );
         }
         
         // If no images to delete, just delete the product
         console.log(`No images to delete, proceeding with product ${id} deletion`);
-        return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
+        return this.http.delete<void>(`${this.baseUrl}/${id}`, { headers }).pipe(
           tap(() => console.log(`Product ${id} deleted successfully (no images)`)),
-          catchError(error => {
+          catchError((error: HttpErrorResponse) => {
             console.error(`Error deleting product ${id}:`, error);
-            throw new Error('Грешка при изтриване на продукта. Моля, опитайте отново.');
+            return throwError(() => new Error(error.error?.message || 'Грешка при изтриване на продукта. Моля, опитайте отново.'));
           })
         );
       }),
-      catchError(error => {
+      catchError((error: HttpErrorResponse) => {
         console.error(`Error fetching product ${id} for deletion:`, error);
-        return throwError(() => new Error('Грешка при зареждане на данните за продукта. Моля, опитайте отново.'));
+        return throwError(() => new Error(error.error?.message || 'Грешка при зареждане на данните за продукта. Моля, опитайте отново.'));
       })
     );
   }
