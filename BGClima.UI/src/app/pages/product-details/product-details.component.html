@@ -22,7 +22,8 @@
           [src]="selectedImage" 
           [alt]="product.name" 
           (error)="handleImageError($event)"
-          class="main-product-image" />
+          (click)="openImageModal(selectedImage)"
+          class="main-product-image clickable" />
       </div>
       
       <!-- Thumbnail Gallery -->
@@ -228,4 +229,26 @@
   <mat-icon>error_outline</mat-icon>
   <p>{{error}}</p>
   <button mat-button color="primary" (click)="loadProduct()">Опитайте отново</button>
+</div>
+
+<!-- Image Modal -->
+<div class="image-modal-overlay" *ngIf="isImageModalOpen" (click)="closeImageModal()">
+  <div class="image-modal-container" (click)="$event.stopPropagation()">
+    <button class="modal-close-btn" (click)="closeImageModal()">
+      <mat-icon>close</mat-icon>
+    </button>
+    <div class="modal-image-wrapper">
+      <img [src]="modalImageSrc" [alt]="product?.name" class="modal-image" />
+      <div class="modal-navigation" *ngIf="getThumbnailImages().length > 1">
+        <button class="nav-btn prev-btn" (click)="previousModalImage()" [disabled]="currentModalImageIndex === 0" aria-label="Предишна">
+          <span class="chevron chevron-left"></span>
+          <span class="arrow-label">Предишна</span>
+        </button>
+        <button class="nav-btn next-btn" (click)="nextModalImage()" [disabled]="currentModalImageIndex === getThumbnailImages().length - 1" aria-label="Следваща">
+          <span class="chevron chevron-right"></span>
+          <span class="arrow-label">Следваща</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

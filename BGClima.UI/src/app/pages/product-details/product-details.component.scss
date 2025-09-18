@@ -91,6 +91,15 @@
           object-fit: contain;
           background: #fff;
           padding: 10px;
+          
+          &.clickable {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            
+            &:hover {
+              transform: scale(1.02);
+            }
+          }
         }
         
         .no-image {
@@ -1306,6 +1315,197 @@
   // Animation for tab content
   .tab-pane {
     animation: fadeIn 0.3s ease-in-out;
+  }
+
+  // Image Modal Styles
+  .image-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    // Lighten the overlay (less blur/darkness effect perceived)
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease-out;
+    
+    .image-modal-container {
+      position: relative;
+      max-width: 90vw;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      
+      .modal-close-btn {
+        position: absolute;
+        top: -50px;
+        right: 0;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        z-index: 10001;
+        
+        mat-icon {
+          color: white;
+          font-size: 24px;
+        }
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+      }
+      
+      .modal-image-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-width: 100%;
+        max-height: 100%;
+        position: relative; // make wrapper the positioning context for arrows
+        overflow: visible; // allow arrows to sit slightly outside the image
+        
+        .modal-image {
+          max-width: 100%;
+          max-height: 80vh;
+          object-fit: contain;
+          border-radius: 8px;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+      }
+      
+      .modal-navigation {
+        position: absolute;
+        inset: 0; // cover the whole wrapper
+        pointer-events: none; // allow clicks through except on buttons
+        z-index: 10005; // ensure nav layer above image
+        
+        .nav-btn {
+          // Visual: remove circular background
+          background: transparent;
+          border: none;
+          border-radius: 0;
+          width: auto;
+          height: auto;
+          padding: 6px;
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: opacity 0.2s ease;
+          pointer-events: all;
+          z-index: 10002; // ensure arrows are above the image
+
+          // CSS chevron arrow (clean, like the screenshot)
+          .chevron {
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border: solid #ffffff;
+            border-width: 0 4px 4px 0; // create an L-shape
+            padding: 10px; // controls arrow size
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+          }
+          .chevron-left { transform: rotate(135deg); }
+          .chevron-right { transform: rotate(-45deg); }
+
+          // Tooltip-style labels (show on hover)
+          .arrow-label {
+            display: none;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.75);
+            color: #fff;
+            font-size: 12px;
+            line-height: 1;
+            padding: 6px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+          }
+
+          &.prev-btn .arrow-label { left: 38px; }
+          &.next-btn .arrow-label { right: 38px; }
+
+          &:hover .arrow-label { display: block; }
+
+          &:hover:not(:disabled) { opacity: 0.85; }
+          &:disabled { opacity: 0.3; cursor: not-allowed; }
+
+          // Just inside the image edges for guaranteed visibility
+          &.prev-btn { left: -24px; }
+          &.next-btn { right: -24px; }
+        }
+      }
+    }
+  }
+
+  // Mobile styles for modal
+  @media (max-width: 768px) {
+    .image-modal-overlay {
+      .image-modal-container {
+        max-width: 95vw;
+        max-height: 95vh;
+        
+        .modal-close-btn {
+          top: -40px;
+          width: 35px;
+          height: 35px;
+          
+          mat-icon {
+            font-size: 20px;
+          }
+        }
+        
+        .modal-image-wrapper {
+          .modal-image {
+            max-height: 70vh;
+          }
+        }
+        
+        .modal-image-wrapper { position: relative; }
+        .modal-navigation {
+          inset: 0;
+          .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: auto;
+            height: auto;
+            padding: 6px;
+            
+            mat-icon { font-size: 36px; }
+            
+            // Keep arrows clearly inside viewport on mobile
+            &.prev-btn { left: 6px; right: auto; }
+            &.next-btn { right: 6px; left: auto; }
+          }
+        }
+      }
+    }
+  }
+
+  // Fade in animation
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
   
   @keyframes fadeIn {
