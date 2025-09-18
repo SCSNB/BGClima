@@ -2,15 +2,26 @@ import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { environment } from '../../environments/environment';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
-  constructor(private authService: AuthService) {}
+  private apiUrl: string;
+
+  constructor(private authService: AuthService) {
+    // Remove protocol and trailing slashes from API URL for comparison
+    this.apiUrl = this.normalizeUrl(environment.apiUrl);
+  }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // Add auth header with jwt if user is logged in and request is to the api url
     const token = this.authService.getToken();
-    const isApiUrl = request.url.startsWith('/api/') || request.url.startsWith('api/');
+    const requestUrl = this.normalizeUrl(request.url);
+    
+    // Check if request is to our API
+    const isApiUrl = request.url.startsWith(environment.apiUrl) || 
+                    request.url.startsWith('/api/') || 
+                    request.url.startsWith('api/');
     
     console.log('JWT Interceptor - URL:', request.url);
     console.log('JWT Interceptor - Token exists:', !!token);
@@ -20,11 +31,19 @@ export class JwtInterceptor implements HttpInterceptor {
       console.log('JWT Interceptor - Adding Authorization header');
       request = request.clone({
         setHeaders: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
     }
 
     return next.handle(request);
   }
-} 
+
+  private normalizeUrl(url: string): string {
+    // Remove protocol and trailing slashes
+    return url
+      .replace(/^https?:\/\//, '') // Remove http:// or https://
+      .replace(/\/+$/, '');        // Remove trailing slashes
+  }
+}
