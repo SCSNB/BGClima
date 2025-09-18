@@ -5,6 +5,7 @@ using BGClima.Infrastructure.Data;
 using BGClima.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BGClima.API.Controllers
 {
@@ -220,6 +221,7 @@ namespace BGClima.API.Controllers
 
         // POST: api/products
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<ProductDto>> CreateProduct([FromBody] CreateProductDto createProductDto)
         {
             try
@@ -261,6 +263,7 @@ namespace BGClima.API.Controllers
 
         // PUT: api/products/5
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] CreateProductDto updateProductDto)
         {
             try
@@ -356,6 +359,7 @@ namespace BGClima.API.Controllers
 
         // DELETE: api/products/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             try

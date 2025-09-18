@@ -99,6 +99,14 @@
         </div>
       </div>
 
+      <!-- Free Standard Installation Banner (conditional) -->
+      <div class="free-install-banner" *ngIf="shouldShowFreeInstall()">
+        <div class="fi-icon">
+          <mat-icon>handyman</mat-icon>
+        </div>
+        <div class="fi-text">БЕЗПЛАТЕН СТАНДАРТЕН МОНТАЖ</div>
+      </div>
+
       <!-- Product actions removed as per request -->
 
       <!-- Product Meta -->
