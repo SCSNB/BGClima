@@ -87,7 +87,10 @@ namespace BGClima.Application.Services
         private string GenerateJwtToken(IdentityUser user, IList<string> roles)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
-            var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"] ?? "your-super-secret-key-with-at-least-32-characters");
+            var jwtSecret = _configuration.GetValue<string>("JWT_SECRET_KEY") ??
+                Environment.GetEnvironmentVariable("JWT_SECRET_KEY") ??
+                jwtSettings["SecretKey"] ?? "your-super-secret-key-with-at-least-32-characters";
+            var key = Encoding.ASCII.GetBytes(jwtSecret);
             var issuer = jwtSettings["Issuer"] ?? "BGClima";
             var audience = jwtSettings["Audience"] ?? "BGClimaUsers";
             var expirationHours = int.Parse(jwtSettings["ExpirationHours"] ?? "24");
