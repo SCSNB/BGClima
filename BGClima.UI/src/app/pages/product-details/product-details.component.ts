@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule, ViewportScroller } from '@angular/common';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ProductService, ProductDto } from '../../services/product.service';
@@ -34,6 +34,11 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   relatedProducts: any[] = [];
   expandedGroups = new Set<string>();
   tabs = ['Описание', 'Спецификации'];
+  
+  // Image modal properties
+  isImageModalOpen = false;
+  modalImageSrc: string | null = null;
+  currentModalImageIndex = 0;
   
   // Връща true ако продуктът е "БГКЛИМА тръбни топлообменници"
   isHeatExchangerType(): boolean {
@@ -828,6 +833,77 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       return `${parseFloat(attr.attributeValue).toFixed(2)} лв.`;
     }
     return attr.attributeValue;
+  }
+
+  // Image Modal Methods
+  openImageModal(imageSrc: string): void {
+    this.modalImageSrc = imageSrc;
+    this.isImageModalOpen = true;
+    
+    // Find current image index in thumbnail gallery
+    const thumbnails = this.getThumbnailImages();
+    this.currentModalImageIndex = thumbnails.findIndex(img => {
+      const imgUrl = this.getImageUrl(img.url || img.imageUrl || img.path || img);
+      return imgUrl === imageSrc;
+    });
+    
+    if (this.currentModalImageIndex === -1) {
+      this.currentModalImageIndex = 0;
+    }
+    
+    // Prevent body scrolling when modal is open
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeImageModal(): void {
+    this.isImageModalOpen = false;
+    this.modalImageSrc = null;
+    
+    // Restore body scrolling
+    document.body.style.overflow = 'auto';
+  }
+
+  previousModalImage(): void {
+    if (this.currentModalImageIndex > 0) {
+      this.currentModalImageIndex--;
+      this.updateModalImage();
+    }
+  }
+
+  nextModalImage(): void {
+    const thumbnails = this.getThumbnailImages();
+    if (this.currentModalImageIndex < thumbnails.length - 1) {
+      this.currentModalImageIndex++;
+      this.updateModalImage();
+    }
+  }
+
+  private updateModalImage(): void {
+    const thumbnails = this.getThumbnailImages();
+    if (thumbnails[this.currentModalImageIndex]) {
+      const img = thumbnails[this.currentModalImageIndex];
+      this.modalImageSrc = this.getImageUrl(img.url || img.imageUrl || img.path || img);
+    }
+  }
+
+  // Handle keyboard events for modal
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    if (!this.isImageModalOpen) return;
+
+    switch (event.key) {
+      case 'Escape':
+        this.closeImageModal();
+        break;
+      case 'ArrowLeft':
+        event.preventDefault();
+        this.previousModalImage();
+        break;
+      case 'ArrowRight':
+        event.preventDefault();
+        this.nextModalImage();
+        break;
+    }
   }
 
   printSpecifications(): void {
