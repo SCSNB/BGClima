@@ -98,30 +98,30 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   // Хелпър: дали текущата категория е термопомпена секция
   isHeatPumpCategory(): boolean {
     const c = (this.currentCategory || '').trim();
-    return c === 'termopompeni-sistemi' || c === 'bgclima-toploobmennici';
+    return c === '9' || c === '11'; // 9: Термопомпени системи, 11: БГКЛИМА тръбни топлообменници
   }
 
   selectedSort: string = 'name-asc';
 
   // Бърза навигация по типове климатици (от ПРОДУКТИ > Климатици)
   private acCategories = [
-    { slug: 'stenen-tip', label: 'Климатици стенен тип' },
-    { slug: 'podov-tip', label: 'Климатици подов тип' },
-    { slug: 'hiperinvertori', label: 'Хиперинвертори' },
-    { slug: 'kolonen-tip', label: 'Климатици колонен тип' },
-    { slug: 'multisplit-sistemi', label: 'Мулти сплит системи' },
-    { slug: 'kasetachen-tip', label: 'Климатици касетъчен тип' },
-    { slug: 'kanalen-tip', label: 'Климатици канален тип' },
-    { slug: 'podovo-tavanen-tip', label: 'Подово - таванен тип' },
-    { slug: 'mobilni-prenosimi', label: 'Мобилни / преносими' },
-    { slug: 'vrf-vrv', label: 'VRF / VRV' }
+    { slug: '1', label: 'Климатици стенен тип' },
+    { slug: '5', label: 'Климатици подов тип' },
+    { slug: '12', label: 'Хиперинвертори' },
+    { slug: '2', label: 'Климатици колонен тип' },
+    { slug: '10', label: 'Мулти сплит системи' },
+    { slug: '4', label: 'Климатици касетъчен тип' },
+    { slug: '3', label: 'Климатици канален тип' },
+    { slug: '6', label: 'Климатици подово - таванен тип' },
+    { slug: '8', label: 'Мобилни / преносими климатици' },
+    { slug: '7', label: 'VRF / VRV' }
   ];
   
 
   // ПРОДУКТИ > Термопомпи
   private heatPumpCategories = [
-    { slug: 'termopompeni-sistemi', label: 'Термопомпени системи' },
-    { slug: 'bgclima-toploobmennici', label: 'БГКЛИMA тръбни топлообменници' }
+    { slug: '9', label: 'Термопомпени системи' },
+    { slug: '11', label: 'БГКЛИМА тръбни топлообменници' }
   ];
 
   get isHeatPumpSection(): boolean {

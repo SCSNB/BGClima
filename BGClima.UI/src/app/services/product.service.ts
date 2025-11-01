@@ -360,87 +360,13 @@ export class ProductService {
     );
   }
 
-  getProductsByCategory(category: string, page: number = 1, pageSize: number = 12): Observable<PaginatedResponse<ProductDto>> {
-    console.log(`Getting products for category: ${category}`);
-  
-    // Map URL segments to product type names - updated to match the database
-    // Note: Some categories (e.g. 'stenen-tip') should include multiple product types
-    const categoryToTypeMap: { [key: string]: string | string[] } = {
-      'stenen-tip': ['Климатици стенен тип', 'Хиперинвертори'],
-      'kolonen-tip': 'Климатици колонен тип',
-      'kanalen-tip': 'Климатици канален тип',
-      'kasetachen-tip': 'Климатици касетъчен тип',
-      'podov-tip': 'Климатици подов тип',
-      'podovo-tavanen-tip': 'Климатици подово-таванен тип',
-      'vrf-vrv': 'VRF / VRV',
-      'mobilni-prenosimi': 'Мобилни / преносими климатици',
-      'hiperinvertori': 'Хиперинвертори',
-      'termopompeni-sistemi': 'Термопомпени системи',
-      'multisplit-sistemi': 'Мултисплит системи',
-      'bgclima-toploobmennici': 'БГКЛИМА тръбни топлообменници'
-    };
-
-    const mapping = categoryToTypeMap[category];
-
-    if (!mapping) {
-      console.warn(`No product type mapping found for category: ${category}`);
-      return of({
-        items: [],
-        totalCount: 0,
-        pageSize,
-        currentPage: page,
-        totalPages: 0
-      });
-    }
-  
-    const targetTypes: string[] = Array.isArray(mapping) ? mapping : [mapping];
-    console.log(`Mapped category '${category}' to type(s):`, targetTypes);
-
-    // Get all products with pagination
+  getProductsByCategory(page: number = 1, pageSize: number = 12, productTypeId?: number): Observable<PaginatedResponse<ProductDto>> {
+   
     return this.getProducts({
-      page,
-      pageSize,
-      // Add other filter parameters as needed
-    }).pipe(
-      tap(response => {
-        console.log(`Total products received: ${response.totalCount}`);
-        // Log all unique product types for debugging
-        const types = [...new Set(response.items.map(p => p.productType?.name))];
-        console.log('Available product types:', types);
-      }),
-      map(response => {
-        // Filter products by productType name (case insensitive and trimmed)
-        const targetSet = new Set(targetTypes.map(t => t.trim().toLowerCase()));
-        const filteredItems = response.items.filter(p => {
-          const n = p.productType?.name?.trim().toLowerCase();
-          return !!n && targetSet.has(n);
-        });
-
-        console.log(`Found ${filteredItems.length} products for type(s):`, targetTypes);
-        if (filteredItems.length === 0) {
-          console.warn('No products found for the specified type(s). Available types:', 
-            [...new Set(response.items.map(p => p.productType?.name))]
-          );
-        }
-
-        // Return a new paginated response with filtered items
-        return {
-          ...response,
-          items: filteredItems,
-          totalCount: filteredItems.length, // Note: This is just for the current page
-        };
-      }),
-      catchError(err => {
-        console.error(`Error filtering products for type(s) '${targetTypes.join(', ')}':`, err);
-        return of({
-          items: [],
-          totalCount: 0,
-          pageSize,
-          currentPage: page,
-          totalPages: 0
-        });
-      })
-    );
+      productTypeId: productTypeId,
+      page: page,
+      pageSize: pageSize
+    });
   }
 
   deleteImage(imageId: number): Observable<void> {

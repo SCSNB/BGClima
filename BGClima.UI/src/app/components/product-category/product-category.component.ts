@@ -154,11 +154,14 @@ export class ProductCategoryComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
+      debugger;
       const category = params.get('category');
+      this.productTypeId = Number(category);
+      
       if (category) {
         this.currentCategory = category;
         this.setCategoryTitle(category);
-        this.loadProducts(category);
+        this.loadProducts();
       }
     });
   }
@@ -178,18 +181,12 @@ export class ProductCategoryComponent implements OnInit {
   onPageChange(event: any): void {
     this.currentPage = event.pageIndex + 1;
     this.pageSize = event.pageSize;
-    this.loadProducts(this.currentCategory);
+    this.loadProducts();
   }
 
-  loadProducts(category: string): void {
-    this.currentCategory = category;
-    const productTypeId = parseInt(category, 10);
+  loadProducts(): void {
     
-    this.productService.getProducts({ 
-      page: this.currentPage, 
-      pageSize: this.pageSize,
-      ...(isNaN(productTypeId) ? {} : { productTypeId })
-    }).subscribe(response => {
+    this.productService.getProductsByCategory(this.currentPage, this.pageSize, this.productTypeId).subscribe(response => {
       this.totalItems = response.totalCount || 0;
       const withCardData: ProductCard[] = response.items.map((p: ProductDto) => {
         const priceEur = this.toEur(p.price);
@@ -383,18 +380,18 @@ export class ProductCategoryComponent implements OnInit {
 
   private setCategoryTitle(category: string): void {
     const categoryMap: { [key: string]: string } = {
-      'stenen-tip': 'Климатици стенен тип',
-      'kolonen-tip': 'Климатици колонен тип',
-      'kanalen-tip': 'Климатици канален тип',
-      'kasetachen-tip': 'Климатици касетъчен тип',
-      'podov-tip': 'Климатици подов тип',
-      'podovo-tavanen-tip': 'Климатици подово - таванен тип',
-      'vrf-vrv': 'VRF / VRV',
-      'mobilni-prenosimi': 'Мобилни / преносими климатици',
-      'hiperinvertori': 'Хиперинвертори',
-      'termopompeni-sistemi': 'Термопомпени системи',
-      'multisplit-sistemi': 'Мултисплит системи',
-      'bgclima-toploobmennici': 'БГКЛИМА тръбни топлообменници'
+      '1': 'Климатици стенен тип',
+      '2': 'Климатици колонен тип',
+      '3': 'Климатици канален тип',
+      '4': 'Климатици касетъчен тип',
+      '5': 'Климатици подов тип',
+      '6': 'Климатици подово - таванен тип',
+      '7': 'VRF / VRV',
+      '8': 'Мобилни / преносими климатици',
+      '9': 'Термопомпени системи',
+      '10': 'Мултисплит системи',
+      '11': 'БГКЛИМА тръбни топлообменници',
+      '12': 'Хиперинвертори'
     };
 
     this.categoryTitle = categoryMap[category] || 'Продукти';
