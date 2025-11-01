@@ -32,12 +32,21 @@ export class OffersComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.productService.getProducts().subscribe((products) => {
-      const items = products.filter(p => !!p.isFeatured);
-      const top = items.slice(0, 8);
-      // попълни карта по id за последваща работа с CompareService
-      this.byId = top.reduce((acc, p) => { acc[p.id] = p; return acc; }, {} as Record<number, ProductDto>);
-      this.featured = top.map(p => this.mapToCard(p));
+    this.productService.getProducts({
+      page: 1,
+      pageSize: 100, // Get more products to ensure we have enough featured ones
+      isFeatured: true
+    }).subscribe({
+      next: (response) => {
+        const items = response.items;
+        const top = items.slice(0, 8);
+        // попълни карта по id за последваща работа с CompareService
+        this.byId = top.reduce((acc, p) => { acc[p.id] = p; return acc; }, {} as Record<number, ProductDto>);
+        this.featured = top.map(p => this.mapToCard(p));
+      },
+      error: (error) => {
+        console.error('Error loading featured products:', error);
+      }
     });
   }
 

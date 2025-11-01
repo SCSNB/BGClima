@@ -142,17 +142,17 @@ export class CalculatorComponent implements OnInit {
   private loadRecommended(recommendedClass: number): void {
     // Филтрираме клиентски по BTU (в хиляди) спрямо recommendedClass
     const targetThousands = Math.round(recommendedClass / 1000);
-    this.productService.getProducts().subscribe({
-      next: (products) => {
-        const filtered = products.filter(p => {
+    this.productService.getProducts({ page: 1, pageSize: 1000 }).subscribe({
+      next: (response) => {
+        const filtered = response.items.filter((p: ProductDto) => {
           // Приоритет: p.btu?.value
           let btuVal: number | null = null;
           if (p.btu?.value) {
             const m = p.btu.value.toString().match(/(\d+(?:\.\d+)?)/);
             if (m) btuVal = parseFloat(m[1]);
           }
-          if (btuVal == null) {
-            const attr = (p.attributes || []).find(a => (a.attributeKey || '').toLowerCase().includes('btu'));
+          if (btuVal == null && p.attributes) {
+            const attr = p.attributes.find((a: { attributeKey?: string }) => (a.attributeKey || '').toLowerCase().includes('btu'));
             if (attr?.attributeValue) {
               const m = attr.attributeValue.toString().match(/(\d+(?:\.\d+)?)/);
               if (m) btuVal = parseFloat(m[1]);
@@ -170,8 +170,11 @@ export class CalculatorComponent implements OnInit {
           return thousands === targetThousands;
         });
 
-        this.byId = filtered.reduce((acc, p) => { acc[p.id] = p; return acc; }, {} as Record<number, ProductDto>);
-        this.recommendedCards = filtered.map(p => this.mapToCard(p));
+        this.byId = filtered.reduce((acc: Record<number, ProductDto>, p: ProductDto) => { 
+          acc[p.id] = p; 
+          return acc; 
+        }, {} as Record<number, ProductDto>);
+        this.recommendedCards = filtered.map((p: ProductDto) => this.mapToCard(p));
       },
       error: () => {
         this.recommendedCards = [];

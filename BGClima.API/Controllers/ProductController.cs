@@ -31,17 +31,27 @@ namespace BGClima.API.Controllers
             [FromQuery] int? productTypeId = null,
             [FromQuery] bool? isFeatured = null,
             [FromQuery] bool? isOnSale = null,
-            [FromQuery] bool? isNew = null)
+            [FromQuery] bool? isNew = null,
+            [FromQuery] decimal? minPrice = null,
+            [FromQuery] decimal? maxPrice = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 12,
+            [FromQuery] string? sortBy = "name",
+            [FromQuery] string? sortOrder = "asc")
         {
             try
             {
+                // Валидация на параметрите
+                if (page < 1) page = 1;
+                if (pageSize < 1) pageSize = 12;
+                if (pageSize > 100) pageSize = 100; // Ограничаваме максималния брой продукти на страница
+
                 var query = _context.Products
                     .Include(p => p.Brand)
                     .Include(p => p.BTU)
                     .Include(p => p.EnergyClass)
                     .Include(p => p.ProductType)
-                    .Include(p => p.Attributes)
-                    .Include(p => p.Images)
+                    .Include(p => p.Attributes.Where(a => a.AttributeKey.Contains("мощност") || a.AttributeKey.Contains("Енергиен") || a.AttributeKey.Contains("Wi-Fi")))
                     .AsQueryable();
 
                 // Филтриране
@@ -60,8 +70,44 @@ namespace BGClima.API.Controllers
                 if (isNew.HasValue)
                     query = query.Where(p => p.IsNew == isNew);
 
-                var products = await query.ToListAsync();
-                return Ok(_mapper.Map<List<ProductDto>>(products));
+                // Филтриране по цена
+                if (minPrice.HasValue && minPrice >= 0)
+                    query = query.Where(p => p.Price >= minPrice.Value);
+
+                if (maxPrice.HasValue && maxPrice > 0)
+                    query = query.Where(p => p.Price <= maxPrice.Value);
+
+                // Сортиране
+                query = sortBy?.ToLower() switch
+                {
+                    "price" => sortOrder?.ToLower() == "desc" ? 
+                        query.OrderByDescending(p => p.Price) : 
+                        query.OrderBy(p => p.Price),
+                    _ => sortOrder?.ToLower() == "desc" ? 
+                        query.OrderByDescending(p => p.Name) : 
+                        query.OrderBy(p => p.Name),
+                };
+
+                // Брой на всички продукти след филтрирането
+                var totalCount = await query.CountAsync();
+                
+                // Прилагане на пагинация
+                var products = await query
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                // Връщаме заедно с метаданни за пагинацията
+                var result = new
+                {
+                    TotalCount = totalCount,
+                    PageSize = pageSize,
+                    CurrentPage = page,
+                    TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                    Items = _mapper.Map<List<ProductDto>>(products)
+                };
+
+                return Ok(result);
             }
             catch (Exception ex)
             {

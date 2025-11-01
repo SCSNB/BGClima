@@ -17,7 +17,8 @@
   </div>
 </div>
 
-<table mat-table [dataSource]="dataSource" class="mat-elevation-z1" *ngIf="!loading && !error">
+<div class="table-container" *ngIf="!loading && !error">
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
   <ng-container matColumnDef="id">
     <th mat-header-cell *matHeaderCellDef>ID</th>
     <td mat-cell *matCellDef="let p">{{ p.id }}</td>
@@ -70,5 +71,17 @@
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
 
-<div *ngIf="loading">Зареждане...</div>
-<div *ngIf="error" class="error">{{ error }}</div> 
+<mat-paginator [length]="totalItems"
+                [pageSize]="pageSize"
+                [pageSizeOptions]="pageSizeOptions"
+                [pageIndex]="currentPage"
+                (page)="onPageChange($event)"
+                aria-label="Изберете страница">
+</mat-paginator>
+</div>
+
+<div *ngIf="loading" class="loading-container">
+  <mat-spinner diameter="40"></mat-spinner>
+  <div>Зареждане на продуктите...</div>
+</div>
+<div *ngIf="error" class="error">{{ error }}</div>

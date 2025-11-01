@@ -37,6 +37,13 @@ export class ProductCategoryComponent implements OnInit {
   isMobile: boolean = false;
   currentFilters: any;
   currentSort: string | null = null; // Track current sort order
+  productTypeId?: number; // Add productTypeId property
+  
+  // Pagination properties
+  currentPage: number = 1;
+  pageSize: number = 18;
+  totalItems: number = 0;
+  pageSizeOptions = [9, 18, 36, 100];
 
   constructor(
     private route: ActivatedRoute, 
@@ -168,9 +175,23 @@ export class ProductCategoryComponent implements OnInit {
     return +(bgn / rate).toFixed(2);
   }
 
+  onPageChange(event: any): void {
+    this.currentPage = event.pageIndex + 1;
+    this.pageSize = event.pageSize;
+    this.loadProducts(this.currentCategory);
+  }
+
   loadProducts(category: string): void {
-    this.productService.getProductsByCategory(category).subscribe(products => {
-      const withCardData: ProductCard[] = products.map((p: ProductDto) => {
+    this.currentCategory = category;
+    const productTypeId = parseInt(category, 10);
+    
+    this.productService.getProducts({ 
+      page: this.currentPage, 
+      pageSize: this.pageSize,
+      ...(isNaN(productTypeId) ? {} : { productTypeId })
+    }).subscribe(response => {
+      this.totalItems = response.totalCount || 0;
+      const withCardData: ProductCard[] = response.items.map((p: ProductDto) => {
         const priceEur = this.toEur(p.price);
         const oldPriceEur = this.toEur(p.oldPrice ?? undefined);
         const badges: Badge[] = [];

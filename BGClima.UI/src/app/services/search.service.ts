@@ -25,11 +25,12 @@ export class SearchService {
   }
 
   private loadProducts(): void {
-    this.productService.getProducts().subscribe({
-      next: (products) => {
-        this.allProducts = products;
+    // Load all products for search (using a large page size to get all at once)
+    this.productService.getProducts({ page: 1, pageSize: 1000 }).subscribe({
+      next: (response) => {
+        this.allProducts = response.items;
         this.productsLoaded = true;
-        console.log(`Loaded ${products.length} products for search`);
+        console.log(`Loaded ${response.totalCount} products for search`);
       },
       error: (error) => {
         console.error('Error loading products for search:', error);

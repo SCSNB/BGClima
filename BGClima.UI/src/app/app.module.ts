@@ -49,8 +49,8 @@ import { CommonModule } from '@angular/common';
 import { ImageService } from './services/image.service';
 import { PromoProductsComponent } from './pages/promo-products/promo-products.component';
 import { SharedModule } from './shared/shared.module';
-
 import { CompareComponent } from './pages/compare/compare.component';
+import { SearchService } from './services/search.service';
 
 @NgModule({
   declarations: [
@@ -100,12 +100,13 @@ import { CompareComponent } from './pages/compare/compare.component';
     SharedModule,
   ],
   providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true } },
     AuthService,
     AuthGuard,
     ImageService,
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
-    { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true } }
+    SearchService,
   ],
   bootstrap: [AppComponent],
   entryComponents: [

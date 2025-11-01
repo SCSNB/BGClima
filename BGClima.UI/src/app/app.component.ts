@@ -88,6 +88,22 @@ export class AppComponent implements OnInit {
     private snackBar: MatSnackBar,
     private searchService: SearchService
   ) {
+    // Initialize search subscription
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(query => this.searchService.searchProducts(query))
+    ).subscribe({
+      next: (results) => {
+        this.searchResults = results;
+        this.isSearchDropdownVisible = results.length > 0;
+      },
+      error: (error) => {
+        console.error('Search error:', error);
+        this.searchResults = [];
+        this.isSearchDropdownVisible = false;
+      }
+    });
     // Subscribe to router events to keep track of the current URL
     this.router.events.pipe(
       filter((event: Event): event is NavigationEnd => event instanceof NavigationEnd)

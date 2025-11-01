@@ -217,15 +217,14 @@ export class PromoProductsComponent implements OnInit {
   }
 
   private loadPromoProducts(): void {
-    this.productService.getProducts().subscribe({
-      next: (all) => {
-        const filtered = (all || []).filter(p => !!p.isOnSale);
-        this.allPromoProducts = filtered.map(p => {
+    this.productService.getProducts({ page: 1, pageSize: 1000, isOnSale: true }).subscribe({
+      next: (response) => {
+        this.allPromoProducts = response.items.map((p: ProductDto) => {
           const priceEur = this.toEur(p.price);
           const oldPriceEur = this.toEur(p.oldPrice ?? undefined);
 
-          // WiFi badge detection (same as Offers)
-          const hasWifi = (p.attributes || []).some(a => {
+// WiFi badge detection (same as Offers)
+          const hasWifi = (p.attributes || []).some((a: any) => {
             const key = (a.attributeKey || '').toLowerCase();
             const value = (a.attributeValue || '').toString().toLowerCase().trim();
             return (key.includes('wi-fi') || key.includes('wifi') || key.includes('wi fi')) &&

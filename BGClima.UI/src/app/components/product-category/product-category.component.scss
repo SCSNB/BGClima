@@ -1112,3 +1112,106 @@ app-product-category .desktop-actions,
     }
   }
 }
+
+/* Pagination Container */
+.pagination-container {
+  width: 100%;
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-top: 1px solid #e0e0e0;
+  background: #fff;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+
+  .pagination-info {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #5f6368;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .product-paginator {
+    width: 100%;
+    max-width: 800px;
+    background: transparent;
+    
+    ::ng-deep {
+      .mat-mdc-paginator-container {
+        padding: 0;
+        min-height: 40px;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        
+        @media (max-width: 599px) {
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+      }
+      
+      .mat-mdc-paginator-page-size {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        
+        .mat-mdc-paginator-page-size-label {
+          margin: 0 8px 0 0;
+          font-size: 13px;
+          color: #5f6368;
+        }
+        
+        .mat-mdc-select {
+          font-size: 13px;
+          
+          .mat-mdc-select-arrow {
+            color: #5f6368;
+          }
+        }
+      }
+      
+      .mat-mdc-paginator-range-actions {
+        margin-left: 8px;
+        
+        .mat-mdc-paginator-range-label {
+          margin: 0 12px;
+          color: #5f6368;
+        }
+        
+        .mat-mdc-icon-button {
+          width: 36px;
+          height: 36px;
+          line-height: 36px;
+          margin: 0 4px;
+          border-radius: 4px;
+          transition: background-color 0.2s;
+          
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+          }
+          
+          .mat-mdc-paginator-icon {
+            width: 20px;
+            height: 20px;
+            font-size: 20px;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .pagination-container {
+    padding: 1rem 0;
+    
+    .pagination-info {
+      font-size: 0.8rem;
+    }
+  }
+}

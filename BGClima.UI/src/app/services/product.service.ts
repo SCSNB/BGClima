@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, forkJoin, of, throwError } from 'rxjs';
 import { tap, switchMap, map, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
@@ -115,6 +115,28 @@ export interface CreateProductDto {
   descriptionImages?: CreateProductDescriptionImageDto[];
 }
 
+export interface PaginatedResponse<T> {
+  items: T[];
+  totalCount: number;
+  pageSize: number;
+  currentPage: number;
+  totalPages: number;
+}
+
+export interface ProductFilterParams {
+  brandId?: number;
+  productTypeId?: number;
+  isFeatured?: boolean;
+  isOnSale?: boolean;
+  isNew?: boolean;
+  minPrice?: number;
+  maxPrice?: number;
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
 @Injectable({ providedIn: 'root' })
 export class ProductService {
   private readonly baseUrl = environment.production ? '/api/products' : `${environment.apiUrl}/api/products`;
@@ -136,18 +158,43 @@ export class ProductService {
     return headers.set('Authorization', `Bearer ${token}`);
   }
 
-  getProducts(): Observable<ProductDto[]> {
-    console.log('Fetching products from:', this.baseUrl);
-    return this.http.get<ProductDto[]>(this.baseUrl).pipe(
+  getProducts(params?: ProductFilterParams): Observable<PaginatedResponse<ProductDto>> {
+    console.log('Fetching products with params:', params);
+    
+    // Set up query parameters
+    let httpParams = new HttpParams();
+    
+    // Add filter parameters if they exist
+    if (params) {
+      if (params.brandId) httpParams = httpParams.set('brandId', params.brandId.toString());
+      if (params.productTypeId) httpParams = httpParams.set('productTypeId', params.productTypeId.toString());
+      if (params.isFeatured !== undefined) httpParams = httpParams.set('isFeatured', params.isFeatured.toString());
+      if (params.isOnSale !== undefined) httpParams = httpParams.set('isOnSale', params.isOnSale.toString());
+      if (params.isNew !== undefined) httpParams = httpParams.set('isNew', params.isNew.toString());
+      if (params.minPrice !== undefined) httpParams = httpParams.set('minPrice', params.minPrice.toString());
+      if (params.maxPrice !== undefined) httpParams = httpParams.set('maxPrice', params.maxPrice.toString());
+      
+      // Pagination
+      const page = params.page || 1;
+      const pageSize = params.pageSize || 12;
+      httpParams = httpParams.set('page', page.toString());
+      httpParams = httpParams.set('pageSize', pageSize.toString());
+      
+      // Sorting
+      if (params.sortBy) httpParams = httpParams.set('sortBy', params.sortBy);
+      if (params.sortOrder) httpParams = httpParams.set('sortOrder', params.sortOrder);
+    }
+
+    return this.http.get<PaginatedResponse<ProductDto>>(this.baseUrl, { params: httpParams }).pipe(
       tap({
-        next: (products) => {
-          console.log(`Successfully fetched ${products?.length || 0} products`);
-          if (products && products.length > 0) {
+        next: (response) => {
+          console.log(`Successfully fetched page ${response.currentPage} of ${response.totalPages} with ${response.items?.length || 0} products`);
+          if (response.items && response.items.length > 0) {
             console.log('Sample product:', {
-              id: products[0].id,
-              name: products[0].name,
-              productType: products[0].productType,
-              brand: products[0].brand
+              id: response.items[0].id,
+              name: response.items[0].name,
+              productType: response.items[0].productType,
+              brand: response.items[0].brand
             });
           }
         },
@@ -163,7 +210,14 @@ export class ProductService {
       }),
       catchError(err => {
         console.error('Failed to fetch products:', err);
-        return of([]); // Return empty array on error to prevent breaking the app
+        // Return empty paginated response on error
+        return of({
+          items: [],
+          totalCount: 0,
+          pageSize: params?.pageSize || 12,
+          currentPage: params?.page || 1,
+          totalPages: 0
+        });
       })
     );
   }
@@ -306,7 +360,7 @@ export class ProductService {
     );
   }
 
-  getProductsByCategory(category: string): Observable<ProductDto[]> {
+  getProductsByCategory(category: string, page: number = 1, pageSize: number = 12): Observable<PaginatedResponse<ProductDto>> {
     console.log(`Getting products for category: ${category}`);
   
     // Map URL segments to product type names - updated to match the database
@@ -330,40 +384,61 @@ export class ProductService {
 
     if (!mapping) {
       console.warn(`No product type mapping found for category: ${category}`);
-      return this.getProducts();
+      return of({
+        items: [],
+        totalCount: 0,
+        pageSize,
+        currentPage: page,
+        totalPages: 0
+      });
     }
   
     const targetTypes: string[] = Array.isArray(mapping) ? mapping : [mapping];
     console.log(`Mapped category '${category}' to type(s):`, targetTypes);
 
-    // First get all products
-    return this.getProducts().pipe(
-      tap(products => {
-        console.log(`Total products received: ${products.length}`);
+    // Get all products with pagination
+    return this.getProducts({
+      page,
+      pageSize,
+      // Add other filter parameters as needed
+    }).pipe(
+      tap(response => {
+        console.log(`Total products received: ${response.totalCount}`);
         // Log all unique product types for debugging
-        const types = [...new Set(products.map(p => p.productType?.name))];
+        const types = [...new Set(response.items.map(p => p.productType?.name))];
         console.log('Available product types:', types);
       }),
-      map(products => {
+      map(response => {
         // Filter products by productType name (case insensitive and trimmed)
-        const targetSet = new Set(targetTypes.map(t => t.trim().toLowerCase()))
-        const filtered = products.filter(p => {
+        const targetSet = new Set(targetTypes.map(t => t.trim().toLowerCase()));
+        const filteredItems = response.items.filter(p => {
           const n = p.productType?.name?.trim().toLowerCase();
           return !!n && targetSet.has(n);
         });
 
-        console.log(`Found ${filtered.length} products for type(s):`, targetTypes);
-        if (filtered.length === 0) {
+        console.log(`Found ${filteredItems.length} products for type(s):`, targetTypes);
+        if (filteredItems.length === 0) {
           console.warn('No products found for the specified type(s). Available types:', 
-            [...new Set(products.map(p => p.productType?.name))]
+            [...new Set(response.items.map(p => p.productType?.name))]
           );
         }
 
-        return filtered;
+        // Return a new paginated response with filtered items
+        return {
+          ...response,
+          items: filteredItems,
+          totalCount: filteredItems.length, // Note: This is just for the current page
+        };
       }),
       catchError(err => {
         console.error(`Error filtering products for type(s) '${targetTypes.join(', ')}':`, err);
-        return of([]);
+        return of({
+          items: [],
+          totalCount: 0,
+          pageSize,
+          currentPage: page,
+          totalPages: 0
+        });
       })
     );
   }
