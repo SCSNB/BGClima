@@ -70,7 +70,7 @@
   <mat-divider></mat-divider>
 
   <!-- Energy Class Filter -->
-  <mat-expansion-panel [expanded]="true" *ngIf="!isToploobmennici">
+  <mat-expansion-panel [expanded]="true" *ngIf="!isHeatPumpSection">
     <mat-expansion-panel-header>
       <mat-panel-title>
         Енергиен клас
@@ -87,7 +87,7 @@
   <mat-divider></mat-divider>
 
   <!-- Power (kW) for Heat Pump categories -->
-  <mat-expansion-panel *ngIf="isHeatPumpSection && !isToploobmennici" [expanded]="true">
+  <mat-expansion-panel *ngIf="isHeatPumpSection && !isHeatPumpSection" [expanded]="true">
     <mat-expansion-panel-header>
       <mat-panel-title>
         Мощност (kW)
@@ -104,7 +104,7 @@
 
   <!-- BTU Filter -->
   <!-- Показваме за всички НЕ-термопомпени + специално за bgclima-toploobmennici -->
-  <mat-expansion-panel *ngIf="!isHeatPumpSection || isToploobmennici" [expanded]="true">
+  <mat-expansion-panel *ngIf="!isHeatPumpSection" [expanded]="true">
     <mat-expansion-panel-header>
       <mat-panel-title>
         BTU

@@ -60,7 +60,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
 
   // Източник за показване на BTU: за топлообменници показваме само големите стъпки
   get btuOptionsToShow(): BTUDto[] {
-    if (this.isToploobmennici) {
+    if (this.isHeatPumpSection) {
       return this.topHeatExchangerBtuValues.map(v => ({ value: v } as BTUDto));
     }
     return this.btuOptions;
@@ -127,11 +127,6 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   get isHeatPumpSection(): boolean {
     const hpSet = new Set(['9', '11']);
     return hpSet.has(this.currentCategory);
-  }
-
-  // Специален флаг за страницата БГКЛИМА тръбни топлообменници
-  get isToploobmennici(): boolean {
-    return (this.currentCategory || '').trim() === 'bgclima-toploobmennici';
   }
 
   applyFilters(): void {
@@ -231,7 +226,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['currentCategory']) {
       // При смяна на категория – ако сме в топлообменници, остави само Марка, Цена и BTU
-      if (this.isToploobmennici) {
+      if (this.isHeatPumpCategory()) {
         this.filters.energyClasses = [];
         this.filters.powerKws = [];
         this.filters.roomSizeRanges = [];
