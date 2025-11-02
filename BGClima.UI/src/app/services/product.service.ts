@@ -20,6 +20,7 @@ export interface ProductTypeDto {
 export interface EnergyClassDto {
   id: number;
   class: string;
+  displayName?: string; // Optional display name for UI
 }
 
 export interface BTUDto {
@@ -124,7 +125,7 @@ export interface PaginatedResponse<T> {
 }
 
 export interface ProductFilterParams {
-  brandId?: number;
+  brandIds?: number[];
   productTypeId?: number;
   isFeatured?: boolean;
   isOnSale?: boolean;
@@ -135,6 +136,9 @@ export interface ProductFilterParams {
   pageSize?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  energyClassIds?: number[];
+  btuValue?: number;
+  roomSize?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -166,13 +170,29 @@ export class ProductService {
     
     // Add filter parameters if they exist
     if (params) {
-      if (params.brandId) httpParams = httpParams.set('brandId', params.brandId.toString());
+      // Handle brand IDs array
+      if (params.brandIds && params.brandIds.length > 0) {
+        // Add each brand ID as a separate query parameter with the same name
+        params.brandIds.forEach(id => {
+          httpParams = httpParams.append('brandIds', id.toString());
+        });
+      }
+      
       if (params.productTypeId) httpParams = httpParams.set('productTypeId', params.productTypeId.toString());
       if (params.isFeatured !== undefined) httpParams = httpParams.set('isFeatured', params.isFeatured.toString());
       if (params.isOnSale !== undefined) httpParams = httpParams.set('isOnSale', params.isOnSale.toString());
       if (params.isNew !== undefined) httpParams = httpParams.set('isNew', params.isNew.toString());
       if (params.minPrice !== undefined) httpParams = httpParams.set('minPrice', params.minPrice.toString());
       if (params.maxPrice !== undefined) httpParams = httpParams.set('maxPrice', params.maxPrice.toString());
+      
+      // Additional filters
+      if (params.energyClassIds?.length) {
+        params.energyClassIds.forEach(id => {
+          httpParams = httpParams.append('energyClassIds', id.toString());
+        });
+      }
+      if (params.btuValue !== undefined) httpParams = httpParams.set('btuValue', params.btuValue.toString());
+      if (params.roomSize) httpParams = httpParams.set('roomSize', params.roomSize);
       
       // Pagination
       const page = params.page || 1;

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { ProductService, BrandDto, BTUDto } from '../../services/product.service';
+import { ProductService, BrandDto, BTUDto, EnergyClassDto } from '../../services/product.service';
 
 @Component({
   selector: 'app-product-filters',
@@ -18,18 +18,34 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   // Показва/скрива секцията с бързи връзки (категории)
   @Input() showCategoriesNav: boolean = true;
   // Външен preset за текущ избор на филтри (за запазване при повторно отваряне)
-  @Input() preset: {
-    brands: string[];
+  @Input() set preset(value: {
+    brands: number[];
     price: { lower: number; upper: number };
-    energyClasses: string[];
+    energyClasses: number[];
+    btus: string[];
+    roomSizeRanges: string[];
+  } | null) {
+    if (value) {
+      this._preset = {
+        ...value,
+        brands: value.brands.map(b => typeof b === 'string' ? parseInt(b, 10) : b).filter((b): b is number => !isNaN(b))
+      };
+    } else {
+      this._preset = null;
+    }
+  }
+  private _preset: {
+    brands: number[];
+    price: { lower: number; upper: number };
+    energyClasses: number[];
     btus: string[];
     roomSizeRanges: string[];
   } | null = null;
 
   filters = {
-    brands: [] as string[],
+    brands: [] as number[],
     price: { lower: 230, upper: 79900 },
-    energyClasses: [] as string[],
+    energyClasses: [] as number[],
     btus: [] as string[],
     roomSizeRanges: [] as string[],
     // Само за термопомпи: избор на мощност (kW)
@@ -49,9 +65,23 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   ];
 
   // Списък с марки от бекенда
-  brands: BrandDto[] = [];
+  brands: BrandDto[] = [
+    { id: 1, name: 'Daikin', country: 'Япония' },
+    { id: 2, name: 'Mitsubishi Electric', country: 'Япония' },
+    { id: 3, name: 'Toshiba', country: 'Япония' },
+    { id: 4, name: 'Fujitsu', country: 'Япония' },
+    { id: 5, name: 'Hitachi', country: 'Япония' },
+    { id: 6, name: 'Gree', country: 'Китай' },
+    { id: 7, name: 'AUX', country: 'Китай' },
+    { id: 8, name: 'Nippon', country: 'Япония' },
+    { id: 9, name: 'Inventor', country: 'Гърция' },
+    { id: 10, name: 'Kobe', country: 'Япония' },
+    { id: 11, name: 'Sendo', country: 'Китай' },
+    { id: 12, name: 'Cooper & Hunter', country: 'САЩ' },
+    { id: 13, name: 'Aqua Systems', country: 'България' }
+  ];
   // Пълен списък за локално филтриране по allowedBrands
-  private allBrands: BrandDto[] = [];
+  private allBrands: BrandDto[] = [...this.brands];
   // Списък с BTU стойности от бекенда
   btuOptions: BTUDto[] = [];
 
@@ -76,6 +106,14 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   // Термопомпи: опции за Мощност (kW) – визуално като чеклист
   powerKwOptions: string[] = [
     '3','4','5','6','8','9','10','11','12','14','15','16','17','22','25','30','32','65','75','110','140'
+  ];
+
+  // Energy Class options
+  energyClasses: EnergyClassDto[] = [
+    { id: 1, class: 'A+++', displayName: 'A+++' },
+    { id: 2, class: 'A++', displayName: 'A++' },
+    { id: 3, class: 'A+', displayName: 'A+' },
+    { id: 4, class: 'A', displayName: 'A' }
   ];
 
   constructor(private productService: ProductService, private dialog: MatDialog) {}
@@ -169,7 +207,6 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   }
 
   get sectionTitle(): string {
-    debugger;
     return this.isHeatPumpSection ? 'Термопомпи' : 'Климатици';
   }
 
@@ -182,12 +219,40 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     this.filtersChanged.emit(this.filters);
   }
 
-  toggleFilter(array: string[], value: string) {
+  toggleFilter(array: any[], value: any): void {
     const index = array.indexOf(value);
     if (index === -1) {
       array.push(value);
     } else {
       array.splice(index, 1);
+    }
+    this.onFiltersChanged();
+  }
+
+  isBrandSelected(brandId: number): boolean {
+    return this.filters.brands.includes(brandId);
+  }
+
+  toggleBrand(brandId: number): void {
+    const index = this.filters.brands.indexOf(brandId);
+    if (index === -1) {
+      this.filters.brands.push(brandId);
+    } else {
+      this.filters.brands.splice(index, 1);
+    }
+    this.onFiltersChanged();
+  }
+
+  isEnergyClassSelected(energyClassId: number): boolean {
+    return this.filters.energyClasses.includes(energyClassId);
+  }
+
+  toggleEnergyClass(energyClassId: number): void {
+    const index = this.filters.energyClasses.indexOf(energyClassId);
+    if (index === -1) {
+      this.filters.energyClasses.push(energyClassId);
+    } else {
+      this.filters.energyClasses.splice(index, 1);
     }
     this.onFiltersChanged();
   }
@@ -240,12 +305,12 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     if (changes['preset'] && this.preset) {
       // При подаден preset, приложи стойностите към вътрешните филтри
       this.filters = {
-        brands: [...(this.preset.brands || [])],
+        brands: [...(this.preset.brands || [])].map(brand => Number(brand)),
         price: {
           lower: Number(this.preset.price?.lower ?? this.minPrice),
           upper: Number(this.preset.price?.upper ?? this.maxPrice)
         },
-        energyClasses: [...(this.preset.energyClasses || [])],
+        energyClasses: [...(this.preset.energyClasses?.map(id => Number(id)) || [])],
         btus: [...(this.preset.btus || [])],
         roomSizeRanges: [...(this.preset.roomSizeRanges || [])],
         powerKws: [...((this.preset as any).powerKws || [])]
@@ -292,14 +357,23 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   private applyAllowedBrandsFilter(): void {
     const allow = (this.allowedBrands || []).filter(Boolean);
     if (allow.length > 0) {
-      this.brands = (this.allBrands || []).filter(b => !!b?.name && allow.includes(b.name));
+      // Convert allowed brand names to IDs for filtering
+      const allowedBrandIds = new Set<number>();
+      this.allBrands.forEach(brand => {
+        if (allow.includes(brand.name)) {
+          allowedBrandIds.add(brand.id);
+        }
+      });
+      this.brands = this.allBrands.filter(brand => allowedBrandIds.has(brand.id));
     } else {
-      this.brands = [...(this.allBrands || [])];
+      this.brands = [...this.allBrands];
     }
+    
     // Премахни от избора марки, които вече не се показват
-    const visibleNames = new Set(this.brands.map(b => b.name));
+    const visibleBrandIds = new Set(this.brands.map(b => b.id));
     const before = this.filters.brands.length;
-    this.filters.brands = (this.filters.brands || []).filter(n => visibleNames.has(n));
+    this.filters.brands = this.filters.brands.filter(id => visibleBrandIds.has(id));
+    
     if (this.filters.brands.length !== before) {
       // ако има промяна – емитни, за да се актуализира списъкът с продукти
       this.filtersChanged.emit(this.filters);

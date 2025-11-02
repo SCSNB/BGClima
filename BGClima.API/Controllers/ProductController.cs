@@ -27,8 +27,9 @@ namespace BGClima.API.Controllers
         // GET: api/products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts(
-            [FromQuery] int? brandId = null,
+            [FromQuery] int[]? brandIds = null,
             [FromQuery] int? productTypeId = null,
+            [FromQuery] int[]? energyClassIds = null,
             [FromQuery] bool? isFeatured = null,
             [FromQuery] bool? isOnSale = null,
             [FromQuery] bool? isNew = null,
@@ -47,7 +48,8 @@ namespace BGClima.API.Controllers
                 if (pageSize > 100) pageSize = 100; // Ограничаваме максималния брой продукти на страница
 
                 var query = _context.Products
-                    .Include(p => p.Brand)
+                    .Where(p => p.IsActive) // Връщаме само активни продукти
+                    //.Include(p => p.Brand)
                     .Include(p => p.BTU)
                     .Include(p => p.EnergyClass)
                     .Include(p => p.ProductType)
@@ -55,8 +57,8 @@ namespace BGClima.API.Controllers
                     .AsQueryable();
 
                 // Филтриране
-                if (brandId.HasValue)
-                    query = query.Where(p => p.BrandId == brandId);
+                if (brandIds != null &&  brandIds.Any())
+                    query = query.Where(p => brandIds.Contains(p.BrandId));
 
                 if (productTypeId.HasValue)
                     query = query.Where(p => p.ProductTypeId == productTypeId);
@@ -69,6 +71,12 @@ namespace BGClima.API.Controllers
 
                 if (isNew.HasValue)
                     query = query.Where(p => p.IsNew == isNew);
+
+                // Филтриране по енергиен клас
+                if (energyClassIds != null && energyClassIds.Any())
+                {
+                    query = query.Where(p => p.EnergyClassId.HasValue && energyClassIds.Contains(p.EnergyClassId.Value));
+                }
 
                 // Филтриране по цена
                 if (minPrice.HasValue && minPrice >= 0)

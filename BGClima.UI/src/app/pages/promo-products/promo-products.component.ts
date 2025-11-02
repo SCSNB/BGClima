@@ -27,9 +27,9 @@ export class PromoProductsComponent implements OnInit {
   
   // Current filter state
   filters: {
-    brands: string[];
+    brands: number[];
     price: { lower: number; upper: number };
-    energyClasses: string[];
+    energyClasses: number[];
     btus: string[];
     roomSizeRanges: string[];
   } = {
@@ -129,21 +129,35 @@ export class PromoProductsComponent implements OnInit {
     this.loadPromoProducts();
   }
 
-  onFiltersChanged = (f: { brands: string[]; price: { lower: number; upper: number }; energyClasses: string[]; btus: string[]; roomSizeRanges: string[] }) => {
+  onFiltersChanged = (f: { brands: (string | number)[]; price: { lower: number; upper: number }; energyClasses: (string | number)[]; btus: string[]; roomSizeRanges: string[] }) => {
+    // Convert brand IDs to numbers and filter out any invalid values
+    const brandIds = (f.brands || []).map(brand => {
+      const id = typeof brand === 'string' ? parseInt(brand, 10) : Number(brand);
+      return isNaN(id) ? null : id;
+    }).filter((id): id is number => id !== null);
+
+    // Convert energy class IDs to numbers and filter out any invalid values
+    const energyClassIds = (f.energyClasses || []).map(cls => {
+      const id = typeof cls === 'string' ? parseInt(cls, 10) : Number(cls);
+      return isNaN(id) ? null : id;
+    }).filter((id): id is number => id !== null);
+
     // Запази последния избор, за да се подаде като preset при повторно отваряне на диалога
     this.filters = {
-      brands: [...(f.brands || [])],
+      brands: brandIds,
       price: { lower: Number(f.price?.lower ?? this.minPrice), upper: Number(f.price?.upper ?? this.maxPrice) },
-      energyClasses: [...(f.energyClasses || [])],
+      energyClasses: energyClassIds,
       btus: [...(f.btus || [])],
       roomSizeRanges: [...(f.roomSizeRanges || [])]
     };
-    const byBrand = (p: ProductCard) => !f.brands.length || !!p.brand && f.brands.includes(p.brand.name);
+    const byBrand = (p: ProductCard) => !f.brands.length || (!!p.brand && (f.brands.includes(p.brand.id) || f.brands.includes(p.brand.id.toString())));
     const byPrice = (p: ProductCard) => {
       const price = p.price || 0;
       return price >= f.price.lower && price <= f.price.upper;
     };
-    const byClass = (p: ProductCard) => !f.energyClasses.length || !!p.energyClass && f.energyClasses.includes(p.energyClass.class);
+    const byClass = (p: ProductCard) => !f.energyClasses.length || !!p.energyClass && f.energyClasses.some(cls => 
+      p.energyClass && (cls === p.energyClass.id || cls.toString() === p.energyClass.id.toString())
+    );
     const byBTU = (p: ProductCard) => {
       if (!f.btus.length) return true;
       const btu = (p.btu?.value ?? '').toString();

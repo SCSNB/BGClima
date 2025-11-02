@@ -24,10 +24,10 @@
       </mat-panel-title>
     </mat-expansion-panel-header>
     <div class="filter-options">
-      <mat-checkbox *ngFor="let b of brands"
-                    [checked]="isSelected(filters.brands, b.name)"
-                    (change)="toggleFilter(filters.brands, b.name)">
-        {{ b.name }}
+      <mat-checkbox *ngFor="let brand of brands"
+                   [checked]="isBrandSelected(brand.id)"
+                   (change)="toggleBrand(brand.id)">
+        {{ brand.name }} <span class="text-muted small" *ngIf="brand.country">({{ brand.country }})</span>
       </mat-checkbox>
     </div>
   </mat-expansion-panel>
@@ -77,17 +77,18 @@
       </mat-panel-title>
     </mat-expansion-panel-header>
     <div class="filter-options">
-      <mat-checkbox [checked]="isSelected(filters.energyClasses, 'A+++')" (change)="toggleFilter(filters.energyClasses, 'A+++')">A+++</mat-checkbox>
-      <mat-checkbox [checked]="isSelected(filters.energyClasses, 'A++')" (change)="toggleFilter(filters.energyClasses, 'A++')">A++</mat-checkbox>
-      <mat-checkbox [checked]="isSelected(filters.energyClasses, 'A+')" (change)="toggleFilter(filters.energyClasses, 'A+')">A+</mat-checkbox>
-      <mat-checkbox [checked]="isSelected(filters.energyClasses, 'A')" (change)="toggleFilter(filters.energyClasses, 'A')">A</mat-checkbox>
+      <mat-checkbox *ngFor="let ec of energyClasses"
+                   [checked]="isEnergyClassSelected(ec.id)"
+                   (change)="toggleEnergyClass(ec.id)">
+        {{ ec.displayName }}
+      </mat-checkbox>
     </div>
   </mat-expansion-panel>
 
   <mat-divider></mat-divider>
 
   <!-- Power (kW) for Heat Pump categories -->
-  <mat-expansion-panel *ngIf="isHeatPumpSection && !isHeatPumpSection" [expanded]="true">
+  <mat-expansion-panel *ngIf="isHeatPumpSection" [expanded]="true">
     <mat-expansion-panel-header>
       <mat-panel-title>
         Мощност (kW)
