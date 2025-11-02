@@ -125,7 +125,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   ];
 
   get isHeatPumpSection(): boolean {
-    const hpSet = new Set(['termopompeni-sistemi', 'bgclima-toploobmennici']);
+    const hpSet = new Set(['9', '11']);
     return hpSet.has(this.currentCategory);
   }
 
@@ -174,6 +174,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   }
 
   get sectionTitle(): string {
+    debugger;
     return this.isHeatPumpSection ? 'Термопомпи' : 'Климатици';
   }
 
