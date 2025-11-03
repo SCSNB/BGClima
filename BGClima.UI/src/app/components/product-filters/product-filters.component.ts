@@ -22,13 +22,14 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     brands: number[];
     price: { lower: number; upper: number };
     energyClasses: number[];
-    btus: string[];
+    btus: (string | number)[];
     roomSizeRanges: string[];
   } | null) {
     if (value) {
       this._preset = {
         ...value,
-        brands: value.brands.map(b => typeof b === 'string' ? parseInt(b, 10) : b).filter((b): b is number => !isNaN(b))
+        brands: value.brands.map(b => typeof b === 'string' ? parseInt(b, 10) : b).filter((b): b is number => !isNaN(b)),
+        btus: value.btus.map(b => typeof b === 'string' ? parseInt(b, 10) : b).filter((b): b is number => !isNaN(b))
       };
     } else {
       this._preset = null;
@@ -38,7 +39,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     brands: number[];
     price: { lower: number; upper: number };
     energyClasses: number[];
-    btus: string[];
+    btus: number[];
     roomSizeRanges: string[];
   } | null = null;
 
@@ -46,7 +47,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     brands: [] as number[],
     price: { lower: 230, upper: 79900 },
     energyClasses: [] as number[],
-    btus: [] as string[],
+    btus: [] as number[], // Changed from string[] to number[] to store BTU IDs
     roomSizeRanges: [] as string[],
     // Само за термопомпи: избор на мощност (kW)
     powerKws: [] as string[]
@@ -86,22 +87,22 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   btuOptions: BTUDto[] = [];
 
   // Специален набор BTU за "БГКЛИМА тръбни топлообменници"
-  private topHeatExchangerBtuValues: string[] = ['24000','36000','48000','60000','72000'];
+  private topHeatExchangerBtuIds = [12, 13, 15, 20, 22]; // IDs for 24000, 36000, 48000, 60000, 72000 BTU
 
   // Източник за показване на BTU: за топлообменници показваме само големите стъпки
   get btuOptionsToShow(): BTUDto[] {
     if (this.isHeatPumpSection) {
-      return this.topHeatExchangerBtuValues.map(v => ({ value: v } as BTUDto));
+      return this.btuOptions.filter(btu => this.topHeatExchangerBtuIds.includes(btu.id));
     }
     return this.btuOptions;
   }
 
-  // Форматира етикета за BTU без дублиране на "BTU"
-  formatBtuLabel(opt: BTUDto): string {
-    const raw = String((opt as any)?.value ?? '').trim();
-    if (!raw) return '';
-    return /\bBTU\b/i.test(raw) ? raw : `${raw} BTU`;
-  }
+  // // Форматира етикета за BTU без дублиране на "BTU"
+  // formatBtuLabel(opt: BTUDto): string {
+  //   const raw = String(opt?.value ?? '').trim();
+  //   if (!raw) return '';
+  //   return raw.endsWith('BTU') || raw.endsWith('btu') ? raw : `${raw} BTU`;
+  // }
 
   // Термопомпи: опции за Мощност (kW) – визуално като чеклист
   powerKwOptions: string[] = [
@@ -257,8 +258,8 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     this.onFiltersChanged();
   }
 
-  isSelected(array: string[], value: string): boolean {
-    return array.includes(value);
+  isSelected(array: (string | number)[], value: string | number): boolean {
+    return array.some(item => String(item) === String(value));
   }
 
   ngOnInit(): void {
@@ -295,9 +296,11 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
         this.filters.energyClasses = [];
         this.filters.powerKws = [];
         this.filters.roomSizeRanges = [];
-        // Пази само позволените BTU стойности
-        const allowed = new Set(this.topHeatExchangerBtuValues);
-        this.filters.btus = (this.filters.btus || []).filter(v => allowed.has(String(v)));
+        // Keep only allowed BTU IDs for heat pump section
+        if (this.isHeatPumpSection) {
+          const allowedBtuIds = new Set(this.topHeatExchangerBtuIds);
+          this.filters.btus = (this.filters.btus || []).filter(id => allowedBtuIds.has(Number(id)));
+        }
         this.clampPrices();
         this.filtersChanged.emit(this.filters);
       }
@@ -311,7 +314,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
           upper: Number(this.preset.price?.upper ?? this.maxPrice)
         },
         energyClasses: [...(this.preset.energyClasses?.map(id => Number(id)) || [])],
-        btus: [...(this.preset.btus || [])],
+        btus: [...(this.preset.btus || [])].map(btu => Number(btu)),
         roomSizeRanges: [...(this.preset.roomSizeRanges || [])],
         powerKws: [...((this.preset as any).powerKws || [])]
       };

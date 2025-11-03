@@ -113,9 +113,9 @@
     </mat-expansion-panel-header>
     <div class="filter-options">
       <mat-checkbox *ngFor="let btu of btuOptionsToShow"
-                    [checked]="isSelected(filters.btus, btu.value)"
-                    (change)="toggleFilter(filters.btus, btu.value)">
-        {{ formatBtuLabel(btu) }}
+                    [checked]="isSelected(filters.btus, btu.id)"
+                    (change)="toggleFilter(filters.btus, btu.id)">
+                    {{ btu.value }}
       </mat-checkbox>
     </div>
   </mat-expansion-panel>

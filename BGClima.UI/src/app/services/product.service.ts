@@ -137,7 +137,7 @@ export interface ProductFilterParams {
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
   energyClassIds?: number[];
-  btuValue?: number;
+  btuIds?: number[];
   roomSize?: string;
 }
 
@@ -191,7 +191,11 @@ export class ProductService {
           httpParams = httpParams.append('energyClassIds', id.toString());
         });
       }
-      if (params.btuValue !== undefined) httpParams = httpParams.set('btuValue', params.btuValue.toString());
+      if (params.btuIds?.length) {
+        params.btuIds.forEach(id => {
+          httpParams = httpParams.append('btuIds', id.toString());
+        });
+      }
       if (params.roomSize) httpParams = httpParams.set('roomSize', params.roomSize);
       
       // Pagination

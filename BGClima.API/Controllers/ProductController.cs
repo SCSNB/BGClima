@@ -30,29 +30,26 @@ namespace BGClima.API.Controllers
             [FromQuery] int[]? brandIds = null,
             [FromQuery] int? productTypeId = null,
             [FromQuery] int[]? energyClassIds = null,
+            [FromQuery] int[]? btuIds = null,
             [FromQuery] bool? isFeatured = null,
             [FromQuery] bool? isOnSale = null,
             [FromQuery] bool? isNew = null,
             [FromQuery] decimal? minPrice = null,
             [FromQuery] decimal? maxPrice = null,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 12,
+            [FromQuery] int pageSize = 18,
             [FromQuery] string? sortBy = "name",
             [FromQuery] string? sortOrder = "asc")
         {
             try
             {
                 // Валидация на параметрите
-                if (page < 1) page = 1;
-                if (pageSize < 1) pageSize = 12;
                 if (pageSize > 100) pageSize = 100; // Ограничаваме максималния брой продукти на страница
 
                 var query = _context.Products
-                    .Where(p => p.IsActive) // Връщаме само активни продукти
-                    //.Include(p => p.Brand)
+                    .Where(p => p.IsActive)
                     .Include(p => p.BTU)
                     .Include(p => p.EnergyClass)
-                    .Include(p => p.ProductType)
                     .Include(p => p.Attributes.Where(a => a.AttributeKey.Contains("мощност") || a.AttributeKey.Contains("Енергиен") || a.AttributeKey.Contains("Wi-Fi")))
                     .AsQueryable();
 
@@ -76,6 +73,12 @@ namespace BGClima.API.Controllers
                 if (energyClassIds != null && energyClassIds.Any())
                 {
                     query = query.Where(p => p.EnergyClassId.HasValue && energyClassIds.Contains(p.EnergyClassId.Value));
+                }
+
+                // Филтриране по BTU ID-та
+                if (btuIds != null && btuIds.Any())
+                {
+                    query = query.Where(p => p.BTUId.HasValue && btuIds.Contains(p.BTUId.Value));
                 }
 
                 // Филтриране по цена

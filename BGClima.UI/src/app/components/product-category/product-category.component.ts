@@ -112,34 +112,7 @@ export class ProductCategoryComponent implements OnInit {
 
   onSortChanged(sortKey: string) {
     this.currentSort = sortKey;
-    this.applySorting();
-  }
-
-  private applySorting() {
-    if (!this.currentSort) return;
-    
-    const products = [...this.filteredProducts];
-    
-    switch (this.currentSort) {
-      case 'name-asc':
-        products.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-        break;
-      case 'name-desc':
-        products.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
-        break;
-      case 'price-asc':
-        products.sort((a, b) => (a.price || 0) - (b.price || 0));
-        break;
-      case 'price-desc':
-        products.sort((a, b) => (b.price || 0) - (a.price || 0));
-        break;
-      default:
-        // Default sorting (by original order)
-        products.sort((a, b) => (a.id || 0) - (b.id || 0));
-        break;
-    }
-    
-    this.filteredProducts = products;
+    this.applyFilters(this.currentFilters);
   }
 
   clearFilters() {
@@ -184,11 +157,10 @@ export class ProductCategoryComponent implements OnInit {
   onPageChange(event: any): void {
     this.currentPage = event.pageIndex + 1;
     this.pageSize = event.pageSize;
-    this.loadProducts();
+    this.applyFilters(this.currentFilters);
   }
 
   loadProducts(): void {
-    
     this.productService.getProductsByCategory(this.currentPage, this.pageSize, this.productTypeId).subscribe(response => {
       const { items, totalCount } = this.transformProductResponse(response);
       this.totalItems = totalCount;
@@ -205,11 +177,8 @@ export class ProductCategoryComponent implements OnInit {
         energyClasses: [],
         btus: [],
         roomSizeRanges: [],
-        powerKws: []
+        powerKws: [],
       };
-
-      // Apply any existing sort
-      this.applySorting();
     });
   }
 
@@ -239,7 +208,7 @@ export class ProductCategoryComponent implements OnInit {
     // Prepare filter parameters for the API call
     const filterParams: any = {
       productTypeId: this.productTypeId,
-      page: 1, // Reset to first page when filters change
+      page: this.currentPage, // Reset to first page when filters change
       pageSize: this.pageSize
     };
 
@@ -264,13 +233,20 @@ export class ProductCategoryComponent implements OnInit {
 
     // Add BTU filter if any are selected
     if (filters?.btus?.length) {
-      const btuValues = filters.btus.map((b: string) => parseInt(b, 10));
-      filterParams.btuValue = btuValues[0]; // Using first selected BTU value
+      const btuIds = filters.btus.map((b: string | number) => Number(b));
+      filterParams.btuIds = btuIds; // Send array of BTU IDs
     }
 
     // Add room size filter if any are selected
     if (filters?.roomSizeRanges?.length) {
       filterParams.roomSize = filters.roomSizeRanges[0];
+    }
+
+    // Add sorting parameters
+    if (this.currentSort) {
+      const [sortBy, sortOrder] = this.currentSort.split('-');
+      filterParams.sortBy = sortBy;
+      filterParams.sortOrder = sortOrder as 'asc' | 'desc';
     }
 
     // Call the product service to get filtered products
@@ -281,8 +257,6 @@ export class ProductCategoryComponent implements OnInit {
         this.filteredProducts = [...items];
         this.totalItems = totalCount;
         this.loading = false;
-        // Apply any active sorting
-        this.applySorting();
       },
       error: (error) => {
         console.error('Error fetching filtered products:', error);
