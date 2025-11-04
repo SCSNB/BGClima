@@ -200,7 +200,6 @@ export class ProductCategoryComponent implements OnInit {
   }
 
   public applyFilters(filters: any): void {
-    debugger;
     this.currentFilters = filters;
     this.loading = true;
     

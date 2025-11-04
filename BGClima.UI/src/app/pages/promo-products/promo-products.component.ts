@@ -23,9 +23,16 @@ export class PromoProductsComponent implements OnInit {
   title = 'ПРОМО оферти';
   loading = true;
   products: ProductCard[] = [];
-  private lastSortKey: string = '';
+  private currentSort: string = '';
   
+  // Pagination
+  currentPage: number = 1;
+  pageSize: number = 18;
+  totalItems: number = 0;
+  pageSizeOptions = [9, 18, 36, 100];
+
   // Current filter state
+  currentFilters: any = {};
   filters: {
     brands: number[];
     price: { lower: number; upper: number };
@@ -106,9 +113,74 @@ export class PromoProductsComponent implements OnInit {
     }
   }
 
-  applyFilters() {
-    this.closeFiltersDialog();
+  public applyFilters(filters: any): void {
+    this.currentFilters = filters;
+    this.loading = true;
+    
+    // Prepare filter parameters for the API call
+    const filterParams: any = {
+      page: this.currentPage, // Reset to first page when filters change
+      pageSize: this.pageSize,
+      isOnSale: true
+    };
+
+    // Add brand filter if any brands are selected
+    if (filters?.brands?.length) {
+      // Convert brand IDs to numbers and filter out any invalid values
+      filterParams.brandIds = filters.brands
+        .map((id: string | number) => typeof id === 'string' ? parseInt(id, 10) : id)
+        .filter((id: number) => !isNaN(id));
+    }
+
+    // Add price range filter
+    if (filters?.price) {
+      filterParams.minPrice = Number(filters.price.lower) || 0;
+      filterParams.maxPrice = Number(filters.price.upper) || Number.MAX_SAFE_INTEGER;
+    }
+
+    // Add energy class filter if any are selected
+    if (filters?.energyClasses?.length) {
+      filterParams.energyClassIds = filters.energyClasses;
+    }
+
+    // Add BTU filter if any are selected
+    if (filters?.btus?.length) {
+      const btuIds = filters.btus.map((b: string | number) => Number(b));
+      filterParams.btuIds = btuIds; // Send array of BTU IDs
+    }
+
+    if (filters?.powerKws?.length) {
+      // Convert string array to array of numbers for MaxHatingPowers
+      filterParams.MaxHatingPowers = filters.powerKws.map((kw: string) => parseFloat(kw));
+    }
+
+    // Add room size filter if any are selected
+    if (filters?.roomSizeRanges?.length) {
+      filterParams.roomSize = filters.roomSizeRanges[0];
+    }
+
+    // Add sorting parameters
+    if (this.currentSort) {
+      const [sortBy, sortOrder] = this.currentSort.split('-');
+      filterParams.sortBy = sortBy;
+      filterParams.sortOrder = sortOrder as 'asc' | 'desc';
+    }
+
+    // Call the product service to get filtered products
+    this.productService.getProducts(filterParams).subscribe({
+      next: (response) => {
+        const { items, totalCount } = this.transformProductResponse(response);
+        this.products = items;
+        this.totalItems = totalCount;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error fetching filtered products:', error);
+        this.loading = false;
+      }
+    });
   }
+
 
   clearFilters() {
     // Reset all filters to their default values
@@ -129,68 +201,10 @@ export class PromoProductsComponent implements OnInit {
     this.loadPromoProducts();
   }
 
-  onFiltersChanged = (f: { brands: (string | number)[]; price: { lower: number; upper: number }; energyClasses: (string | number)[]; btus: string[]; roomSizeRanges: string[] }) => {
-    // Convert brand IDs to numbers and filter out any invalid values
-    const brandIds = (f.brands || []).map(brand => {
-      const id = typeof brand === 'string' ? parseInt(brand, 10) : Number(brand);
-      return isNaN(id) ? null : id;
-    }).filter((id): id is number => id !== null);
-
-    // Convert energy class IDs to numbers and filter out any invalid values
-    const energyClassIds = (f.energyClasses || []).map(cls => {
-      const id = typeof cls === 'string' ? parseInt(cls, 10) : Number(cls);
-      return isNaN(id) ? null : id;
-    }).filter((id): id is number => id !== null);
-
-    // Запази последния избор, за да се подаде като preset при повторно отваряне на диалога
-    this.filters = {
-      brands: brandIds,
-      price: { lower: Number(f.price?.lower ?? this.minPrice), upper: Number(f.price?.upper ?? this.maxPrice) },
-      energyClasses: energyClassIds,
-      btus: [...(f.btus || [])],
-      roomSizeRanges: [...(f.roomSizeRanges || [])]
-    };
-    const byBrand = (p: ProductCard) => !f.brands.length || (!!p.brand && (f.brands.includes(p.brand.id) || f.brands.includes(p.brand.id.toString())));
-    const byPrice = (p: ProductCard) => {
-      const price = p.price || 0;
-      return price >= f.price.lower && price <= f.price.upper;
-    };
-    const byClass = (p: ProductCard) => !f.energyClasses.length || !!p.energyClass && f.energyClasses.some(cls => 
-      p.energyClass && (cls === p.energyClass.id || cls.toString() === p.energyClass.id.toString())
-    );
-    const byBTU = (p: ProductCard) => {
-      if (!f.btus.length) return true;
-      const btu = (p.btu?.value ?? '').toString();
-      const match = btu.match(/(\d+(?:\.\d+)?)/);
-      const k = match ? Math.round(parseFloat(match[1]) / 1000).toString() : '';
-      return f.btus.includes(k) || f.btus.includes((p.btu as any)?.value?.toString?.() ?? '');
-    };
-    const byRoomSize = (p: ProductCard) => {
-      if (!f.roomSizeRanges.length) return true;
-      
-      const roomSizeAttr = (p.attributes || []).find(a => 
-        (a.attributeKey || '').toLowerCase().includes('подходящ за помещения')
-      );
-      
-      if (roomSizeAttr && roomSizeAttr.attributeValue) {
-        // Извличаме числовата стойност от атрибута (например "45 кв.м" -> 45)
-        const roomSizeMatch = roomSizeAttr.attributeValue.match(/(\d+(\.\d+)?)/);
-        if (roomSizeMatch) {
-          const roomSize = parseFloat(roomSizeMatch[0]);
-          return f.roomSizeRanges.some(range => {
-            const [min, max] = range.split('-').map(Number);
-            return roomSize >= min && roomSize <= max;
-          });
-        }
-      }
-      return false;
-    };
-    
-    this.products = this.allPromoProducts
-      .filter(p => byBrand(p) && byPrice(p) && byClass(p) && byBTU(p) && byRoomSize(p));
-    // re-apply last sort to keep ordering consistent
-    this.onSortChanged(this.lastSortKey);
-  };
+  onFiltersChanged(filters: any) {
+    this.currentFilters = filters;
+    this.applyFilters(filters);
+  }
 
   onSortChanged = (key: string) => {
     // Normalize incoming keys from different sources
@@ -201,7 +215,7 @@ export class PromoProductsComponent implements OnInit {
       nameDesc: 'name-desc'
     };
     key = map[key] || key;
-    this.lastSortKey = key;
+    this.currentSort = key;
 
     const arr = [...this.products];
     const by = (k: keyof ProductCard, dir: 1|-1 = 1) => arr.sort((a,b)=>((a[k]||0)>(b[k]||0)?dir:-dir));
@@ -220,8 +234,44 @@ export class PromoProductsComponent implements OnInit {
     return +(bgn / rate).toFixed(2);
   }
 
+  private transformProductResponse(response: any): { items: ProductCard[], totalCount: number } {
+    const totalCount = response.totalCount || 0;
+    const items = response.items.map((p: ProductDto) => {
+      const priceEur = this.toEur(p.price);
+      const oldPriceEur = this.toEur(p.oldPrice ?? undefined);
+
+      // WiFi badge detection
+      const hasWifi = (p.attributes || []).some((a: any) => {
+        const key = (a.attributeKey || '').toLowerCase();
+        const value = (a.attributeValue || '').toString().toLowerCase().trim();
+        return (key.includes('wi-fi') || key.includes('wifi') || key.includes('wi fi')) &&
+               key.includes('модул') &&
+               (value === 'да' || value === 'da' || value === 'yes' || value === 'true');
+      });
+
+      const badges: Badge[] = [];
+      if (p.isNew) badges.push({ text: 'НОВО', bg: '#F54387', color: '#fff' });
+      if (p.isOnSale) badges.push({ text: 'ПРОМО', bg: '#E6003E', color: '#fff' });
+      if (hasWifi) badges.push({ text: 'WiFi', bg: '#3B82F6', color: '#fff' });
+
+      const btuStr = (this.getAttrFormatted(p, 'BTU') || '').toString();
+      const btuThousands = parseInt(btuStr.replace(/\D+/g, ''), 10) || 0;
+
+      const specs: Spec[] = [
+        { icon: 'bolt', label: 'Мощност', value: btuThousands > 0 ? String(btuThousands) : '' },
+        { icon: 'eco', label: 'Клас', value: p.energyClass?.class || this.getAttrFormatted(p, 'Клас') || '' },
+        { icon: 'ac_unit', label: 'Охлаждане', value: this.getAttrFormatted(p, 'Охлаждане') || '' },
+        { icon: 'wb_sunny', label: 'Отопление', value: this.getAttrFormatted(p, 'Отопление') || '' },
+      ];
+
+      return { ...p, badges, specs, priceEur, oldPriceEur } as ProductCard;
+    });
+
+    return { items, totalCount };
+  }
+
   get currentSortLabel(): string {
-    switch (this.lastSortKey) {
+    switch (this.currentSort) {
       case 'price-asc': return 'Ниска цена';
       case 'price-desc': return 'Висока цена';
       case 'name-asc': return 'A → Я';
@@ -231,7 +281,7 @@ export class PromoProductsComponent implements OnInit {
   }
 
   private loadPromoProducts(): void {
-    this.productService.getProducts({ page: 1, pageSize: 1000, isOnSale: true }).subscribe({
+    this.productService.getProducts({ isOnSale: true }).subscribe({
       next: (response) => {
         this.allPromoProducts = response.items.map((p: ProductDto) => {
           const priceEur = this.toEur(p.price);
@@ -273,7 +323,7 @@ export class PromoProductsComponent implements OnInit {
         this.maxPrice = prices.length ? Math.max(...prices) : 0;
         // Първоначално показваме всички и прилагаме последната подредба
         this.products = [...this.allPromoProducts];
-        this.onSortChanged(this.lastSortKey);
+        this.onSortChanged(this.currentSort);
         this.loading = false;
       },
       error: () => {
