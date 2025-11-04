@@ -25,6 +25,10 @@ namespace BGClima.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder
+            .HasDbFunction(() => GetMaxHeatingPowerSql(default!))
+            .HasName("get_max_heating_power");
+
             // Конфигурация на Brand
             modelBuilder.Entity<Brand>(entity =>
             {
@@ -138,5 +142,10 @@ namespace BGClima.Infrastructure.Data
             modelBuilder.Entity<ProductImage>()
                 .HasIndex(pi => pi.ProductId);
         }
+    
+
+            [DbFunction("get_max_heating_power", IsBuiltIn = false)]
+        public static double? GetMaxHeatingPowerSql(string attrValue)
+            => throw new NotSupportedException(); // EF will translate this to SQL
     }
 }

@@ -1,11 +1,13 @@
 using AutoMapper;
 using BGClima.API.DTOs;
+using BGClima.Application.Services;
 using BGClima.Domain.Entities;
 using BGClima.Infrastructure.Data;
-using BGClima.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Linq;
 
 namespace BGClima.API.Controllers
 {
@@ -36,6 +38,7 @@ namespace BGClima.API.Controllers
             [FromQuery] bool? isNew = null,
             [FromQuery] decimal? minPrice = null,
             [FromQuery] decimal? maxPrice = null,
+            [FromQuery] double[]? MaxHatingPowers = null,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 18,
             [FromQuery] string? sortBy = "name",
@@ -44,6 +47,7 @@ namespace BGClima.API.Controllers
             try
             {
                 // Валидация на параметрите
+
                 if (pageSize > 100) pageSize = 100; // Ограничаваме максималния брой продукти на страница
 
                 var query = _context.Products
@@ -54,7 +58,7 @@ namespace BGClima.API.Controllers
                     .AsQueryable();
 
                 // Филтриране
-                if (brandIds != null &&  brandIds.Any())
+                if (brandIds != null && brandIds.Any())
                     query = query.Where(p => brandIds.Contains(p.BrandId));
 
                 if (productTypeId.HasValue)
@@ -91,17 +95,29 @@ namespace BGClima.API.Controllers
                 // Сортиране
                 query = sortBy?.ToLower() switch
                 {
-                    "price" => sortOrder?.ToLower() == "desc" ? 
-                        query.OrderByDescending(p => p.Price) : 
+                    "price" => sortOrder?.ToLower() == "desc" ?
+                        query.OrderByDescending(p => p.Price) :
                         query.OrderBy(p => p.Price),
-                    _ => sortOrder?.ToLower() == "desc" ? 
-                        query.OrderByDescending(p => p.Name) : 
+                    _ => sortOrder?.ToLower() == "desc" ?
+                        query.OrderByDescending(p => p.Name) :
                         query.OrderBy(p => p.Name),
                 };
 
+                if (MaxHatingPowers != null && MaxHatingPowers.Any())
+                {
+                    query = query.Where(p =>
+                        p.Attributes.Any(a =>
+                            a.AttributeKey.Contains("Отдавана мощност на отопление") &&
+                            MaxHatingPowers.Any(m =>
+                                BGClimaContext.GetMaxHeatingPowerSql(a.AttributeValue).GetValueOrDefault() >= m
+                            )
+                        )
+                    );
+                }
+
                 // Брой на всички продукти след филтрирането
                 var totalCount = await query.CountAsync();
-                
+
                 // Прилагане на пагинация
                 var products = await query
                     .Skip((page - 1) * pageSize)
@@ -175,8 +191,8 @@ namespace BGClima.API.Controllers
                 if (!string.IsNullOrWhiteSpace(searchTerm))
                 {
                     searchTerm = searchTerm.ToLower();
-                    query = query.Where(p => 
-                        p.Name.ToLower().Contains(searchTerm) || 
+                    query = query.Where(p =>
+                        p.Name.ToLower().Contains(searchTerm) ||
                         (p.Description != null && p.Description.ToLower().Contains(searchTerm)) ||
                         (p.Sku != null && p.Sku.ToLower().Contains(searchTerm))
                     );
@@ -186,33 +202,33 @@ namespace BGClima.API.Controllers
                 switch (sortBy?.ToLower())
                 {
                     case "name":
-                        query = sortOrder?.ToLower() == "desc" 
+                        query = sortOrder?.ToLower() == "desc"
                             ? query.OrderByDescending(p => p.Name)
                             : query.OrderBy(p => p.Name);
                         break;
                     case "price":
-                        query = sortOrder?.ToLower() == "desc" 
+                        query = sortOrder?.ToLower() == "desc"
                             ? query.OrderByDescending(p => p.Price)
                             : query.OrderBy(p => p.Price);
                         break;
                     case "stock":
-                        query = sortOrder?.ToLower() == "desc" 
+                        query = sortOrder?.ToLower() == "desc"
                             ? query.OrderByDescending(p => p.StockQuantity)
                             : query.OrderBy(p => p.StockQuantity);
                         break;
                     case "brand":
-                        query = sortOrder?.ToLower() == "desc" 
+                        query = sortOrder?.ToLower() == "desc"
                             ? query.OrderByDescending(p => p.Brand.Name)
                             : query.OrderBy(p => p.Brand.Name);
                         break;
                     case "type":
-                        query = sortOrder?.ToLower() == "desc" 
+                        query = sortOrder?.ToLower() == "desc"
                             ? query.OrderByDescending(p => p.ProductType.Name)
                             : query.OrderBy(p => p.ProductType.Name);
                         break;
                     case "created":
                     default:
-                        query = sortOrder?.ToLower() == "desc" 
+                        query = sortOrder?.ToLower() == "desc"
                             ? query.OrderByDescending(p => p.Id)
                             : query.OrderBy(p => p.Id);
                         break;
@@ -365,7 +381,7 @@ namespace BGClima.API.Controllers
                 {
                     // Изтриваме старите атрибути
                     _context.ProductAttributes.RemoveRange(existingProduct.Attributes);
-                    
+
                     // Създаваме нови атрибути ръчно
                     var newAttributes = new List<ProductAttribute>();
                     foreach (var attrDto in updateProductDto.Attributes)
@@ -392,7 +408,7 @@ namespace BGClima.API.Controllers
                 {
                     // Изтриваме старите изображения
                     _context.ProductImages.RemoveRange(existingProduct.Images);
-                    
+
                     // Създаваме нови изображения
                     var newImages = _mapper.Map<List<ProductImage>>(updateProductDto.Images);
                     foreach (var img in newImages)

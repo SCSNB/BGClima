@@ -130,7 +130,6 @@ export class ProductCategoryComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
-      // debugger;
       const category = params.get('category');
       this.productTypeId = Number(category);
       
@@ -237,6 +236,11 @@ export class ProductCategoryComponent implements OnInit {
       filterParams.btuIds = btuIds; // Send array of BTU IDs
     }
 
+    if (filters?.powerKws?.length) {
+      // Convert string array to array of numbers for MaxHatingPowers
+      filterParams.MaxHatingPowers = filters.powerKws.map((kw: string) => parseFloat(kw));
+    }
+
     // Add room size filter if any are selected
     if (filters?.roomSizeRanges?.length) {
       filterParams.roomSize = filters.roomSizeRanges[0];
@@ -277,7 +281,7 @@ export class ProductCategoryComponent implements OnInit {
       if (this.hasWifi(p)) badges.push({ text: 'WiFi', bg: '#3B82F6', color: '#fff' });
 
       const btuThousands = this.getBtuInThousands(p);
-      const isHeatPump = !!p?.productType?.name && p.productType.name.toLowerCase().includes('термопомп');
+      const isHeatPump = this.productTypeId == 9;
       const coolingAttrKey = 'Отдавана мощност на охлаждане (Мин./Ном./Макс)';
       const heatingAttrKey = 'Отдавана мощност на отопление (Мин./Ном./Макс)';
 

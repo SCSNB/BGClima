@@ -139,6 +139,7 @@ export interface ProductFilterParams {
   energyClassIds?: number[];
   btuIds?: number[];
   roomSize?: string;
+  MaxHatingPowers?: number[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -175,6 +176,13 @@ export class ProductService {
         // Add each brand ID as a separate query parameter with the same name
         params.brandIds.forEach(id => {
           httpParams = httpParams.append('brandIds', id.toString());
+        });
+      }
+
+      if (params.MaxHatingPowers && params.MaxHatingPowers.length > 0) {
+        // Add each brand ID as a separate query parameter with the same name
+        params.MaxHatingPowers.forEach(kw => {
+          httpParams = httpParams.append('MaxHatingPowers', kw.toString());
         });
       }
       
