@@ -40,12 +40,20 @@ export class ProductListComponent implements OnInit {
 
   private load(pageIndex: number = 0, pageSize: number = this.pageSize): void {
     this.loading = true;
-    this.service.getProducts({
+    
+    const params: any = {
       page: pageIndex + 1, // API is 1-based, MatPaginator is 0-based
       pageSize: pageSize,
       sortBy: 'name',
       sortOrder: 'asc'
-    }).subscribe({
+    };
+    
+    // Add search term if it exists
+    if (this.searchTerm) {
+      params.searchTerm = this.searchTerm;
+    }
+    
+    this.service.getProductsForAdmin(params).subscribe({
       next: (response) => {
         this.dataSource.data = response.items;
         this.totalItems = response.totalCount;

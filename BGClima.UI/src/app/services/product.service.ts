@@ -163,6 +163,34 @@ export class ProductService {
     return headers.set('Authorization', `Bearer ${token}`);
   }
 
+  getProductsForAdmin(params?: ProductFilterParams): Observable<PaginatedResponse<ProductDto>> {
+    let httpParams = new HttpParams();
+    
+    if (params) {
+      if (params.page) httpParams = httpParams.set('page', params.page.toString());
+      if (params.pageSize) httpParams = httpParams.set('pageSize', params.pageSize.toString());
+      if (params.sortBy) httpParams = httpParams.set('sortBy', params.sortBy);
+      if (params.sortOrder) httpParams = httpParams.set('sortOrder', params.sortOrder);
+      
+      // Add search term if provided
+      if ((params as any).searchTerm) {
+        httpParams = httpParams.set('searchTerm', (params as any).searchTerm);
+      }
+    }
+
+    const url = `${this.baseUrl}/admin`;
+    return this.http.get<PaginatedResponse<ProductDto>>(url, { params: httpParams }).pipe(
+      tap({
+        next: (response) => {
+          console.log('Admin products response:', response);
+        },
+        error: (error) => {
+          console.error('Error fetching admin products:', error);
+        }
+      })
+    );
+  }
+
   getProducts(params?: ProductFilterParams): Observable<PaginatedResponse<ProductDto>> {
     console.log('Fetching products with params:', params);
     

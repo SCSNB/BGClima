@@ -46,10 +46,6 @@ namespace BGClima.API.Controllers
         {
             try
             {
-                // Валидация на параметрите
-
-                if (pageSize > 100) pageSize = 100; // Ограничаваме максималния брой продукти на страница
-
                 var query = _context.Products
                     .Where(p => p.IsActive)
                     .Include(p => p.BTU)
@@ -145,17 +141,9 @@ namespace BGClima.API.Controllers
         // GET: api/products/admin
         [HttpGet("admin")]
         public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsForAdmin(
-            [FromQuery] int? brandId = null,
-            [FromQuery] int? productTypeId = null,
-            [FromQuery] bool? isActive = null,
-            [FromQuery] bool? isFeatured = null,
-            [FromQuery] bool? isOnSale = null,
-            [FromQuery] bool? isNew = null,
             [FromQuery] string? searchTerm = null,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 20,
-            [FromQuery] string? sortBy = "name",
-            [FromQuery] string? sortOrder = "asc")
+            [FromQuery] int pageSize = 18)
         {
             try
             {
@@ -168,26 +156,7 @@ namespace BGClima.API.Controllers
                     .Include(p => p.Images)
                     .AsQueryable();
 
-                // Филтриране
-                if (brandId.HasValue)
-                    query = query.Where(p => p.BrandId == brandId);
 
-                if (productTypeId.HasValue)
-                    query = query.Where(p => p.ProductTypeId == productTypeId);
-
-                if (isActive.HasValue)
-                    query = query.Where(p => p.IsActive == isActive);
-
-                if (isFeatured.HasValue)
-                    query = query.Where(p => p.IsFeatured == isFeatured);
-
-                if (isOnSale.HasValue)
-                    query = query.Where(p => p.IsOnSale == isOnSale);
-
-                if (isNew.HasValue)
-                    query = query.Where(p => p.IsNew == isNew);
-
-                // Търсене по име или описание
                 if (!string.IsNullOrWhiteSpace(searchTerm))
                 {
                     searchTerm = searchTerm.ToLower();
@@ -198,56 +167,23 @@ namespace BGClima.API.Controllers
                     );
                 }
 
-                // Сортиране
-                switch (sortBy?.ToLower())
-                {
-                    case "name":
-                        query = sortOrder?.ToLower() == "desc"
-                            ? query.OrderByDescending(p => p.Name)
-                            : query.OrderBy(p => p.Name);
-                        break;
-                    case "price":
-                        query = sortOrder?.ToLower() == "desc"
-                            ? query.OrderByDescending(p => p.Price)
-                            : query.OrderBy(p => p.Price);
-                        break;
-                    case "stock":
-                        query = sortOrder?.ToLower() == "desc"
-                            ? query.OrderByDescending(p => p.StockQuantity)
-                            : query.OrderBy(p => p.StockQuantity);
-                        break;
-                    case "brand":
-                        query = sortOrder?.ToLower() == "desc"
-                            ? query.OrderByDescending(p => p.Brand.Name)
-                            : query.OrderBy(p => p.Brand.Name);
-                        break;
-                    case "type":
-                        query = sortOrder?.ToLower() == "desc"
-                            ? query.OrderByDescending(p => p.ProductType.Name)
-                            : query.OrderBy(p => p.ProductType.Name);
-                        break;
-                    case "created":
-                    default:
-                        query = sortOrder?.ToLower() == "desc"
-                            ? query.OrderByDescending(p => p.Id)
-                            : query.OrderBy(p => p.Id);
-                        break;
-                }
-
-                // Пагинация
                 var totalCount = await query.CountAsync();
+
                 var products = await query
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync();
 
-                // Добавяме метаданни за пагинация
-                Response.Headers.Add("X-Total-Count", totalCount.ToString());
-                Response.Headers.Add("X-Page", page.ToString());
-                Response.Headers.Add("X-PageSize", pageSize.ToString());
-                Response.Headers.Add("X-Total-Pages", Math.Ceiling((double)totalCount / pageSize).ToString());
+                var result = new
+                {
+                    TotalCount = totalCount,
+                    PageSize = pageSize,
+                    CurrentPage = page,
+                    TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                    Items = _mapper.Map<List<ProductDto>>(products)
+                };
 
-                return Ok(_mapper.Map<List<ProductDto>>(products));
+                return Ok(result);
             }
             catch (Exception ex)
             {
