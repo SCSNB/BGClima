@@ -323,22 +323,6 @@ export class ProductCategoryComponent implements OnInit {
     return { items, totalCount };
   }
 
-  // Извлича максималната стойност (kW) от атрибут "Отдавана мощност на отопление (Мин./Ном./Макс)"
-  // Връща число (kW) или null ако липсва/невалидно
-  private getHeatingPowerMaxKw(p: ProductDto): number | null {
-    const attrs = p?.attributes || [];
-    const fullKey = 'Отдавана мощност на отопление (Мин./Ном./Макс)';
-    const found = attrs.find(a => (a.attributeKey || '').trim() === fullKey);
-    const raw = found?.attributeValue?.toString() || '';
-    if (!raw) return null;
-    const matches = raw.match(/(\d+[\.,]?\d*)/g);
-    if (!matches || matches.length === 0) return null;
-    const nums = matches.map(v => parseFloat(v.replace(',', '.'))).filter(n => !isNaN(n));
-    if (nums.length === 0) return null;
-    const max = Math.max(...nums);
-    return isFinite(max) ? max : null;
-  }
-
   private setCategoryTitle(category: string): void {
     const categoryMap: { [key: string]: string } = {
       '1': 'Климатици стенен тип',

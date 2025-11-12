@@ -281,52 +281,47 @@ export class PromoProductsComponent implements OnInit {
   }
 
   private loadPromoProducts(): void {
-    this.productService.getProducts({ isOnSale: true }).subscribe({
+    this.loading = true;
+    
+    const filterParams = {
+      isOnSale: true,
+      page: 1,
+      pageSize: 1000 // Set a high number to get all promo products at once
+    };
+
+    this.productService.getProducts(filterParams).subscribe({
       next: (response) => {
-        this.allPromoProducts = response.items.map((p: ProductDto) => {
-          const priceEur = this.toEur(p.price);
-          const oldPriceEur = this.toEur(p.oldPrice ?? undefined);
-
-// WiFi badge detection (same as Offers)
-          const hasWifi = (p.attributes || []).some((a: any) => {
-            const key = (a.attributeKey || '').toLowerCase();
-            const value = (a.attributeValue || '').toString().toLowerCase().trim();
-            return (key.includes('wi-fi') || key.includes('wifi') || key.includes('wi fi')) &&
-                   key.includes('модул') &&
-                   (value === 'да' || value === 'da' || value === 'yes' || value === 'true');
-          });
-
-          const badges: Badge[] = [];
-          if (p.isNew) badges.push({ text: 'НОВО', bg: '#F54387', color: '#fff' });
-          if (p.isOnSale) badges.push({ text: 'ПРОМО', bg: '#E6003E', color: '#fff' });
-          if (hasWifi) badges.push({ text: 'WiFi', bg: '#3B82F6', color: '#fff' });
-
-          const btuStr = (this.getAttrFormatted(p, 'BTU') || '').toString();
-          const btuThousands = parseInt(btuStr.replace(/\D+/g, ''), 10) || 0;
-
-          const specs: Spec[] = [
-            { icon: 'bolt', label: 'Мощност', value: btuThousands > 0 ? String(btuThousands) : '' },
-            { icon: 'eco', label: 'Клас', value: p.energyClass?.class || this.getAttrFormatted(p, 'Клас') || '' },
-            { icon: 'ac_unit', label: 'Охлаждане', value: this.getAttrFormatted(p, 'Охлаждане') || '' },
-            { icon: 'wb_sunny', label: 'Отопление', value: this.getAttrFormatted(p, 'Отопление') || '' },
-          ];
-
-          return { ...p, badges, specs, priceEur, oldPriceEur } as ProductCard;
-        });
-        // Определи разрешените марки на база наличните промо продукти
+        // Transform the response using the existing method
+        const { items, totalCount } = this.transformProductResponse(response);
+        this.allPromoProducts = items;
+        
+        // Extract unique brand names from allPromoProducts
         const brandSet = new Set<string>();
-        this.allPromoProducts.forEach(p => { const n = p.brand?.name?.trim(); if (n) brandSet.add(n); });
-        this.allowedBrandNames = Array.from(brandSet).sort((a,b)=>a.localeCompare(b));
-        // Определи мин/макс цена
-        const prices = this.allPromoProducts.map(p => p.price || 0);
-        this.minPrice = prices.length ? Math.min(...prices) : 0;
-        this.maxPrice = prices.length ? Math.max(...prices) : 0;
-        // Първоначално показваме всички и прилагаме последната подредба
+        this.allPromoProducts.forEach(p => { 
+          const brandName = p.brand?.name?.trim(); 
+          if (brandName) brandSet.add(brandName); 
+        });
+        this.allowedBrandNames = Array.from(brandSet).sort((a, b) => a.localeCompare(b));
+        
+        // Calculate min and max prices from allPromoProducts
+        if (this.allPromoProducts.length > 0) {
+          const prices = this.allPromoProducts
+            .map(p => p.price || 0)
+            .filter(price => price > 0);
+          
+          if (prices.length > 0) {
+            this.minPrice = Math.min(...prices);
+            this.maxPrice = Math.max(...prices);
+          }
+        }
+        
+        // Update products and apply sorting
         this.products = [...this.allPromoProducts];
-        this.onSortChanged(this.currentSort);
+        this.totalItems = this.allPromoProducts.length;
         this.loading = false;
       },
-      error: () => {
+      error: (error) => {
+        console.error('Error loading promo products:', error);
         this.products = [];
         this.loading = false;
       }
@@ -336,7 +331,6 @@ export class PromoProductsComponent implements OnInit {
   // Mirror OffersComponent attribute parsing
   private getAttrFormatted(p: ProductDto, key: string): string {
     const normalizedKey = key.trim().toLowerCase();
-    const isHeatPump = !!p?.productType?.name && p.productType.name.toLowerCase().includes('термопомп');
 
     if (normalizedKey === 'btu') {
       if (p.btu?.value) {
