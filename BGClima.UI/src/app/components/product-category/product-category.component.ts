@@ -5,6 +5,26 @@ import { ProductDto, ProductService } from 'src/app/services/product.service';
 import { FilterDialogComponent } from 'src/app/shared/components/filter-dialog/filter-dialog.component';
 import { CompareService } from 'src/app/services/compare.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
+import { Subject } from 'rxjs';
+
+// Custom paginator for Bulgarian language
+export class BgPaginatorIntl implements MatPaginatorIntl {
+  changes = new Subject<void>();
+  firstPageLabel = 'Първа страница';
+  itemsPerPageLabel = 'Продукти на страница:';
+  lastPageLabel = 'Последна страница';
+  nextPageLabel = 'Следваща страница';
+  previousPageLabel = 'Предишна страница';
+
+  getRangeLabel(page: number, pageSize: number, length: number): string {
+    if (length === 0) {
+      return 'Страница 1 от 1';
+    }
+    const amountPages = Math.ceil(length / pageSize);
+    return `Страница ${page + 1} от ${amountPages}`;
+  }
+}
 
 type Badge = { bg: string; color: string; text: string };
 type Spec = { icon: string; label: string; value: string };
@@ -22,7 +42,10 @@ type ProductCard = ProductDto & {
   encapsulation: ViewEncapsulation.None,
   host: {
     'class': 'app-product-category'
-  }
+  },
+  providers: [
+    { provide: MatPaginatorIntl, useClass: BgPaginatorIntl }
+  ]
 })
 
 export class ProductCategoryComponent implements OnInit {
@@ -53,7 +76,8 @@ export class ProductCategoryComponent implements OnInit {
     private productService: ProductService,
     public dialog: MatDialog,
     private compareService: CompareService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    public _MatPaginatorIntl: MatPaginatorIntl
   ) { 
     this.checkScreenSize();
   }

@@ -298,6 +298,7 @@ app-product-category .desktop-actions,
     height: 100%;
     overflow-y: auto;
   }
+}
 
   .filters-content {
     padding: 0 16px 16px;
@@ -377,7 +378,6 @@ app-product-category .desktop-actions,
       }
     }
   }
-}
 
 /* Override dialog container styles */
 ::ng-deep .mobile-filters-dialog-container {
@@ -546,23 +546,6 @@ app-product-category .desktop-actions,
         @media (min-width: 992px) {
           grid-template-columns: repeat(3, 1fr);
         }
-
-        /* На по-тесни екрани позволяваме по-малка минимална ширина */
-        @media (max-width: 991px) {
-          grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-          gap: 12px;
-        }
-        @media (max-width: 768px) {
-          grid-template-columns: repeat(2, 1fr);
-          gap: 10px;
-        }
-        @media (max-width: 576px) {
-          grid-template-columns: 1fr;
-          max-width: 420px;
-          margin: 0 auto;
-          gap: 10px;
-        }
-      }
 
       .product-card-link {
         text-decoration: none;
@@ -1113,62 +1096,105 @@ app-product-category .desktop-actions,
   }
 }
 
-/* 
 .pagination-container {
   width: 100%;
-  margin-top: 2rem;
-  padding: 1.5rem 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border-top: 1px solid #e0e0e0;
   background: #fff;
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-
-  .pagination-info {
-    text-align: center;
-    margin-bottom: 1rem;
-    color: #5f6368;
-    font-size: 0.9rem;
-    font-weight: 500;
-  }
-
-  .product-paginator {
-    width: 100%;
-    max-width: 800px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-top: 1.5rem;
+  
+  mat-paginator {
     background: transparent;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0;
     
     ::ng-deep {
       .mat-mdc-paginator-container {
+        justify-content: center;
         padding: 0;
         min-height: 40px;
-        justify-content: space-between;
-        flex-wrap: nowrap;
-        
-        @media (max-width: 599px) {
-          flex-wrap: wrap;
-          justify-content: center;
-        }
       }
       
       .mat-mdc-paginator-page-size {
-        margin: 0;
-        display: flex;
-        align-items: center;
-        
-        .mat-mdc-paginator-page-size-label {
-          margin: 0 8px 0 0;
-          font-size: 13px;
-          color: #5f6368;
+        margin: 0 16px 0 0;
+      }
+      
+      .mat-mdc-paginator-range-actions {
+        margin: 0 8px;
+      }
+    }
+  }
+}
+
+/* Match the grid layout padding */
+:host {
+  display: block;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  box-sizing: border-box;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  :host {
+    padding: 0 1.5rem;
+  }
+  
+  .pagination-container {
+    padding: 1.25rem 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  :host {
+    padding: 0 1rem;
+  }
+  
+  .pagination-container {
+    padding: 1rem;
+    margin-top: 1.5rem;
+    
+    mat-paginator {
+      ::ng-deep {
+        .mat-mdc-paginator-container {
+          flex-wrap: wrap;
+          gap: 8px;
         }
         
-        .mat-mdc-select {
-          font-size: 13px;
-          
-          .mat-mdc-select-arrow {
+        .mat-mdc-paginator-range-actions {
+          order: 1;
+          width: 100%;
+          justify-content: center;
+          margin: 8px 0 0;
+        }
+        
+        .mat-mdc-paginator-page-size {
+          margin: 0;
+        }
+      }
+    }
+  }
+}
+
+/* Pagination styles are now properly scoped above */
+.pagination-container {
+  mat-paginator {
+    ::ng-deep {
+      .mat-mdc-paginator-page-size-label {
+        margin: 0 8px 0 0;
+        font-size: 13px;
+        color: #5f6368;
+      }
+      
+      .mat-mdc-select {
+        font-size: 13px;
+        
+        .mat-mdc-select-arrow {
             color: #5f6368;
           }
         }
@@ -1185,10 +1211,14 @@ app-product-category .desktop-actions,
         .mat-mdc-icon-button {
           width: 36px;
           height: 36px;
-          line-height: 36px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0;
           margin: 0 4px;
           border-radius: 4px;
           transition: background-color 0.2s;
+          vertical-align: middle;
           
           &:hover {
             background-color: rgba(0, 0, 0, 0.04);
@@ -1214,5 +1244,3 @@ app-product-category .desktop-actions,
     }
   }
 }
-
-*/
