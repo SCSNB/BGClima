@@ -114,16 +114,14 @@
   </div>
 </div>
 
-
-
-    <div class="pagination-container">
-      <mat-paginator 
-        [length]="totalItems"
-        [pageSize]="pageSize"
-        [pageSizeOptions]="pageSizeOptions"
-        [pageIndex]="currentPage - 1"
-        (page)="onPageChange($event)"
-        aria-label="Изберете страница"
-        class="product-paginator">
-      </mat-paginator>
-    </div>
+<div class="pagination-container">
+  <mat-paginator 
+    [length]="totalItems"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    [pageIndex]="currentPage - 1"
+    (page)="onPageChange($event)"
+    aria-label="Изберете страница"
+    class="product-paginator">
+   </mat-paginator>
+</div>

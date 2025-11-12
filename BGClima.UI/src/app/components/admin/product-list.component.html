@@ -2,12 +2,15 @@
   <div class="search-container">
     <mat-form-field appearance="outline" class="search-field">
       <mat-label>Търсене на продукт</mat-label>
-      <input matInput placeholder="Въведете име или ID" [(ngModel)]="searchTerm" (keyup)="applyFilter()">
+      <input matInput placeholder="Въведете име" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()">
       <button mat-icon-button matSuffix *ngIf="searchTerm" (click)="clearSearch()">
         <mat-icon>close</mat-icon>
       </button>
-      <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
+    <button mat-flat-button color="primary" class="search-button" (click)="onSearch()">
+      <mat-icon>search</mat-icon>
+      Търси
+    </button>
   </div>
   <div class="toolbar-right">
     <button mat-flat-button color="primary" (click)="addProduct()">

@@ -91,6 +91,18 @@
           </div>
         </a>
       </ng-container>
+
+      <div class="pagination-container" *ngIf="!loading && products.length > 0">
+        <mat-paginator 
+          [length]="totalItems"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          [pageIndex]="currentPage - 1"
+          (page)="onPageChange($event)"
+          aria-label="Изберете страница"
+          class="product-paginator">
+        </mat-paginator>
+      </div>
     </div>
 
     <div class="empty" *ngIf="!loading && !products.length">

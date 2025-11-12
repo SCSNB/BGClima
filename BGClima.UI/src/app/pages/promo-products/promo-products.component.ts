@@ -181,7 +181,6 @@ export class PromoProductsComponent implements OnInit {
     });
   }
 
-
   clearFilters() {
     // Reset all filters to their default values
     this.filters = {
@@ -206,27 +205,16 @@ export class PromoProductsComponent implements OnInit {
     this.applyFilters(filters);
   }
 
-  onSortChanged = (key: string) => {
-    // Normalize incoming keys from different sources
-    const map: Record<string, string> = {
-      priceAsc: 'price-asc',
-      priceDesc: 'price-desc',
-      nameAsc: 'name-asc',
-      nameDesc: 'name-desc'
-    };
-    key = map[key] || key;
-    this.currentSort = key;
+  onSortChanged(sortKey: string) {
+    this.currentSort = sortKey;
+    this.applyFilters(this.currentFilters);
+  }
 
-    const arr = [...this.products];
-    const by = (k: keyof ProductCard, dir: 1|-1 = 1) => arr.sort((a,b)=>((a[k]||0)>(b[k]||0)?dir:-dir));
-    switch (key) {
-      case 'name-asc': this.products = arr.sort((a,b)=> (a.name||'').localeCompare(b.name||'')); break;
-      case 'name-desc': this.products = arr.sort((a,b)=> (b.name||'').localeCompare(a.name||'')); break;
-      case 'price-asc': this.products = by('price', 1); break;
-      case 'price-desc': this.products = by('price', -1); break;
-      case 'newest': default: this.products = arr; break;
-    }
-  };
+  onPageChange(event: any) {
+    this.currentPage = event.pageIndex + 1;
+    this.pageSize = event.pageSize;
+    this.applyFilters(this.currentFilters);
+  }
 
   private toEur(bgn?: number | null): number | null {
     if (bgn === undefined || bgn === null) return null;
@@ -283,11 +271,18 @@ export class PromoProductsComponent implements OnInit {
   private loadPromoProducts(): void {
     this.loading = true;
     
-    const filterParams = {
+    const filterParams: any = {
       isOnSale: true,
       page: 1,
       pageSize: 1000 // Set a high number to get all promo products at once
     };
+
+    // Add sorting parameters if any
+    if (this.currentSort) {
+      const [sortBy, sortOrder] = this.currentSort.split('-');
+      filterParams.sortBy = sortBy;
+      filterParams.sortOrder = sortOrder as 'asc' | 'desc';
+    }
 
     this.productService.getProducts(filterParams).subscribe({
       next: (response) => {

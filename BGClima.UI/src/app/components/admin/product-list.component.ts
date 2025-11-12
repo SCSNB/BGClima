@@ -75,6 +75,10 @@ export class ProductListComponent implements OnInit {
     this.load(0, this.pageSize);
   }
 
+  onSearch(): void {
+    this.applyFilter();
+  }
+
   clearSearch(): void {
     this.searchTerm = '';
     this.applyFilter();
