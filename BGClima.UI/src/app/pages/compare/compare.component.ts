@@ -22,14 +22,14 @@ export class CompareComponent implements OnInit {
     this.products = this.compareService.getAll();
     if (this.products.length < 2) {
       this.snackBar.open('Моля, изберете поне 2 продукта за сравнение.', 'OK', { duration: 2000 });
-      this.router.navigate(['/products/stenen-tip']); // fallback към някоя категория
+      this.router.navigate(['/products/1']); // fallback към някоя категория
       return;
     }
     // също се абонираме за промени
     this.compareService.products$.subscribe(list => {
       this.products = list;
       if (list.length < 2) {
-        this.router.navigate(['/products/stenen-tip']);
+        this.router.navigate(['/products/1']);
       }
     });
   }
