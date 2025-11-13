@@ -156,10 +156,9 @@ namespace BGClima.API.Controllers
                     .Include(p => p.Images)
                     .AsQueryable();
 
-
                 if (!string.IsNullOrWhiteSpace(searchTerm))
                 {
-                    searchTerm = searchTerm.ToLower();
+                    searchTerm = searchTerm.Trim().ToLower();
                     query = query.Where(p =>
                         p.Name.ToLower().Contains(searchTerm) ||
                         (p.Description != null && p.Description.ToLower().Contains(searchTerm)) ||
@@ -191,7 +190,6 @@ namespace BGClima.API.Controllers
             }
         }
 
-        // GET: api/products/category/stenen-tip
         [HttpGet("category/{categoryName}")]
         public async Task<IActionResult> GetProductsByCategory(string categoryName)
         {
