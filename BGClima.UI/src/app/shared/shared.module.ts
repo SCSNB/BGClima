@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 // Material Modules
 import { MatButtonModule } from '@angular/material/button';
@@ -14,9 +15,19 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { FilterDialogComponent } from './components/filter-dialog/filter-dialog.component';
+import { ProductCardComponent } from './components/product-card/product-card.component';
+import { ProductGridComponent } from './components/product-grid/product-grid.component';
 
 @NgModule({
+  declarations: [
+    FilterDialogComponent,
+    ProductCardComponent,
+    ProductGridComponent
+  ],
   imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
     // Material Modules
     MatButtonModule,
     MatDialogModule,
@@ -39,16 +50,15 @@ import { FilterDialogComponent } from './components/filter-dialog/filter-dialog.
     MatSlideToggleModule,
     MatSliderModule,
     // Components
-    FilterDialogComponent
+    FilterDialogComponent,
+    ProductCardComponent,
+    ProductGridComponent
   ],
   entryComponents: [
     FilterDialogComponent
   ],
   providers: [
     { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true } }
-  ],
-  declarations: [
-    FilterDialogComponent
   ]
 })
 export class SharedModule { }

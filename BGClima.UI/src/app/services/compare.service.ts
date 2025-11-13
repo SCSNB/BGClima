@@ -46,6 +46,50 @@ export class CompareService {
     return this.currentMaxCompare();
   }
 
+  // Alias for getAll() to maintain backward compatibility
+  getCompareList(): ProductDto[] {
+    return this.productsSubject.value;
+  }
+
+  // Get list of product IDs in compare
+  getCompareListIds(): number[] {
+    return this.productsSubject.value.map(p => p.id);
+  }
+
+  // Check if a product is in compare list
+  isInCompareList(productId: number): boolean {
+    return this.productsSubject.value.some(p => p.id === productId);
+  }
+
+  // Toggle product in compare list
+  toggleCompare(product: ProductDto): boolean {
+    const currentList = this.productsSubject.value;
+    const maxCompare = this.currentMaxCompare();
+    
+    // Check if product is already in compare list
+    const existingIndex = currentList.findIndex(p => p.id === product.id);
+    
+    if (existingIndex > -1) {
+      // Remove from compare
+      const newList = [...currentList];
+      newList.splice(existingIndex, 1);
+      this.productsSubject.next(newList);
+      this.countSubject.next(newList.length);
+      this.persist(newList);
+      return false;
+    } else if (currentList.length >= maxCompare) {
+      // Can't add more items
+      return false;
+    } else {
+      // Add to compare
+      const newList = [...currentList, product];
+      this.productsSubject.next(newList);
+      this.countSubject.next(newList.length);
+      this.persist(newList);
+      return true;
+    }
+  }
+
   getAll(): ProductDto[] {
     return this.productsSubject.value;
   }

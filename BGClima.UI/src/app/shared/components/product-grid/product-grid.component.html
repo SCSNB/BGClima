@@ -1,0 +1,16 @@
+<div class="product-grid">
+  <ng-container *ngIf="products && products.length > 0; else noProducts">
+    <div *ngFor="let product of products" class="product-card" (click)="onProductClick($event, product)">
+      <app-product-card 
+        [product]="transformProduct(product)"
+        (compareClick)="$event.event.stopPropagation()">
+      </app-product-card>
+    </div>
+  </ng-container>
+  
+  <ng-template #noProducts>
+    <div class="no-products">
+      <p class="no-products-message">Няма намерени продукти.</p>
+    </div>
+  </ng-template>
+</div>
