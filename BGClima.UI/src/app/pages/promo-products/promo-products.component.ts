@@ -283,7 +283,7 @@ export class PromoProductsComponent implements OnInit {
     const filterParams: any = {
       isOnSale: true,
       page: 1,
-      pageSize: 1000 // Set a high number to get all promo products at once
+      pageSize: 18
     };
 
     // Add sorting parameters if any
@@ -296,7 +296,7 @@ export class PromoProductsComponent implements OnInit {
     this.productService.getProducts(filterParams).subscribe({
       next: (response) => {
         // Transform the response using the existing method
-        const { items, totalCount } = this.transformProductResponse(response);
+        const { items } = this.transformProductResponse(response);
         this.allPromoProducts = items;
         
         // Extract unique brand names from allPromoProducts
