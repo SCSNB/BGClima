@@ -1,8 +1,28 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, TemplateRef, HostListener } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, TemplateRef, HostListener, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ProductDto, ProductService } from '../../services/product.service';
 import { CompareService } from '../../services/compare.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatPaginatorIntl } from '@angular/material/paginator';
+import { Subject } from 'rxjs';
+
+// Custom paginator for Bulgarian language
+export class BgPaginatorIntl implements MatPaginatorIntl {
+  changes = new Subject<void>();
+  firstPageLabel = 'Първа страница';
+  itemsPerPageLabel = 'Продукти на страница:';
+  lastPageLabel = 'Последна страница';
+  nextPageLabel = 'Следваща страница';
+  previousPageLabel = 'Предишна страница';
+
+  getRangeLabel(page: number, pageSize: number, length: number): string {
+    if (length === 0) {
+      return 'Страница 1 от 1';
+    }
+    const amountPages = Math.ceil(length / pageSize);
+    return `Страница ${page + 1} от ${amountPages}`;
+  }
+}
 
 interface Badge { bg: string; color: string; text: string }
 interface Spec { icon: string; label: string; value: string }
@@ -17,7 +37,14 @@ type ProductCard = ProductDto & {
 @Component({
   selector: 'app-promo-products',
   templateUrl: './promo-products.component.html',
-  styleUrls: ['./promo-products.component.scss']
+  styleUrls: ['./promo-products.component.scss'],
+  encapsulation: ViewEncapsulation.None,
+  host: {
+    'class': 'app-promo-products'
+  },
+  providers: [
+    { provide: MatPaginatorIntl, useClass: BgPaginatorIntl }
+  ]
 })
 export class PromoProductsComponent implements OnInit {
   title = 'ПРОМО оферти';
