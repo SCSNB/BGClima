@@ -50,6 +50,7 @@ namespace BGClima.API.Controllers
                     .Where(p => p.IsActive)
                     .Include(p => p.BTU)
                     .Include(p => p.EnergyClass)
+                    .Include(p => p.Brand)
                     .Include(p => p.Attributes.Where(a => a.AttributeKey.Contains("мощност") || a.AttributeKey.Contains("Енергиен") || a.AttributeKey.Contains("Wi-Fi")))
                     .AsQueryable();
 

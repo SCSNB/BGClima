@@ -151,8 +151,8 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     { slug: '10', label: 'Мулти сплит системи' },
     { slug: '4', label: 'Климатици касетъчен тип' },
     { slug: '3', label: 'Климатици канален тип' },
-    { slug: '6', label: 'Климатици подово - таванен тип' },
-    { slug: '8', label: 'Мобилни / преносими климатици' },
+    { slug: '6', label: 'Подово - таванен тип' },
+    { slug: '8', label: 'Мобилни / преносими' },
     { slug: '7', label: 'VRF / VRV' }
   ];
   

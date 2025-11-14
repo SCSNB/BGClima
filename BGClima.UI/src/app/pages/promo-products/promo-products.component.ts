@@ -41,7 +41,7 @@ export class PromoProductsComponent implements OnInit {
     roomSizeRanges: string[];
   } = {
     brands: [],
-    price: { lower: 0, upper: 0 },
+    price: { lower: 0, upper: 20000 },
     energyClasses: [],
     btus: [],
     roomSizeRanges: []
@@ -70,7 +70,7 @@ export class PromoProductsComponent implements OnInit {
 
   // За колоната с филтри
   minPrice = 0;
-  maxPrice = 0;
+  maxPrice = 20000;
   currentCategory = '';
   isMobile = false;
   private dialogRef: any;
@@ -170,7 +170,16 @@ export class PromoProductsComponent implements OnInit {
     this.productService.getProducts(filterParams).subscribe({
       next: (response) => {
         const { items, totalCount } = this.transformProductResponse(response);
+                // Extract unique brand names from allPromoProducts
+
         this.products = items;
+        const brandSet = new Set<string>();
+        this.products.forEach(p => { 
+          const brandName = p.brand?.name?.trim(); 
+          if (brandName) brandSet.add(brandName); 
+        });
+
+        this.allowedBrandNames = Array.from(brandSet).sort((a, b) => a.localeCompare(b));
         this.totalItems = totalCount;
         this.loading = false;
       },
@@ -297,18 +306,6 @@ export class PromoProductsComponent implements OnInit {
           if (brandName) brandSet.add(brandName); 
         });
         this.allowedBrandNames = Array.from(brandSet).sort((a, b) => a.localeCompare(b));
-        
-        // Calculate min and max prices from allPromoProducts
-        if (this.allPromoProducts.length > 0) {
-          const prices = this.allPromoProducts
-            .map(p => p.price || 0)
-            .filter(price => price > 0);
-          
-          if (prices.length > 0) {
-            this.minPrice = Math.min(...prices);
-            this.maxPrice = Math.max(...prices);
-          }
-        }
         
         // Update products and apply sorting
         this.products = [...this.allPromoProducts];

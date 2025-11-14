@@ -56,7 +56,7 @@ export class ProductCategoryComponent implements OnInit {
   filteredProducts: ProductCard[] = []; // Products to display after filtering
   currentCategory: string = '';
   minPrice: number = 0;
-  maxPrice: number = 0;
+  maxPrice: number = 20000;
   isMobile: boolean = false;
   currentFilters: any;
   currentSort: string | null = null; // Track current sort order
@@ -184,19 +184,24 @@ export class ProductCategoryComponent implements OnInit {
   }
 
   loadProducts(): void {
-    this.productService.getProductsByCategory(this.currentPage, this.pageSize, this.productTypeId).subscribe(response => {
+    const filterParams = {
+      productTypeId: this.productTypeId,
+      page: this.currentPage,
+      pageSize: this.pageSize,
+      price: { lower: 0, upper: 20000 } // Hardcoded max price of 20000
+    };
+
+    this.productService.getProducts(filterParams).subscribe(response => {
       const { items, totalCount } = this.transformProductResponse(response);
       this.totalItems = totalCount;
      
       this.allProducts = items;
       this.filteredProducts = [...items];
-      this.maxPrice = this.computeMaxPrice(this.allProducts);
-      this.minPrice = 0; // Reset min price
 
-      // Reset filters with new price range
+      // Update current filters with the hardcoded price range
       this.currentFilters = {
         brands: [],
-        price: { lower: 0, upper: this.maxPrice },
+        price: { lower: 0, upper: 20000 },
         energyClasses: [],
         btus: [],
         roomSizeRanges: [],
