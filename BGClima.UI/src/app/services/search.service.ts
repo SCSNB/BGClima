@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { map, debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
-import { ProductService, ProductDto, ProductFilterParams } from './product.service';
+import { map, catchError } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
+import { ProductDto } from './product.service';
 
 export interface SearchResult {
   id: number;
@@ -17,86 +19,36 @@ export interface SearchResult {
   providedIn: 'root'
 })
 export class SearchService {
-  private allProducts: ProductDto[] = [];
-  private productsLoaded = false;
+  private readonly baseUrl = environment.production ? '/api/products' : `${environment.apiUrl}/api/products`;
+  private readonly apiUrl = environment.production ? '/api' : `${environment.apiUrl}/api`;
 
-  constructor(private productService: ProductService) {
-    this.loadProducts();
-  }
-
-  private loadProducts(): void {
-    // Load all products for search (using a large page size to get all at once)
-    this.productService.getProducts({ page: 1, pageSize: 1000 }).subscribe({
-      next: (response) => {
-        this.allProducts = response.items;
-        this.productsLoaded = true;
-        console.log(`Loaded ${response.totalCount} products for search`);
-      },
-      error: (error) => {
-        console.error('Error loading products for search:', error);
-        this.productsLoaded = true; // Set to true to prevent infinite loading
-      }
-    });
-  }
+  constructor(private http: HttpClient) {}
 
   searchProducts(query: string): Observable<SearchResult[]> {
-    if (!query || query.trim().length < 2) {
+    if (!query || query.trim().length === 0) {
       return of([]);
     }
 
-    if (!this.productsLoaded) {
-      // If products aren't loaded yet, wait and try again
-      return new Observable(observer => {
-        const checkInterval = setInterval(() => {
-          if (this.productsLoaded) {
-            clearInterval(checkInterval);
-            this.performSearch(query).subscribe(observer);
-          }
-        }, 100);
-        
-        // Timeout after 5 seconds
-        setTimeout(() => {
-          clearInterval(checkInterval);
-          observer.next([]);
-          observer.complete();
-        }, 5000);
-      });
-    }
-
-    return this.performSearch(query);
+    debugger;
+    const encodedQuery = encodeURIComponent(query.trim());
+    return this.http.get<ProductDto[]>(`${this.baseUrl}/search?searchTerm=${encodedQuery}`).pipe(
+      map(products => {
+        return products.map(product => ({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          oldPrice: product.oldPrice,
+          imageUrl: product.imageUrl,
+          brand: product.brand?.name,
+          slug: this.generateSlug(product.name)
+        } as SearchResult));
+      }),
+      catchError(error => {
+        console.error('Error performing search:', error);
+        return of([]);
+      })
+    );
   }
-
-  private performSearch(query: string): Observable<SearchResult[]> {
-  const searchTerm = query.toLowerCase().trim();
-  
-  // Create search parameters
-  debugger;
-  const params: ProductFilterParams = {
-    searchTerm: searchTerm,
-    page: 1,
-    pageSize: 100 // Adjust based on your needs
-  };
-
-  // Use the product service to search
-  return this.productService.getProducts(params).pipe(
-    map(response => {
-      // Map the ProductDto[] to SearchResult[]
-      return response.items.map(product => ({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        oldPrice: product.oldPrice,
-        imageUrl: product.imageUrl,
-        brand: product.brand?.name,
-        slug: this.generateSlug(product.name)
-      } as SearchResult));
-    }),
-    catchError(error => {
-      console.error('Error performing search:', error);
-      return of([]); // Return empty array on error
-    })
-  );
-}
 
   private generateSlug(name: string): string {
     return name

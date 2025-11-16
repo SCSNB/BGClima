@@ -2,8 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AuthService } from './services/auth.service';
 import { Router, NavigationEnd, Event } from '@angular/router';
-import { filter, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { Observable, Subject } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { CompareService } from './services/compare.service';
 import { SearchService, SearchResult } from './services/search.service';
 
@@ -26,7 +26,6 @@ export class AppComponent implements OnInit {
   searchQuery = '';
   searchResults: SearchResult[] = [];
   isSearchDropdownVisible = false;
-  private searchSubject = new Subject<string>();
 
   constructor(
     private authService: AuthService,
@@ -34,22 +33,6 @@ export class AppComponent implements OnInit {
     private compareService: CompareService,
     private searchService: SearchService
   ) {
-    // Initialize search subscription
-    this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap(query => this.searchService.searchProducts(query))
-    ).subscribe({
-      next: (results) => {
-        this.searchResults = results;
-        this.isSearchDropdownVisible = results.length > 0;
-      },
-      error: (error) => {
-        console.error('Search error:', error);
-        this.searchResults = [];
-        this.isSearchDropdownVisible = false;
-      }
-    });
     // Subscribe to router events to keep track of the current URL
     this.router.events.pipe(
       filter((event: Event): event is NavigationEnd => event instanceof NavigationEnd)
@@ -90,16 +73,6 @@ export class AppComponent implements OnInit {
       this.isAuthenticated = !!user;
       this.isAdmin = this.authService.isAdmin();
     });
-
-    // Setup search functionality
-    this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap(query => this.searchService.searchProducts(query))
-    ).subscribe(results => {
-      this.searchResults = results;
-      this.isSearchDropdownVisible = results.length > 0;
-    });
   }
 
   logout(): void {
@@ -117,10 +90,24 @@ export class AppComponent implements OnInit {
   }
 
   // Search functionality methods
-  onSearchInput(event: any): void {
-    const query = event.target.value;
-    this.searchQuery = query;
-    this.searchSubject.next(query);
+  onSearch(): void {
+    if (!this.searchQuery || this.searchQuery.trim() === '') {
+      this.searchResults = [];
+      this.isSearchDropdownVisible = false;
+      return;
+    }
+    
+    this.searchService.searchProducts(this.searchQuery).subscribe({
+      next: (results) => {
+        this.searchResults = results;
+        this.isSearchDropdownVisible = results.length > 0;
+      },
+      error: (error) => {
+        console.error('Search error:', error);
+        this.searchResults = [];
+        this.isSearchDropdownVisible = false;
+      }
+    });
   }
 
   onSearchFocus(): void {
@@ -131,9 +118,11 @@ export class AppComponent implements OnInit {
 
   onSearchBlur(): void {
     // Delay hiding to allow clicking on results
-    setTimeout(() => {
-      this.isSearchDropdownVisible = false;
-    }, 200);
+    if (this.searchResults.length > 0) {
+      setTimeout(() => {
+        this.isSearchDropdownVisible = false;
+      }, 200);
+    }
   }
 
   selectSearchResult(result: SearchResult): void {

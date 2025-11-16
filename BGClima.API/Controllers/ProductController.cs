@@ -42,8 +42,7 @@ namespace BGClima.API.Controllers
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 18,
             [FromQuery] string? sortBy = "name",
-            [FromQuery] string? sortOrder = "asc",
-            [FromQuery] string? searchTerm = null)
+            [FromQuery] string? sortOrder = "asc")
         {
             try
             {
@@ -101,12 +100,6 @@ namespace BGClima.API.Controllers
                         query.OrderBy(p => p.Name),
                 };
 
-                if (!string.IsNullOrWhiteSpace(searchTerm))
-                {
-                    searchTerm = searchTerm.Trim().ToLower();
-                    query = query.Where(p => p.Name.ToLower().Contains(searchTerm));
-                }
-
                 if (MaxHatingPowers != null && MaxHatingPowers.Any())
                 {
                     query = query.Where(p =>
@@ -143,6 +136,33 @@ namespace BGClima.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { Message = "Възникна грешка при извличане на продуктите.", Error = ex.Message });
+            }
+        }
+
+        // Add this new endpoint to ProductController.cs
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> SearchProducts([FromQuery] string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return BadRequest("Search term is required.");
+            }
+
+            try
+            {
+                var products = await _context.Products
+                    .Include(p => p.Brand)
+                    .Where(p => p.IsActive && p.Name.ToLower().Contains(searchTerm))
+                    .OrderBy(p => p.Name)
+                    .ToListAsync();
+
+               var productDTOs = _mapper.Map<List<ProductDto>>(products);
+
+                return Ok(productDTOs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while searching for products.", Error = ex.Message });
             }
         }
 

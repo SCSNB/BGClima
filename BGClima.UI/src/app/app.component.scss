@@ -661,14 +661,48 @@ body {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
 }
-::ng-deep .main-header .header-top .search-white-bg .mat-mdc-form-field-flex,
-::ng-deep .main-header .header-top .search-white-bg .mat-form-field-flex,
-::ng-deep .main-header .header-top .search-white-bg .mat-form-field-outline,
-::ng-deep .main-header .header-top .search-white-bg .mat-form-field-outline-thick,
-::ng-deep .main-header .header-top .search-white-bg input.mat-input-element,
-::ng-deep .main-header .header-top .search-white-bg .mat-form-field-outline-start,
-::ng-deep .main-header .header-top .search-white-bg .mat-form-field-outline-end {
-  border-radius: 48px !important;
+::ng-deep .main-header .header-top .search-white-bg {
+  // Reset and simplify the styles
+  .mat-form-field-flex {
+    background-color: transparent !important;
+  }
+  
+  .mat-form-field-outline {
+    background-color: #39377a !important;
+    border-radius: 24px !important;
+  }
+  
+  // Placeholder styles
+  .mat-form-field-label {
+    color: rgba(255, 255, 255, 0.8) !important;
+  }
+  
+  // When input is focused or has value
+  &.mat-focused .mat-form-field-label,
+  .mat-form-field-should-float .mat-form-field-label {
+    display: none !important;
+  }
+  
+  // Input text styles
+  input.mat-input-element {
+    color: white !important;
+    caret-color: white;
+    padding: 8px 0 !important;
+    
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.7) !important;
+      opacity: 1;
+    }
+    
+    &:focus::placeholder {
+      opacity: 0;
+    }
+  }
+  
+  // Search icon color
+  .mat-icon {
+    color: rgba(255, 255, 255, 0.8) !important;
+  }
 }
 ::ng-deep .main-header .header-top .search-white-bg .mat-icon {
   font-size: 1.3rem !important;
