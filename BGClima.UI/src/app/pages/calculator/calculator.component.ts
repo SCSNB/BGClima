@@ -22,11 +22,23 @@ export class CalculatorComponent implements OnInit {
     { label: 'Охлаждане и отопление в преходни сезони', value: 'seasonal' },
     { label: 'Охлаждане и основно отопление', value: 'primary' }
   ];
-  durations = [
-    { label: '24 часа', value: 24 },
-    { label: '10 часа', value: 10 },
-    { label: '6 часа', value: 6 }
-  ];
+
+  // BTU filter mapping (dictionary where key is BTU value and value is ID)
+  btuFilter: { [key: number]: number } = {
+    7000: 1,
+    9000: 2,
+    10000: 3,
+    12000: 4,
+    13000: 5,
+    14000: 6,
+    16000: 7,
+    18000: 8,
+    20000: 9,
+    22000: 10,
+    24000: 11,
+    30000: 12,
+    36000: 13
+  };
 
   // Карти продукти според препоръчителния BTU
   recommendedCards: Array<{
@@ -68,14 +80,6 @@ export class CalculatorComponent implements OnInit {
       this.calculate();
       this.saveState();
     });
-  }
-
-  private roundToBTUClass(btu: number): number {
-    const classes = [9000, 12000, 18000, 24000, 30000, 36000];
-    for (const c of classes) {
-      if (btu <= c) return c;
-    }
-    return classes[classes.length - 1];
   }
 
   private calculate(): void {
@@ -140,41 +144,26 @@ export class CalculatorComponent implements OnInit {
   }
 
   private loadRecommended(recommendedClass: number): void {
-    // Филтрираме клиентски по BTU (в хиляди) спрямо recommendedClass
-    const targetThousands = Math.round(recommendedClass / 1000);
-    this.productService.getProducts({ page: 1, pageSize: 1000 }).subscribe({
-      next: (response) => {
-        const filtered = response.items.filter((p: ProductDto) => {
-          // Приоритет: p.btu?.value
-          let btuVal: number | null = null;
-          if (p.btu?.value) {
-            const m = p.btu.value.toString().match(/(\d+(?:\.\d+)?)/);
-            if (m) btuVal = parseFloat(m[1]);
-          }
-          if (btuVal == null && p.attributes) {
-            const attr = p.attributes.find((a: { attributeKey?: string }) => (a.attributeKey || '').toLowerCase().includes('btu'));
-            if (attr?.attributeValue) {
-              const m = attr.attributeValue.toString().match(/(\d+(?:\.\d+)?)/);
-              if (m) btuVal = parseFloat(m[1]);
-            }
-          }
-          if (btuVal == null) return false;
-          const thousands = Math.round(btuVal / 1000);
-          // 14k и 16k се считат еквивалентни за този диапазон
-          if (targetThousands === 14) {
-            return thousands === 14 || thousands === 16;
-          }
-          if (targetThousands === 16) {
-            return thousands === 14 || thousands === 16;
-          }
-          return thousands === targetThousands;
-        });
+    // Get the ID(s) for the recommended class
+    let ids = [this.btuFilter[recommendedClass]];
+    
+    // Special case: If recommended class is 14000, also include 16000
+    if (recommendedClass === 14000 && this.btuFilter[16000]) {
+      ids.push(this.btuFilter[16000]);
+    }
 
-        this.byId = filtered.reduce((acc: Record<number, ProductDto>, p: ProductDto) => { 
+    if (recommendedClass === 16000 && this.btuFilter[14000]) {
+      ids.push(this.btuFilter[16000]);
+    }
+    
+    this.productService.getProducts({ page: 1, pageSize: 1000, btuIds: ids }).subscribe({
+      next: (response) => {
+
+        this.byId = response.items.reduce((acc: Record<number, ProductDto>, p: ProductDto) => { 
           acc[p.id] = p; 
           return acc; 
         }, {} as Record<number, ProductDto>);
-        this.recommendedCards = filtered.map((p: ProductDto) => this.mapToCard(p));
+        this.recommendedCards = response.items.map((p: ProductDto) => this.mapToCard(p));
       },
       error: () => {
         this.recommendedCards = [];

@@ -140,6 +140,7 @@ export interface ProductFilterParams {
   btuIds?: number[];
   roomSize?: string;
   MaxHatingPowers?: number[];
+  searchTerm?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -220,7 +221,8 @@ export class ProductService {
       if (params.isNew !== undefined) httpParams = httpParams.set('isNew', params.isNew.toString());
       if (params.minPrice !== undefined) httpParams = httpParams.set('minPrice', params.minPrice.toString());
       if (params.maxPrice !== undefined) httpParams = httpParams.set('maxPrice', params.maxPrice.toString());
-      
+      if (params.searchTerm !== undefined) httpParams = httpParams.set('searchTerm', params.searchTerm);
+
       // Additional filters
       if (params.energyClassIds?.length) {
         params.energyClassIds.forEach(id => {

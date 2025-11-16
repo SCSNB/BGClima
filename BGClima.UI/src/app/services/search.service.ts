@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
-import { ProductService, ProductDto } from './product.service';
+import { ProductService, ProductDto, ProductFilterParams } from './product.service';
 
 export interface SearchResult {
   id: number;
@@ -67,64 +67,36 @@ export class SearchService {
   }
 
   private performSearch(query: string): Observable<SearchResult[]> {
-    const searchTerm = query.toLowerCase().trim();
-    
-    const filtered = this.allProducts.filter(product => {
-      // Search in product name
-      if (product.name?.toLowerCase().includes(searchTerm)) {
-        return true;
-      }
-      
-      // Search in brand name
-      if (product.brand?.name?.toLowerCase().includes(searchTerm)) {
-        return true;
-      }
-      
-      // Search in description
-      if (product.description?.toLowerCase().includes(searchTerm)) {
-        return true;
-      }
-      
-      // Search in SKU
-      if (product.sku?.toLowerCase().includes(searchTerm)) {
-        return true;
-      }
-      
-      return false;
-    });
+  const searchTerm = query.toLowerCase().trim();
+  
+  // Create search parameters
+  debugger;
+  const params: ProductFilterParams = {
+    searchTerm: searchTerm,
+    page: 1,
+    pageSize: 100 // Adjust based on your needs
+  };
 
-    // Sort results by relevance (exact matches first, then partial matches)
-    const sorted = filtered.sort((a, b) => {
-      const aName = a.name?.toLowerCase() || '';
-      const bName = b.name?.toLowerCase() || '';
-      const aBrand = a.brand?.name?.toLowerCase() || '';
-      const bBrand = b.brand?.name?.toLowerCase() || '';
-      
-      // Exact name matches first
-      if (aName.startsWith(searchTerm) && !bName.startsWith(searchTerm)) return -1;
-      if (!aName.startsWith(searchTerm) && bName.startsWith(searchTerm)) return 1;
-      
-      // Exact brand matches second
-      if (aBrand.startsWith(searchTerm) && !bBrand.startsWith(searchTerm)) return -1;
-      if (!aBrand.startsWith(searchTerm) && bBrand.startsWith(searchTerm)) return 1;
-      
-      // Then alphabetical by name
-      return aName.localeCompare(bName);
-    });
-
-    // Limit to top 8 results
-    const results = sorted.slice(0, 8).map(product => ({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      oldPrice: product.oldPrice,
-      imageUrl: product.imageUrl,
-      brand: product.brand?.name,
-      slug: this.generateSlug(product.name)
-    }));
-
-    return of(results);
-  }
+  // Use the product service to search
+  return this.productService.getProducts(params).pipe(
+    map(response => {
+      // Map the ProductDto[] to SearchResult[]
+      return response.items.map(product => ({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        oldPrice: product.oldPrice,
+        imageUrl: product.imageUrl,
+        brand: product.brand?.name,
+        slug: this.generateSlug(product.name)
+      } as SearchResult));
+    }),
+    catchError(error => {
+      console.error('Error performing search:', error);
+      return of([]); // Return empty array on error
+    })
+  );
+}
 
   private generateSlug(name: string): string {
     return name

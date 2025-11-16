@@ -42,7 +42,8 @@ namespace BGClima.API.Controllers
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 18,
             [FromQuery] string? sortBy = "name",
-            [FromQuery] string? sortOrder = "asc")
+            [FromQuery] string? sortOrder = "asc",
+            [FromQuery] string? searchTerm = null)
         {
             try
             {
@@ -99,6 +100,12 @@ namespace BGClima.API.Controllers
                         query.OrderByDescending(p => p.Name) :
                         query.OrderBy(p => p.Name),
                 };
+
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    searchTerm = searchTerm.Trim().ToLower();
+                    query = query.Where(p => p.Name.ToLower().Contains(searchTerm));
+                }
 
                 if (MaxHatingPowers != null && MaxHatingPowers.Any())
                 {
