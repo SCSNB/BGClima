@@ -2,10 +2,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AuthService } from './services/auth.service';
 import { Router, NavigationEnd, Event } from '@angular/router';
-import { filter, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { Observable, Subject } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { CompareService } from './services/compare.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { SearchService, SearchResult } from './services/search.service';
 
 @Component({
@@ -27,65 +26,11 @@ export class AppComponent implements OnInit {
   searchQuery = '';
   searchResults: SearchResult[] = [];
   isSearchDropdownVisible = false;
-  private searchSubject = new Subject<string>();
-  
-  // Mock products data
-  products = [
-    {
-      id: 1,
-      name: 'Соларен панел NIPPON 300W',
-      price: 1200,
-      description: 'Висококачествен соларен панел с ефективност 22%',
-      image: 'assets/solar-panel-placeholder.jpg',
-      freeInstallation: true
-    },
-    {
-      id: 2,
-      name: 'Соларен панел NIPPON 400W',
-      price: 1450,
-      description: 'Висококачествен соларен панел с ефективност 24%',
-      image: 'assets/solar-panel-placeholder.jpg',
-      freeInstallation: true
-    },
-    {
-      id: 3,
-      name: 'Соларен панел NIPPON 500W',
-      price: 1800,
-      description: 'Висококачествен соларен панел с ефективност 26%',
-      image: 'assets/solar-panel-placeholder.jpg',
-      freeInstallation: true
-    },
-    {
-      id: 4,
-      name: 'Соларен панел NIPPON 600W',
-      price: 2100,
-      description: 'Висококачествен соларен панел с ефективност 28%',
-      image: 'assets/solar-panel-placeholder.jpg',
-      freeInstallation: false
-    },
-    {
-      id: 5,
-      name: 'Соларен панел NIPPON 700W',
-      price: 2500,
-      description: 'Висококачествен соларен панел с ефективност 30%',
-      image: 'assets/solar-panel-placeholder.jpg',
-      freeInstallation: false
-    },
-    {
-      id: 6,
-      name: 'Соларен панел NIPPON 800W',
-      price: 2900,
-      description: 'Висококачествен соларен панел с ефективност 32%',
-      image: 'assets/solar-panel-placeholder.jpg',
-      freeInstallation: false
-    }
-  ];
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private compareService: CompareService,
-    private snackBar: MatSnackBar,
     private searchService: SearchService
   ) {
     // Subscribe to router events to keep track of the current URL
@@ -128,16 +73,6 @@ export class AppComponent implements OnInit {
       this.isAuthenticated = !!user;
       this.isAdmin = this.authService.isAdmin();
     });
-
-    // Setup search functionality
-    this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap(query => this.searchService.searchProducts(query))
-    ).subscribe(results => {
-      this.searchResults = results;
-      this.isSearchDropdownVisible = results.length > 0;
-    });
   }
 
   logout(): void {
@@ -155,10 +90,24 @@ export class AppComponent implements OnInit {
   }
 
   // Search functionality methods
-  onSearchInput(event: any): void {
-    const query = event.target.value;
-    this.searchQuery = query;
-    this.searchSubject.next(query);
+  onSearch(): void {
+    if (!this.searchQuery || this.searchQuery.trim() === '') {
+      this.searchResults = [];
+      this.isSearchDropdownVisible = false;
+      return;
+    }
+    
+    this.searchService.searchProducts(this.searchQuery).subscribe({
+      next: (results) => {
+        this.searchResults = results;
+        this.isSearchDropdownVisible = results.length > 0;
+      },
+      error: (error) => {
+        console.error('Search error:', error);
+        this.searchResults = [];
+        this.isSearchDropdownVisible = false;
+      }
+    });
   }
 
   onSearchFocus(): void {
@@ -169,9 +118,11 @@ export class AppComponent implements OnInit {
 
   onSearchBlur(): void {
     // Delay hiding to allow clicking on results
-    setTimeout(() => {
-      this.isSearchDropdownVisible = false;
-    }, 200);
+    if (this.searchResults.length > 0) {
+      setTimeout(() => {
+        this.isSearchDropdownVisible = false;
+      }, 200);
+    }
   }
 
   selectSearchResult(result: SearchResult): void {

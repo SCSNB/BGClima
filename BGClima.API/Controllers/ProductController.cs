@@ -1,11 +1,13 @@
 using AutoMapper;
 using BGClima.API.DTOs;
+using BGClima.Application.Services;
 using BGClima.Domain.Entities;
 using BGClima.Infrastructure.Data;
-using BGClima.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Linq;
 
 namespace BGClima.API.Controllers
 {
@@ -27,26 +29,34 @@ namespace BGClima.API.Controllers
         // GET: api/products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts(
-            [FromQuery] int? brandId = null,
+            [FromQuery] int[]? brandIds = null,
             [FromQuery] int? productTypeId = null,
+            [FromQuery] int[]? energyClassIds = null,
+            [FromQuery] int[]? btuIds = null,
             [FromQuery] bool? isFeatured = null,
             [FromQuery] bool? isOnSale = null,
-            [FromQuery] bool? isNew = null)
+            [FromQuery] bool? isNew = null,
+            [FromQuery] decimal? minPrice = null,
+            [FromQuery] decimal? maxPrice = null,
+            [FromQuery] double[]? MaxHatingPowers = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 18,
+            [FromQuery] string? sortBy = "name",
+            [FromQuery] string? sortOrder = "asc")
         {
             try
             {
                 var query = _context.Products
-                    .Include(p => p.Brand)
+                    .Where(p => p.IsActive)
                     .Include(p => p.BTU)
                     .Include(p => p.EnergyClass)
-                    .Include(p => p.ProductType)
-                    .Include(p => p.Attributes)
-                    .Include(p => p.Images)
+                    .Include(p => p.Brand)
+                    .Include(p => p.Attributes.Where(a => a.AttributeKey.Contains("мощност") || a.AttributeKey.Contains("Енергиен") || a.AttributeKey.Contains("Wi-Fi")))
                     .AsQueryable();
 
                 // Филтриране
-                if (brandId.HasValue)
-                    query = query.Where(p => p.BrandId == brandId);
+                if (brandIds != null && brandIds.Any())
+                    query = query.Where(p => brandIds.Contains(p.BrandId));
 
                 if (productTypeId.HasValue)
                     query = query.Where(p => p.ProductTypeId == productTypeId);
@@ -60,8 +70,68 @@ namespace BGClima.API.Controllers
                 if (isNew.HasValue)
                     query = query.Where(p => p.IsNew == isNew);
 
-                var products = await query.ToListAsync();
-                return Ok(_mapper.Map<List<ProductDto>>(products));
+                // Филтриране по енергиен клас
+                if (energyClassIds != null && energyClassIds.Any())
+                {
+                    query = query.Where(p => p.EnergyClassId.HasValue && energyClassIds.Contains(p.EnergyClassId.Value));
+                }
+
+                // Филтриране по BTU ID-та
+                if (btuIds != null && btuIds.Any())
+                {
+                    query = query.Where(p => p.BTUId.HasValue && btuIds.Contains(p.BTUId.Value));
+                }
+
+                // Филтриране по цена
+                if (minPrice.HasValue && minPrice >= 0)
+                    query = query.Where(p => p.Price >= minPrice.Value);
+
+                if (maxPrice.HasValue && maxPrice > 0)
+                    query = query.Where(p => p.Price <= maxPrice.Value);
+
+                // Сортиране
+                query = sortBy?.ToLower() switch
+                {
+                    "price" => sortOrder?.ToLower() == "desc" ?
+                        query.OrderByDescending(p => p.Price) :
+                        query.OrderBy(p => p.Price),
+                    _ => sortOrder?.ToLower() == "desc" ?
+                        query.OrderByDescending(p => p.Name) :
+                        query.OrderBy(p => p.Name),
+                };
+
+                if (MaxHatingPowers != null && MaxHatingPowers.Any())
+                {
+                    query = query.Where(p =>
+                        p.Attributes.Any(a =>
+                            a.AttributeKey.Contains("Отдавана мощност на отопление") &&
+                            MaxHatingPowers.Any(m =>
+                                BGClimaContext.GetMaxHeatingPowerSql(a.AttributeValue).GetValueOrDefault() >= m
+                            )
+                        )
+                    );
+                }
+
+                // Брой на всички продукти след филтрирането
+                var totalCount = await query.CountAsync();
+
+                // Прилагане на пагинация
+                var products = await query
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                // Връщаме заедно с метаданни за пагинацията
+                var result = new
+                {
+                    TotalCount = totalCount,
+                    PageSize = pageSize,
+                    CurrentPage = page,
+                    TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                    Items = _mapper.Map<List<ProductDto>>(products)
+                };
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -69,20 +139,39 @@ namespace BGClima.API.Controllers
             }
         }
 
+        // Add this new endpoint to ProductController.cs
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> SearchProducts([FromQuery] string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return BadRequest("Search term is required.");
+            }
+
+            try
+            {
+                var products = await _context.Products
+                    .Include(p => p.Brand)
+                    .Where(p => p.IsActive && p.Name.ToLower().Contains(searchTerm))
+                    .OrderBy(p => p.Name)
+                    .ToListAsync();
+
+               var productDTOs = _mapper.Map<List<ProductDto>>(products);
+
+                return Ok(productDTOs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while searching for products.", Error = ex.Message });
+            }
+        }
+
         // GET: api/products/admin
         [HttpGet("admin")]
         public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsForAdmin(
-            [FromQuery] int? brandId = null,
-            [FromQuery] int? productTypeId = null,
-            [FromQuery] bool? isActive = null,
-            [FromQuery] bool? isFeatured = null,
-            [FromQuery] bool? isOnSale = null,
-            [FromQuery] bool? isNew = null,
             [FromQuery] string? searchTerm = null,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 20,
-            [FromQuery] string? sortBy = "name",
-            [FromQuery] string? sortOrder = "asc")
+            [FromQuery] int pageSize = 18)
         {
             try
             {
@@ -95,86 +184,33 @@ namespace BGClima.API.Controllers
                     .Include(p => p.Images)
                     .AsQueryable();
 
-                // Филтриране
-                if (brandId.HasValue)
-                    query = query.Where(p => p.BrandId == brandId);
-
-                if (productTypeId.HasValue)
-                    query = query.Where(p => p.ProductTypeId == productTypeId);
-
-                if (isActive.HasValue)
-                    query = query.Where(p => p.IsActive == isActive);
-
-                if (isFeatured.HasValue)
-                    query = query.Where(p => p.IsFeatured == isFeatured);
-
-                if (isOnSale.HasValue)
-                    query = query.Where(p => p.IsOnSale == isOnSale);
-
-                if (isNew.HasValue)
-                    query = query.Where(p => p.IsNew == isNew);
-
-                // Търсене по име или описание
                 if (!string.IsNullOrWhiteSpace(searchTerm))
                 {
-                    searchTerm = searchTerm.ToLower();
-                    query = query.Where(p => 
-                        p.Name.ToLower().Contains(searchTerm) || 
+                    searchTerm = searchTerm.Trim().ToLower();
+                    query = query.Where(p =>
+                        p.Name.ToLower().Contains(searchTerm) ||
                         (p.Description != null && p.Description.ToLower().Contains(searchTerm)) ||
                         (p.Sku != null && p.Sku.ToLower().Contains(searchTerm))
                     );
                 }
 
-                // Сортиране
-                switch (sortBy?.ToLower())
-                {
-                    case "name":
-                        query = sortOrder?.ToLower() == "desc" 
-                            ? query.OrderByDescending(p => p.Name)
-                            : query.OrderBy(p => p.Name);
-                        break;
-                    case "price":
-                        query = sortOrder?.ToLower() == "desc" 
-                            ? query.OrderByDescending(p => p.Price)
-                            : query.OrderBy(p => p.Price);
-                        break;
-                    case "stock":
-                        query = sortOrder?.ToLower() == "desc" 
-                            ? query.OrderByDescending(p => p.StockQuantity)
-                            : query.OrderBy(p => p.StockQuantity);
-                        break;
-                    case "brand":
-                        query = sortOrder?.ToLower() == "desc" 
-                            ? query.OrderByDescending(p => p.Brand.Name)
-                            : query.OrderBy(p => p.Brand.Name);
-                        break;
-                    case "type":
-                        query = sortOrder?.ToLower() == "desc" 
-                            ? query.OrderByDescending(p => p.ProductType.Name)
-                            : query.OrderBy(p => p.ProductType.Name);
-                        break;
-                    case "created":
-                    default:
-                        query = sortOrder?.ToLower() == "desc" 
-                            ? query.OrderByDescending(p => p.Id)
-                            : query.OrderBy(p => p.Id);
-                        break;
-                }
-
-                // Пагинация
                 var totalCount = await query.CountAsync();
+
                 var products = await query
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync();
 
-                // Добавяме метаданни за пагинация
-                Response.Headers.Add("X-Total-Count", totalCount.ToString());
-                Response.Headers.Add("X-Page", page.ToString());
-                Response.Headers.Add("X-PageSize", pageSize.ToString());
-                Response.Headers.Add("X-Total-Pages", Math.Ceiling((double)totalCount / pageSize).ToString());
+                var result = new
+                {
+                    TotalCount = totalCount,
+                    PageSize = pageSize,
+                    CurrentPage = page,
+                    TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                    Items = _mapper.Map<List<ProductDto>>(products)
+                };
 
-                return Ok(_mapper.Map<List<ProductDto>>(products));
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -182,7 +218,6 @@ namespace BGClima.API.Controllers
             }
         }
 
-        // GET: api/products/category/stenen-tip
         [HttpGet("category/{categoryName}")]
         public async Task<IActionResult> GetProductsByCategory(string categoryName)
         {
@@ -308,7 +343,7 @@ namespace BGClima.API.Controllers
                 {
                     // Изтриваме старите атрибути
                     _context.ProductAttributes.RemoveRange(existingProduct.Attributes);
-                    
+
                     // Създаваме нови атрибути ръчно
                     var newAttributes = new List<ProductAttribute>();
                     foreach (var attrDto in updateProductDto.Attributes)
@@ -335,7 +370,7 @@ namespace BGClima.API.Controllers
                 {
                     // Изтриваме старите изображения
                     _context.ProductImages.RemoveRange(existingProduct.Images);
-                    
+
                     // Създаваме нови изображения
                     var newImages = _mapper.Map<List<ProductImage>>(updateProductDto.Images);
                     foreach (var img in newImages)

@@ -15,13 +15,12 @@
                    type="text" 
                    placeholder="Търси продукт..." 
                    [(ngModel)]="searchQuery"
-                   (input)="onSearchInput($event)"
                    (focus)="onSearchFocus()"
                    (blur)="onSearchBlur()">
             <button mat-icon-button matSuffix (click)="clearSearch()" *ngIf="searchQuery">
               <mat-icon>clear</mat-icon>
             </button>
-            <button mat-icon-button matSuffix *ngIf="!searchQuery">
+            <button mat-icon-button matSuffix (click)="onSearch()">
               <mat-icon>search</mat-icon>
             </button>
           </mat-form-field>
@@ -92,13 +91,13 @@
              type="text" 
              placeholder="Търси продукт..." 
              [(ngModel)]="searchQuery"
-             (input)="onSearchInput($event)"
+             (keyup.enter)="onSearch()"
              (focus)="onSearchFocus()"
              (blur)="onSearchBlur()">
       <button mat-icon-button matSuffix (click)="clearSearch()" *ngIf="searchQuery">
         <mat-icon>clear</mat-icon>
       </button>
-      <button mat-icon-button matSuffix *ngIf="!searchQuery">
+      <button mat-icon-button matSuffix (click)="onSearch()">
         <mat-icon>search</mat-icon>
       </button>
     </mat-form-field>
@@ -143,12 +142,12 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
         <div class="submenu-items">
-          <a mat-list-item routerLink="/products/stenen-tip" (click)="sidenav.close()">Климатици стенен тип</a>
-          <a mat-list-item routerLink="/products/podov-tip" (click)="sidenav.close()">Климатици подов тип</a>
-          <a mat-list-item routerLink="/products/hiperinvertori" (click)="sidenav.close()">Хиперинвертори</a>
-          <a mat-list-item routerLink="/products/kolonen-tip" (click)="sidenav.close()">Климатици колонен тип</a>
-          <a mat-list-item routerLink="/products/multisplit-sistemi" (click)="sidenav.close()">Мулти сплит системи</a>
-          <a mat-list-item routerLink="/products/kasetachen-tip" (click)="sidenav.close()">Климатици касетъчен тип</a>
+          <a mat-list-item routerLink="/products/1" (click)="sidenav.close()">Климатици стенен тип</a>
+          <a mat-list-item routerLink="/products/2" (click)="sidenav.close()">Климатици подов тип</a>
+          <a mat-list-item routerLink="/products/3" (click)="sidenav.close()">Хиперинвертори</a>
+          <a mat-list-item routerLink="/products/4" (click)="sidenav.close()">Климатици колонен тип</a>
+          <a mat-list-item routerLink="/products/5" (click)="sidenav.close()">Мулти сплит системи</a>
+          <a mat-list-item routerLink="/products/6" (click)="sidenav.close()">Климатици касетъчен тип</a>
           <a mat-list-item routerLink="/products/kanalen-tip" (click)="sidenav.close()">Климатици канален тип</a>
           <a mat-list-item routerLink="/products/podovo-tavanen-tip" (click)="sidenav.close()">Подово - таванен тип</a>
           <a mat-list-item routerLink="/products/mobilni-prenosimi" (click)="sidenav.close()">Мобилни / преносими</a>

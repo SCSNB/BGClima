@@ -1,6 +1,6 @@
 import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { ProductService, BrandDto, BTUDto } from '../../services/product.service';
+import { ProductService, BrandDto, BTUDto, EnergyClassDto } from '../../services/product.service';
 
 @Component({
   selector: 'app-product-filters',
@@ -18,19 +18,36 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   // Показва/скрива секцията с бързи връзки (категории)
   @Input() showCategoriesNav: boolean = true;
   // Външен preset за текущ избор на филтри (за запазване при повторно отваряне)
-  @Input() preset: {
-    brands: string[];
+  @Input() set preset(value: {
+    brands: number[];
     price: { lower: number; upper: number };
-    energyClasses: string[];
-    btus: string[];
+    energyClasses: number[];
+    btus: (string | number)[];
+    roomSizeRanges: string[];
+  } | null) {
+    if (value) {
+      this._preset = {
+        ...value,
+        brands: value.brands.map(b => typeof b === 'string' ? parseInt(b, 10) : b).filter((b): b is number => !isNaN(b)),
+        btus: value.btus.map(b => typeof b === 'string' ? parseInt(b, 10) : b).filter((b): b is number => !isNaN(b))
+      };
+    } else {
+      this._preset = null;
+    }
+  }
+  private _preset: {
+    brands: number[];
+    price: { lower: number; upper: number };
+    energyClasses: number[];
+    btus: number[];
     roomSizeRanges: string[];
   } | null = null;
 
   filters = {
-    brands: [] as string[],
+    brands: [] as number[],
     price: { lower: 230, upper: 79900 },
-    energyClasses: [] as string[],
-    btus: [] as string[],
+    energyClasses: [] as number[],
+    btus: [] as number[], // Changed from string[] to number[] to store BTU IDs
     roomSizeRanges: [] as string[],
     // Само за термопомпи: избор на мощност (kW)
     powerKws: [] as string[]
@@ -49,33 +66,55 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   ];
 
   // Списък с марки от бекенда
-  brands: BrandDto[] = [];
+  brands: BrandDto[] = [
+    { id: 1, name: 'Daikin', country: 'Япония' },
+    { id: 2, name: 'Mitsubishi Electric', country: 'Япония' },
+    { id: 3, name: 'Toshiba', country: 'Япония' },
+    { id: 4, name: 'Fujitsu', country: 'Япония' },
+    { id: 5, name: 'Hitachi', country: 'Япония' },
+    { id: 6, name: 'Gree', country: 'Китай' },
+    { id: 7, name: 'AUX', country: 'Китай' },
+    { id: 8, name: 'Nippon', country: 'Япония' },
+    { id: 9, name: 'Inventor', country: 'Гърция' },
+    { id: 10, name: 'Kobe', country: 'Япония' },
+    { id: 11, name: 'Sendo', country: 'Китай' },
+    { id: 12, name: 'Cooper & Hunter', country: 'САЩ' },
+    { id: 13, name: 'Aqua Systems', country: 'България' }
+  ];
   // Пълен списък за локално филтриране по allowedBrands
-  private allBrands: BrandDto[] = [];
+  private allBrands: BrandDto[] = [...this.brands];
   // Списък с BTU стойности от бекенда
   btuOptions: BTUDto[] = [];
 
   // Специален набор BTU за "БГКЛИМА тръбни топлообменници"
-  private topHeatExchangerBtuValues: string[] = ['24000','36000','48000','60000','72000'];
+  private topHeatExchangerBtuIds = [12, 13, 15, 20, 22]; // IDs for 24000, 36000, 48000, 60000, 72000 BTU
 
   // Източник за показване на BTU: за топлообменници показваме само големите стъпки
   get btuOptionsToShow(): BTUDto[] {
-    if (this.isToploobmennici) {
-      return this.topHeatExchangerBtuValues.map(v => ({ value: v } as BTUDto));
+    if (this.isHeatPumpSection) {
+      return this.btuOptions.filter(btu => this.topHeatExchangerBtuIds.includes(btu.id));
     }
     return this.btuOptions;
   }
 
-  // Форматира етикета за BTU без дублиране на "BTU"
-  formatBtuLabel(opt: BTUDto): string {
-    const raw = String((opt as any)?.value ?? '').trim();
-    if (!raw) return '';
-    return /\bBTU\b/i.test(raw) ? raw : `${raw} BTU`;
-  }
+  // // Форматира етикета за BTU без дублиране на "BTU"
+  // formatBtuLabel(opt: BTUDto): string {
+  //   const raw = String(opt?.value ?? '').trim();
+  //   if (!raw) return '';
+  //   return raw.endsWith('BTU') || raw.endsWith('btu') ? raw : `${raw} BTU`;
+  // }
 
   // Термопомпи: опции за Мощност (kW) – визуално като чеклист
   powerKwOptions: string[] = [
     '3','4','5','6','8','9','10','11','12','14','15','16','17','22','25','30','32','65','75','110','140'
+  ];
+
+  // Energy Class options
+  energyClasses: EnergyClassDto[] = [
+    { id: 1, class: 'A+++', displayName: 'A+++' },
+    { id: 2, class: 'A++', displayName: 'A++' },
+    { id: 3, class: 'A+', displayName: 'A+' },
+    { id: 4, class: 'A', displayName: 'A' }
   ];
 
   constructor(private productService: ProductService, private dialog: MatDialog) {}
@@ -98,40 +137,35 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   // Хелпър: дали текущата категория е термопомпена секция
   isHeatPumpCategory(): boolean {
     const c = (this.currentCategory || '').trim();
-    return c === 'termopompeni-sistemi' || c === 'bgclima-toploobmennici';
+    return c === '9' || c === '11'; // 9: Термопомпени системи, 11: БГКЛИМА тръбни топлообменници
   }
 
   selectedSort: string = 'name-asc';
 
   // Бърза навигация по типове климатици (от ПРОДУКТИ > Климатици)
   private acCategories = [
-    { slug: 'stenen-tip', label: 'Климатици стенен тип' },
-    { slug: 'podov-tip', label: 'Климатици подов тип' },
-    { slug: 'hiperinvertori', label: 'Хиперинвертори' },
-    { slug: 'kolonen-tip', label: 'Климатици колонен тип' },
-    { slug: 'multisplit-sistemi', label: 'Мулти сплит системи' },
-    { slug: 'kasetachen-tip', label: 'Климатици касетъчен тип' },
-    { slug: 'kanalen-tip', label: 'Климатици канален тип' },
-    { slug: 'podovo-tavanen-tip', label: 'Подово - таванен тип' },
-    { slug: 'mobilni-prenosimi', label: 'Мобилни / преносими' },
-    { slug: 'vrf-vrv', label: 'VRF / VRV' }
+    { slug: '1', label: 'Климатици стенен тип' },
+    { slug: '5', label: 'Климатици подов тип' },
+    { slug: '12', label: 'Хиперинвертори' },
+    { slug: '2', label: 'Климатици колонен тип' },
+    { slug: '10', label: 'Мулти сплит системи' },
+    { slug: '4', label: 'Климатици касетъчен тип' },
+    { slug: '3', label: 'Климатици канален тип' },
+    { slug: '6', label: 'Подово - таванен тип' },
+    { slug: '8', label: 'Мобилни / преносими' },
+    { slug: '7', label: 'VRF / VRV' }
   ];
   
 
   // ПРОДУКТИ > Термопомпи
   private heatPumpCategories = [
-    { slug: 'termopompeni-sistemi', label: 'Термопомпени системи' },
-    { slug: 'bgclima-toploobmennici', label: 'БГКЛИMA тръбни топлообменници' }
+    { slug: '9', label: 'Термопомпени системи' },
+    { slug: '11', label: 'БГКЛИМА тръбни топлообменници' }
   ];
 
   get isHeatPumpSection(): boolean {
-    const hpSet = new Set(['termopompeni-sistemi', 'bgclima-toploobmennici']);
+    const hpSet = new Set(['9', '11']);
     return hpSet.has(this.currentCategory);
-  }
-
-  // Специален флаг за страницата БГКЛИМА тръбни топлообменници
-  get isToploobmennici(): boolean {
-    return (this.currentCategory || '').trim() === 'bgclima-toploobmennici';
   }
 
   applyFilters(): void {
@@ -186,7 +220,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     this.filtersChanged.emit(this.filters);
   }
 
-  toggleFilter(array: string[], value: string) {
+  toggleFilter(array: any[], value: any): void {
     const index = array.indexOf(value);
     if (index === -1) {
       array.push(value);
@@ -196,8 +230,36 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     this.onFiltersChanged();
   }
 
-  isSelected(array: string[], value: string): boolean {
-    return array.includes(value);
+  isBrandSelected(brandId: number): boolean {
+    return this.filters.brands.includes(brandId);
+  }
+
+  toggleBrand(brandId: number): void {
+    const index = this.filters.brands.indexOf(brandId);
+    if (index === -1) {
+      this.filters.brands.push(brandId);
+    } else {
+      this.filters.brands.splice(index, 1);
+    }
+    this.onFiltersChanged();
+  }
+
+  isEnergyClassSelected(energyClassId: number): boolean {
+    return this.filters.energyClasses.includes(energyClassId);
+  }
+
+  toggleEnergyClass(energyClassId: number): void {
+    const index = this.filters.energyClasses.indexOf(energyClassId);
+    if (index === -1) {
+      this.filters.energyClasses.push(energyClassId);
+    } else {
+      this.filters.energyClasses.splice(index, 1);
+    }
+    this.onFiltersChanged();
+  }
+
+  isSelected(array: (string | number)[], value: string | number): boolean {
+    return array.some(item => String(item) === String(value));
   }
 
   ngOnInit(): void {
@@ -230,13 +292,15 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['currentCategory']) {
       // При смяна на категория – ако сме в топлообменници, остави само Марка, Цена и BTU
-      if (this.isToploobmennici) {
+      if (this.isHeatPumpCategory()) {
         this.filters.energyClasses = [];
         this.filters.powerKws = [];
         this.filters.roomSizeRanges = [];
-        // Пази само позволените BTU стойности
-        const allowed = new Set(this.topHeatExchangerBtuValues);
-        this.filters.btus = (this.filters.btus || []).filter(v => allowed.has(String(v)));
+        // Keep only allowed BTU IDs for heat pump section
+        if (this.isHeatPumpSection) {
+          const allowedBtuIds = new Set(this.topHeatExchangerBtuIds);
+          this.filters.btus = (this.filters.btus || []).filter(id => allowedBtuIds.has(Number(id)));
+        }
         this.clampPrices();
         this.filtersChanged.emit(this.filters);
       }
@@ -244,13 +308,13 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     if (changes['preset'] && this.preset) {
       // При подаден preset, приложи стойностите към вътрешните филтри
       this.filters = {
-        brands: [...(this.preset.brands || [])],
+        brands: [...(this.preset.brands || [])].map(brand => Number(brand)),
         price: {
           lower: Number(this.preset.price?.lower ?? this.minPrice),
           upper: Number(this.preset.price?.upper ?? this.maxPrice)
         },
-        energyClasses: [...(this.preset.energyClasses || [])],
-        btus: [...(this.preset.btus || [])],
+        energyClasses: [...(this.preset.energyClasses?.map(id => Number(id)) || [])],
+        btus: [...(this.preset.btus || [])].map(btu => Number(btu)),
         roomSizeRanges: [...(this.preset.roomSizeRanges || [])],
         powerKws: [...((this.preset as any).powerKws || [])]
       };
@@ -296,14 +360,23 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   private applyAllowedBrandsFilter(): void {
     const allow = (this.allowedBrands || []).filter(Boolean);
     if (allow.length > 0) {
-      this.brands = (this.allBrands || []).filter(b => !!b?.name && allow.includes(b.name));
+      // Convert allowed brand names to IDs for filtering
+      const allowedBrandIds = new Set<number>();
+      this.allBrands.forEach(brand => {
+        if (allow.includes(brand.name)) {
+          allowedBrandIds.add(brand.id);
+        }
+      });
+      this.brands = this.allBrands.filter(brand => allowedBrandIds.has(brand.id));
     } else {
-      this.brands = [...(this.allBrands || [])];
+      this.brands = [...this.allBrands];
     }
+    
     // Премахни от избора марки, които вече не се показват
-    const visibleNames = new Set(this.brands.map(b => b.name));
+    const visibleBrandIds = new Set(this.brands.map(b => b.id));
     const before = this.filters.brands.length;
-    this.filters.brands = (this.filters.brands || []).filter(n => visibleNames.has(n));
+    this.filters.brands = this.filters.brands.filter(id => visibleBrandIds.has(id));
+    
     if (this.filters.brands.length !== before) {
       // ако има промяна – емитни, за да се актуализира списъкът с продукти
       this.filtersChanged.emit(this.filters);

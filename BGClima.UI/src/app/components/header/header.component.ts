@@ -25,9 +25,12 @@ export class HeaderComponent {
     this.menuOpen = !this.menuOpen;
   }
 
-  onSearch() {
-    // Тук може да отворите search modal или да навигирате към search страница
-    alert('Търсене!');
+  onSearch(searchTerm: string) {
+    if (!searchTerm || searchTerm.trim() === '') {
+      return;
+    }
+    // Navigate to search results page with the search term as a query parameter
+    this.router.navigate(['/search'], { queryParams: { q: searchTerm } });
   }
 
   onLocation() {

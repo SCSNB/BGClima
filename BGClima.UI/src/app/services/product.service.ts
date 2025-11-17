@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, forkJoin, of, throwError } from 'rxjs';
 import { tap, switchMap, map, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
@@ -20,6 +20,7 @@ export interface ProductTypeDto {
 export interface EnergyClassDto {
   id: number;
   class: string;
+  displayName?: string; // Optional display name for UI
 }
 
 export interface BTUDto {
@@ -115,6 +116,33 @@ export interface CreateProductDto {
   descriptionImages?: CreateProductDescriptionImageDto[];
 }
 
+export interface PaginatedResponse<T> {
+  items: T[];
+  totalCount: number;
+  pageSize: number;
+  currentPage: number;
+  totalPages: number;
+}
+
+export interface ProductFilterParams {
+  brandIds?: number[];
+  productTypeId?: number;
+  isFeatured?: boolean;
+  isOnSale?: boolean;
+  isNew?: boolean;
+  minPrice?: number;
+  maxPrice?: number;
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  energyClassIds?: number[];
+  btuIds?: number[];
+  roomSize?: string;
+  MaxHatingPowers?: number[];
+  searchTerm?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ProductService {
   private readonly baseUrl = environment.production ? '/api/products' : `${environment.apiUrl}/api/products`;
@@ -136,18 +164,99 @@ export class ProductService {
     return headers.set('Authorization', `Bearer ${token}`);
   }
 
-  getProducts(): Observable<ProductDto[]> {
-    console.log('Fetching products from:', this.baseUrl);
-    return this.http.get<ProductDto[]>(this.baseUrl).pipe(
+  getProductsForAdmin(params?: ProductFilterParams): Observable<PaginatedResponse<ProductDto>> {
+    let httpParams = new HttpParams();
+    
+    if (params) {
+      if (params.page) httpParams = httpParams.set('page', params.page.toString());
+      if (params.pageSize) httpParams = httpParams.set('pageSize', params.pageSize.toString());
+      if (params.sortBy) httpParams = httpParams.set('sortBy', params.sortBy);
+      if (params.sortOrder) httpParams = httpParams.set('sortOrder', params.sortOrder);
+      
+      // Add search term if provided
+      if ((params as any).searchTerm) {
+        httpParams = httpParams.set('searchTerm', (params as any).searchTerm);
+      }
+    }
+
+    const url = `${this.baseUrl}/admin`;
+    return this.http.get<PaginatedResponse<ProductDto>>(url, { params: httpParams }).pipe(
       tap({
-        next: (products) => {
-          console.log(`Successfully fetched ${products?.length || 0} products`);
-          if (products && products.length > 0) {
+        next: (response) => {
+          console.log('Admin products response:', response);
+        },
+        error: (error) => {
+          console.error('Error fetching admin products:', error);
+        }
+      })
+    );
+  }
+
+  getProducts(params?: ProductFilterParams): Observable<PaginatedResponse<ProductDto>> {
+    console.log('Fetching products with params:', params);
+    
+    // Set up query parameters
+    let httpParams = new HttpParams();
+    
+    // Add filter parameters if they exist
+    if (params) {
+      // Handle brand IDs array
+      if (params.brandIds && params.brandIds.length > 0) {
+        // Add each brand ID as a separate query parameter with the same name
+        params.brandIds.forEach(id => {
+          httpParams = httpParams.append('brandIds', id.toString());
+        });
+      }
+
+      if (params.MaxHatingPowers && params.MaxHatingPowers.length > 0) {
+        // Add each brand ID as a separate query parameter with the same name
+        params.MaxHatingPowers.forEach(kw => {
+          httpParams = httpParams.append('MaxHatingPowers', kw.toString());
+        });
+      }
+      
+      if (params.productTypeId) httpParams = httpParams.set('productTypeId', params.productTypeId.toString());
+      if (params.isFeatured !== undefined) httpParams = httpParams.set('isFeatured', params.isFeatured.toString());
+      if (params.isOnSale !== undefined) httpParams = httpParams.set('isOnSale', params.isOnSale.toString());
+      if (params.isNew !== undefined) httpParams = httpParams.set('isNew', params.isNew.toString());
+      if (params.minPrice !== undefined) httpParams = httpParams.set('minPrice', params.minPrice.toString());
+      if (params.maxPrice !== undefined) httpParams = httpParams.set('maxPrice', params.maxPrice.toString());
+      if (params.searchTerm !== undefined) httpParams = httpParams.set('searchTerm', params.searchTerm);
+
+      // Additional filters
+      if (params.energyClassIds?.length) {
+        params.energyClassIds.forEach(id => {
+          httpParams = httpParams.append('energyClassIds', id.toString());
+        });
+      }
+      if (params.btuIds?.length) {
+        params.btuIds.forEach(id => {
+          httpParams = httpParams.append('btuIds', id.toString());
+        });
+      }
+      if (params.roomSize) httpParams = httpParams.set('roomSize', params.roomSize);
+      
+      // Pagination
+      const page = params.page || 1;
+      const pageSize = params.pageSize || 12;
+      httpParams = httpParams.set('page', page.toString());
+      httpParams = httpParams.set('pageSize', pageSize.toString());
+      
+      // Sorting
+      if (params.sortBy) httpParams = httpParams.set('sortBy', params.sortBy);
+      if (params.sortOrder) httpParams = httpParams.set('sortOrder', params.sortOrder);
+    }
+
+    return this.http.get<PaginatedResponse<ProductDto>>(this.baseUrl, { params: httpParams }).pipe(
+      tap({
+        next: (response) => {
+          console.log(`Successfully fetched page ${response.currentPage} of ${response.totalPages} with ${response.items?.length || 0} products`);
+          if (response.items && response.items.length > 0) {
             console.log('Sample product:', {
-              id: products[0].id,
-              name: products[0].name,
-              productType: products[0].productType,
-              brand: products[0].brand
+              id: response.items[0].id,
+              name: response.items[0].name,
+              productType: response.items[0].productType,
+              brand: response.items[0].brand
             });
           }
         },
@@ -163,7 +272,14 @@ export class ProductService {
       }),
       catchError(err => {
         console.error('Failed to fetch products:', err);
-        return of([]); // Return empty array on error to prevent breaking the app
+        // Return empty paginated response on error
+        return of({
+          items: [],
+          totalCount: 0,
+          pageSize: params?.pageSize || 12,
+          currentPage: params?.page || 1,
+          totalPages: 0
+        });
       })
     );
   }
@@ -306,66 +422,13 @@ export class ProductService {
     );
   }
 
-  getProductsByCategory(category: string): Observable<ProductDto[]> {
-    console.log(`Getting products for category: ${category}`);
-  
-    // Map URL segments to product type names - updated to match the database
-    // Note: Some categories (e.g. 'stenen-tip') should include multiple product types
-    const categoryToTypeMap: { [key: string]: string | string[] } = {
-      'stenen-tip': ['Климатици стенен тип', 'Хиперинвертори'],
-      'kolonen-tip': 'Климатици колонен тип',
-      'kanalen-tip': 'Климатици канален тип',
-      'kasetachen-tip': 'Климатици касетъчен тип',
-      'podov-tip': 'Климатици подов тип',
-      'podovo-tavanen-tip': 'Климатици подово-таванен тип',
-      'vrf-vrv': 'VRF / VRV',
-      'mobilni-prenosimi': 'Мобилни / преносими климатици',
-      'hiperinvertori': 'Хиперинвертори',
-      'termopompeni-sistemi': 'Термопомпени системи',
-      'multisplit-sistemi': 'Мултисплит системи',
-      'bgclima-toploobmennici': 'БГКЛИМА тръбни топлообменници'
-    };
-
-    const mapping = categoryToTypeMap[category];
-
-    if (!mapping) {
-      console.warn(`No product type mapping found for category: ${category}`);
-      return this.getProducts();
-    }
-  
-    const targetTypes: string[] = Array.isArray(mapping) ? mapping : [mapping];
-    console.log(`Mapped category '${category}' to type(s):`, targetTypes);
-
-    // First get all products
-    return this.getProducts().pipe(
-      tap(products => {
-        console.log(`Total products received: ${products.length}`);
-        // Log all unique product types for debugging
-        const types = [...new Set(products.map(p => p.productType?.name))];
-        console.log('Available product types:', types);
-      }),
-      map(products => {
-        // Filter products by productType name (case insensitive and trimmed)
-        const targetSet = new Set(targetTypes.map(t => t.trim().toLowerCase()))
-        const filtered = products.filter(p => {
-          const n = p.productType?.name?.trim().toLowerCase();
-          return !!n && targetSet.has(n);
-        });
-
-        console.log(`Found ${filtered.length} products for type(s):`, targetTypes);
-        if (filtered.length === 0) {
-          console.warn('No products found for the specified type(s). Available types:', 
-            [...new Set(products.map(p => p.productType?.name))]
-          );
-        }
-
-        return filtered;
-      }),
-      catchError(err => {
-        console.error(`Error filtering products for type(s) '${targetTypes.join(', ')}':`, err);
-        return of([]);
-      })
-    );
+  getProductsByCategory(page: number = 1, pageSize: number = 12, productTypeId?: number): Observable<PaginatedResponse<ProductDto>> {
+   
+    return this.getProducts({
+      productTypeId: productTypeId,
+      page: page,
+      pageSize: pageSize
+    });
   }
 
   deleteImage(imageId: number): Observable<void> {

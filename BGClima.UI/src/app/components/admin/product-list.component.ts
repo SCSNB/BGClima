@@ -19,7 +19,10 @@ export class ProductListComponent implements OnInit {
   loading = true;
   error: string | null = null;
   searchTerm = '';
-  filteredProducts: ProductDto[] = [];
+  totalItems = 0;
+  pageSize = 18;
+  pageSizeOptions = [9, 18, 36, 100];
+  currentPage = 0;
 
   constructor(
     private service: ProductService,
@@ -35,15 +38,29 @@ export class ProductListComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
   }
 
-  private load(): void {
+  private load(pageIndex: number = 0, pageSize: number = this.pageSize): void {
     this.loading = true;
-    this.service.getProducts().subscribe({
-      next: (data) => {
-        this.filteredProducts = [...data];
-        this.applyFilter();
+    
+    const params: any = {
+      page: pageIndex + 1, // API is 1-based, MatPaginator is 0-based
+      pageSize: pageSize,
+      sortBy: 'name',
+      sortOrder: 'asc'
+    };
+    
+    // Add search term if it exists
+    if (this.searchTerm) {
+      params.searchTerm = this.searchTerm;
+    }
+    
+    this.service.getProductsForAdmin(params).subscribe({
+      next: (response) => {
+        this.dataSource.data = response.items;
+        this.totalItems = response.totalCount;
         this.loading = false;
       },
-      error: () => {
+      error: (error) => {
+        console.error('Error loading products:', error);
         this.error = 'Неуспешно зареждане на продуктите';
         this.loading = false;
       }
@@ -51,22 +68,26 @@ export class ProductListComponent implements OnInit {
   }
 
   applyFilter(): void {
-    if (!this.searchTerm) {
-      this.dataSource.data = [...this.filteredProducts];
-      return;
+    // Reset to first page when applying filter
+    if (this.paginator) {
+      this.paginator.firstPage();
     }
+    this.load(0, this.pageSize);
+  }
 
-    const searchLower = this.searchTerm.toLowerCase();
-    this.dataSource.data = this.filteredProducts.filter(product => 
-      product.name.toLowerCase().includes(searchLower) ||
-      product.id.toString().includes(searchLower) ||
-      (product.brand?.name?.toLowerCase().includes(searchLower) ?? false)
-    );
+  onSearch(): void {
+    this.applyFilter();
   }
 
   clearSearch(): void {
     this.searchTerm = '';
     this.applyFilter();
+  }
+
+  onPageChange(event: any): void {
+    this.pageSize = event.pageSize;
+    this.currentPage = event.pageIndex;
+    this.load(event.pageIndex, event.pageSize);
   }
 
   addProduct(): void {

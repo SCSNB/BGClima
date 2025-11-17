@@ -2,12 +2,15 @@
   <div class="search-container">
     <mat-form-field appearance="outline" class="search-field">
       <mat-label>Търсене на продукт</mat-label>
-      <input matInput placeholder="Въведете име или ID" [(ngModel)]="searchTerm" (keyup)="applyFilter()">
+      <input matInput placeholder="Въведете име" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()">
       <button mat-icon-button matSuffix *ngIf="searchTerm" (click)="clearSearch()">
         <mat-icon>close</mat-icon>
       </button>
-      <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
+    <button mat-flat-button color="primary" class="search-button" (click)="onSearch()">
+      <mat-icon>search</mat-icon>
+      Търси
+    </button>
   </div>
   <div class="toolbar-right">
     <button mat-flat-button color="primary" (click)="addProduct()">
@@ -17,7 +20,8 @@
   </div>
 </div>
 
-<table mat-table [dataSource]="dataSource" class="mat-elevation-z1" *ngIf="!loading && !error">
+<div class="table-container" *ngIf="!loading && !error">
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
   <ng-container matColumnDef="id">
     <th mat-header-cell *matHeaderCellDef>ID</th>
     <td mat-cell *matCellDef="let p">{{ p.id }}</td>
@@ -70,5 +74,17 @@
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
 
-<div *ngIf="loading">Зареждане...</div>
-<div *ngIf="error" class="error">{{ error }}</div> 
+<mat-paginator [length]="totalItems"
+                [pageSize]="pageSize"
+                [pageSizeOptions]="pageSizeOptions"
+                [pageIndex]="currentPage"
+                (page)="onPageChange($event)"
+                aria-label="Изберете страница">
+</mat-paginator>
+</div>
+
+<div *ngIf="loading" class="loading-container">
+  <mat-spinner diameter="40"></mat-spinner>
+  <div>Зареждане на продуктите...</div>
+</div>
+<div *ngIf="error" class="error">{{ error }}</div>

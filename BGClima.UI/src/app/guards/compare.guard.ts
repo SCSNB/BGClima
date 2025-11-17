@@ -17,6 +17,6 @@ export class CompareGuard implements CanActivate {
       return true;
     }
     this.snackBar.open('Моля, изберете поне 2 продукта за сравнение.', 'OK', { duration: 2000 });
-    return this.router.parseUrl('/products/stenen-tip');
+    return this.router.parseUrl('/products/1');
   }
 }

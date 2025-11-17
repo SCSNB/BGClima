@@ -1,8 +1,28 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, TemplateRef, HostListener } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, TemplateRef, HostListener, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ProductDto, ProductService } from '../../services/product.service';
 import { CompareService } from '../../services/compare.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatPaginatorIntl } from '@angular/material/paginator';
+import { Subject } from 'rxjs';
+
+// Custom paginator for Bulgarian language
+export class BgPaginatorIntl implements MatPaginatorIntl {
+  changes = new Subject<void>();
+  firstPageLabel = 'Първа страница';
+  itemsPerPageLabel = 'Продукти на страница:';
+  lastPageLabel = 'Последна страница';
+  nextPageLabel = 'Следваща страница';
+  previousPageLabel = 'Предишна страница';
+
+  getRangeLabel(page: number, pageSize: number, length: number): string {
+    if (length === 0) {
+      return 'Страница 1 от 1';
+    }
+    const amountPages = Math.ceil(length / pageSize);
+    return `Страница ${page + 1} от ${amountPages}`;
+  }
+}
 
 interface Badge { bg: string; color: string; text: string }
 interface Spec { icon: string; label: string; value: string }
@@ -17,24 +37,38 @@ type ProductCard = ProductDto & {
 @Component({
   selector: 'app-promo-products',
   templateUrl: './promo-products.component.html',
-  styleUrls: ['./promo-products.component.scss']
+  styleUrls: ['./promo-products.component.scss'],
+  encapsulation: ViewEncapsulation.None,
+  host: {
+    'class': 'app-promo-products'
+  },
+  providers: [
+    { provide: MatPaginatorIntl, useClass: BgPaginatorIntl }
+  ]
 })
 export class PromoProductsComponent implements OnInit {
   title = 'ПРОМО оферти';
   loading = true;
   products: ProductCard[] = [];
-  private lastSortKey: string = '';
+  private currentSort: string = '';
   
+  // Pagination
+  currentPage: number = 1;
+  pageSize: number = 18;
+  totalItems: number = 0;
+  pageSizeOptions = [9, 18, 36, 100];
+
   // Current filter state
+  currentFilters: any = {};
   filters: {
-    brands: string[];
+    brands: number[];
     price: { lower: number; upper: number };
-    energyClasses: string[];
+    energyClasses: number[];
     btus: string[];
     roomSizeRanges: string[];
   } = {
     brands: [],
-    price: { lower: 0, upper: 0 },
+    price: { lower: 0, upper: 20000 },
     energyClasses: [],
     btus: [],
     roomSizeRanges: []
@@ -63,7 +97,7 @@ export class PromoProductsComponent implements OnInit {
 
   // За колоната с филтри
   minPrice = 0;
-  maxPrice = 0;
+  maxPrice = 20000;
   currentCategory = '';
   isMobile = false;
   private dialogRef: any;
@@ -106,8 +140,81 @@ export class PromoProductsComponent implements OnInit {
     }
   }
 
-  applyFilters() {
-    this.closeFiltersDialog();
+  public applyFilters(filters: any): void {
+    this.currentFilters = filters;
+    this.loading = true;
+    
+    // Prepare filter parameters for the API call
+    const filterParams: any = {
+      page: this.currentPage, // Reset to first page when filters change
+      pageSize: this.pageSize,
+      isOnSale: true
+    };
+
+    // Add brand filter if any brands are selected
+    if (filters?.brands?.length) {
+      // Convert brand IDs to numbers and filter out any invalid values
+      filterParams.brandIds = filters.brands
+        .map((id: string | number) => typeof id === 'string' ? parseInt(id, 10) : id)
+        .filter((id: number) => !isNaN(id));
+    }
+
+    // Add price range filter
+    if (filters?.price) {
+      filterParams.minPrice = Number(filters.price.lower) || 0;
+      filterParams.maxPrice = Number(filters.price.upper) || Number.MAX_SAFE_INTEGER;
+    }
+
+    // Add energy class filter if any are selected
+    if (filters?.energyClasses?.length) {
+      filterParams.energyClassIds = filters.energyClasses;
+    }
+
+    // Add BTU filter if any are selected
+    if (filters?.btus?.length) {
+      const btuIds = filters.btus.map((b: string | number) => Number(b));
+      filterParams.btuIds = btuIds; // Send array of BTU IDs
+    }
+
+    if (filters?.powerKws?.length) {
+      // Convert string array to array of numbers for MaxHatingPowers
+      filterParams.MaxHatingPowers = filters.powerKws.map((kw: string) => parseFloat(kw));
+    }
+
+    // Add room size filter if any are selected
+    if (filters?.roomSizeRanges?.length) {
+      filterParams.roomSize = filters.roomSizeRanges[0];
+    }
+
+    // Add sorting parameters
+    if (this.currentSort) {
+      const [sortBy, sortOrder] = this.currentSort.split('-');
+      filterParams.sortBy = sortBy;
+      filterParams.sortOrder = sortOrder as 'asc' | 'desc';
+    }
+
+    // Call the product service to get filtered products
+    this.productService.getProducts(filterParams).subscribe({
+      next: (response) => {
+        const { items, totalCount } = this.transformProductResponse(response);
+                // Extract unique brand names from allPromoProducts
+
+        this.products = items;
+        const brandSet = new Set<string>();
+        this.products.forEach(p => { 
+          const brandName = p.brand?.name?.trim(); 
+          if (brandName) brandSet.add(brandName); 
+        });
+
+        this.allowedBrandNames = Array.from(brandSet).sort((a, b) => a.localeCompare(b));
+        this.totalItems = totalCount;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error fetching filtered products:', error);
+        this.loading = false;
+      }
+    });
   }
 
   clearFilters() {
@@ -129,76 +236,21 @@ export class PromoProductsComponent implements OnInit {
     this.loadPromoProducts();
   }
 
-  onFiltersChanged = (f: { brands: string[]; price: { lower: number; upper: number }; energyClasses: string[]; btus: string[]; roomSizeRanges: string[] }) => {
-    // Запази последния избор, за да се подаде като preset при повторно отваряне на диалога
-    this.filters = {
-      brands: [...(f.brands || [])],
-      price: { lower: Number(f.price?.lower ?? this.minPrice), upper: Number(f.price?.upper ?? this.maxPrice) },
-      energyClasses: [...(f.energyClasses || [])],
-      btus: [...(f.btus || [])],
-      roomSizeRanges: [...(f.roomSizeRanges || [])]
-    };
-    const byBrand = (p: ProductCard) => !f.brands.length || !!p.brand && f.brands.includes(p.brand.name);
-    const byPrice = (p: ProductCard) => {
-      const price = p.price || 0;
-      return price >= f.price.lower && price <= f.price.upper;
-    };
-    const byClass = (p: ProductCard) => !f.energyClasses.length || !!p.energyClass && f.energyClasses.includes(p.energyClass.class);
-    const byBTU = (p: ProductCard) => {
-      if (!f.btus.length) return true;
-      const btu = (p.btu?.value ?? '').toString();
-      const match = btu.match(/(\d+(?:\.\d+)?)/);
-      const k = match ? Math.round(parseFloat(match[1]) / 1000).toString() : '';
-      return f.btus.includes(k) || f.btus.includes((p.btu as any)?.value?.toString?.() ?? '');
-    };
-    const byRoomSize = (p: ProductCard) => {
-      if (!f.roomSizeRanges.length) return true;
-      
-      const roomSizeAttr = (p.attributes || []).find(a => 
-        (a.attributeKey || '').toLowerCase().includes('подходящ за помещения')
-      );
-      
-      if (roomSizeAttr && roomSizeAttr.attributeValue) {
-        // Извличаме числовата стойност от атрибута (например "45 кв.м" -> 45)
-        const roomSizeMatch = roomSizeAttr.attributeValue.match(/(\d+(\.\d+)?)/);
-        if (roomSizeMatch) {
-          const roomSize = parseFloat(roomSizeMatch[0]);
-          return f.roomSizeRanges.some(range => {
-            const [min, max] = range.split('-').map(Number);
-            return roomSize >= min && roomSize <= max;
-          });
-        }
-      }
-      return false;
-    };
-    
-    this.products = this.allPromoProducts
-      .filter(p => byBrand(p) && byPrice(p) && byClass(p) && byBTU(p) && byRoomSize(p));
-    // re-apply last sort to keep ordering consistent
-    this.onSortChanged(this.lastSortKey);
-  };
+  onFiltersChanged(filters: any) {
+    this.currentFilters = filters;
+    this.applyFilters(filters);
+  }
 
-  onSortChanged = (key: string) => {
-    // Normalize incoming keys from different sources
-    const map: Record<string, string> = {
-      priceAsc: 'price-asc',
-      priceDesc: 'price-desc',
-      nameAsc: 'name-asc',
-      nameDesc: 'name-desc'
-    };
-    key = map[key] || key;
-    this.lastSortKey = key;
+  onSortChanged(sortKey: string) {
+    this.currentSort = sortKey;
+    this.applyFilters(this.currentFilters);
+  }
 
-    const arr = [...this.products];
-    const by = (k: keyof ProductCard, dir: 1|-1 = 1) => arr.sort((a,b)=>((a[k]||0)>(b[k]||0)?dir:-dir));
-    switch (key) {
-      case 'name-asc': this.products = arr.sort((a,b)=> (a.name||'').localeCompare(b.name||'')); break;
-      case 'name-desc': this.products = arr.sort((a,b)=> (b.name||'').localeCompare(a.name||'')); break;
-      case 'price-asc': this.products = by('price', 1); break;
-      case 'price-desc': this.products = by('price', -1); break;
-      case 'newest': default: this.products = arr; break;
-    }
-  };
+  onPageChange(event: any) {
+    this.currentPage = event.pageIndex + 1;
+    this.pageSize = event.pageSize;
+    this.applyFilters(this.currentFilters);
+  }
 
   private toEur(bgn?: number | null): number | null {
     if (bgn === undefined || bgn === null) return null;
@@ -206,8 +258,44 @@ export class PromoProductsComponent implements OnInit {
     return +(bgn / rate).toFixed(2);
   }
 
+  private transformProductResponse(response: any): { items: ProductCard[], totalCount: number } {
+    const totalCount = response.totalCount || 0;
+    const items = response.items.map((p: ProductDto) => {
+      const priceEur = this.toEur(p.price);
+      const oldPriceEur = this.toEur(p.oldPrice ?? undefined);
+
+      // WiFi badge detection
+      const hasWifi = (p.attributes || []).some((a: any) => {
+        const key = (a.attributeKey || '').toLowerCase();
+        const value = (a.attributeValue || '').toString().toLowerCase().trim();
+        return (key.includes('wi-fi') || key.includes('wifi') || key.includes('wi fi')) &&
+               key.includes('модул') &&
+               (value === 'да' || value === 'da' || value === 'yes' || value === 'true');
+      });
+
+      const badges: Badge[] = [];
+      if (p.isNew) badges.push({ text: 'НОВО', bg: '#F54387', color: '#fff' });
+      if (p.isOnSale) badges.push({ text: 'ПРОМО', bg: '#E6003E', color: '#fff' });
+      if (hasWifi) badges.push({ text: 'WiFi', bg: '#3B82F6', color: '#fff' });
+
+      const btuStr = (this.getAttrFormatted(p, 'BTU') || '').toString();
+      const btuThousands = parseInt(btuStr.replace(/\D+/g, ''), 10) || 0;
+
+      const specs: Spec[] = [
+        { icon: 'bolt', label: 'Мощност', value: btuThousands > 0 ? String(btuThousands) : '' },
+        { icon: 'eco', label: 'Клас', value: p.energyClass?.class || this.getAttrFormatted(p, 'Клас') || '' },
+        { icon: 'ac_unit', label: 'Охлаждане', value: this.getAttrFormatted(p, 'Охлаждане') || '' },
+        { icon: 'wb_sunny', label: 'Отопление', value: this.getAttrFormatted(p, 'Отопление') || '' },
+      ];
+
+      return { ...p, badges, specs, priceEur, oldPriceEur } as ProductCard;
+    });
+
+    return { items, totalCount };
+  }
+
   get currentSortLabel(): string {
-    switch (this.lastSortKey) {
+    switch (this.currentSort) {
       case 'price-asc': return 'Ниска цена';
       case 'price-desc': return 'Висока цена';
       case 'name-asc': return 'A → Я';
@@ -217,53 +305,42 @@ export class PromoProductsComponent implements OnInit {
   }
 
   private loadPromoProducts(): void {
-    this.productService.getProducts().subscribe({
-      next: (all) => {
-        const filtered = (all || []).filter(p => !!p.isOnSale);
-        this.allPromoProducts = filtered.map(p => {
-          const priceEur = this.toEur(p.price);
-          const oldPriceEur = this.toEur(p.oldPrice ?? undefined);
+    this.loading = true;
+    
+    const filterParams: any = {
+      isOnSale: true,
+      page: 1,
+      pageSize: 18
+    };
 
-          // WiFi badge detection (same as Offers)
-          const hasWifi = (p.attributes || []).some(a => {
-            const key = (a.attributeKey || '').toLowerCase();
-            const value = (a.attributeValue || '').toString().toLowerCase().trim();
-            return (key.includes('wi-fi') || key.includes('wifi') || key.includes('wi fi')) &&
-                   key.includes('модул') &&
-                   (value === 'да' || value === 'da' || value === 'yes' || value === 'true');
-          });
+    // Add sorting parameters if any
+    if (this.currentSort) {
+      const [sortBy, sortOrder] = this.currentSort.split('-');
+      filterParams.sortBy = sortBy;
+      filterParams.sortOrder = sortOrder as 'asc' | 'desc';
+    }
 
-          const badges: Badge[] = [];
-          if (p.isNew) badges.push({ text: 'НОВО', bg: '#F54387', color: '#fff' });
-          if (p.isOnSale) badges.push({ text: 'ПРОМО', bg: '#E6003E', color: '#fff' });
-          if (hasWifi) badges.push({ text: 'WiFi', bg: '#3B82F6', color: '#fff' });
-
-          const btuStr = (this.getAttrFormatted(p, 'BTU') || '').toString();
-          const btuThousands = parseInt(btuStr.replace(/\D+/g, ''), 10) || 0;
-
-          const specs: Spec[] = [
-            { icon: 'bolt', label: 'Мощност', value: btuThousands > 0 ? String(btuThousands) : '' },
-            { icon: 'eco', label: 'Клас', value: p.energyClass?.class || this.getAttrFormatted(p, 'Клас') || '' },
-            { icon: 'ac_unit', label: 'Охлаждане', value: this.getAttrFormatted(p, 'Охлаждане') || '' },
-            { icon: 'wb_sunny', label: 'Отопление', value: this.getAttrFormatted(p, 'Отопление') || '' },
-          ];
-
-          return { ...p, badges, specs, priceEur, oldPriceEur } as ProductCard;
-        });
-        // Определи разрешените марки на база наличните промо продукти
+    this.productService.getProducts(filterParams).subscribe({
+      next: (response) => {
+        // Transform the response using the existing method
+        const { items } = this.transformProductResponse(response);
+        this.allPromoProducts = items;
+        
+        // Extract unique brand names from allPromoProducts
         const brandSet = new Set<string>();
-        this.allPromoProducts.forEach(p => { const n = p.brand?.name?.trim(); if (n) brandSet.add(n); });
-        this.allowedBrandNames = Array.from(brandSet).sort((a,b)=>a.localeCompare(b));
-        // Определи мин/макс цена
-        const prices = this.allPromoProducts.map(p => p.price || 0);
-        this.minPrice = prices.length ? Math.min(...prices) : 0;
-        this.maxPrice = prices.length ? Math.max(...prices) : 0;
-        // Първоначално показваме всички и прилагаме последната подредба
+        this.allPromoProducts.forEach(p => { 
+          const brandName = p.brand?.name?.trim(); 
+          if (brandName) brandSet.add(brandName); 
+        });
+        this.allowedBrandNames = Array.from(brandSet).sort((a, b) => a.localeCompare(b));
+        
+        // Update products and apply sorting
         this.products = [...this.allPromoProducts];
-        this.onSortChanged(this.lastSortKey);
+        this.totalItems = this.allPromoProducts.length;
         this.loading = false;
       },
-      error: () => {
+      error: (error) => {
+        console.error('Error loading promo products:', error);
         this.products = [];
         this.loading = false;
       }
@@ -273,7 +350,6 @@ export class PromoProductsComponent implements OnInit {
   // Mirror OffersComponent attribute parsing
   private getAttrFormatted(p: ProductDto, key: string): string {
     const normalizedKey = key.trim().toLowerCase();
-    const isHeatPump = !!p?.productType?.name && p.productType.name.toLowerCase().includes('термопомп');
 
     if (normalizedKey === 'btu') {
       if (p.btu?.value) {

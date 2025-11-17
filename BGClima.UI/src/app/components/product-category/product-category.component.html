@@ -1,3 +1,4 @@
+<!-- Mobile Filters Dialog duplicate removed -->
 <div class="category-container">
   <div class="category-header">
     <h1 class="category-title">{{ categoryTitle }}</h1>
@@ -55,62 +56,75 @@
         [minPrice]="minPrice" 
         [maxPrice]="maxPrice"
         [preset]="currentFilters"
-        (filtersChanged)="onFiltersChanged($event)"></app-product-filters>
+        (filtersChanged)="onFiltersChanged($event)">
+      </app-product-filters>
     </aside>
-    <div class="product-grid">
-      <ng-container *ngIf="filteredProducts.length > 0; else noProducts">
-        <a *ngFor="let product of filteredProducts" [routerLink]="['/product', product.id]" class="offer-card-link">
-          <div class="offer-card">
-            <div class="offer-card-image-badges">
-              <img [src]="product.imageUrl || 'assets/placeholder.png'" [alt]="product.name" class="offer-card-image" />
-              <div class="offer-badges">
-                <span class="badge" *ngFor="let b of product.badges" [ngStyle]="{background: b.bg, color: b.color}">{{ b.text }}</span>
-              </div>
-            </div>
-            <div class="offer-card-title">{{ product.name }}</div>
-            <div class="offer-card-prices">
-              <div class="price-container">
-                <div class="current-prices">
-                  <span class="current-price">{{ product.price | number:'1.2-2' }} лв.</span>
-                  <span class="current-price-eur">/ {{ product.priceEur | number:'1.2-2' }} €</span>
-                </div>
-                <div class="old-prices" *ngIf="product.oldPrice">
-                  <span class="old-price">{{ product.oldPrice | number:'1.2-2' }} лв.</span>
-                  <span class="old-price-eur" *ngIf="product.oldPriceEur">/ {{ product.oldPriceEur | number:'1.2-2' }} €</span>
+    
+    <div class="main-content">
+      <div class="product-grid">
+        <ng-container *ngIf="filteredProducts.length > 0; else noProducts">
+          <a *ngFor="let product of filteredProducts" [routerLink]="['/product', product.id]" class="offer-card-link">
+            <div class="offer-card">
+              <div class="offer-card-image-badges">
+                <img [src]="product.imageUrl || 'assets/placeholder.png'" [alt]="product.name" class="offer-card-image" />
+                <div class="offer-badges">
+                  <span class="badge" *ngFor="let b of product.badges" [ngStyle]="{background: b.bg, color: b.color}">{{ b.text }}</span>
                 </div>
               </div>
-            </div>
-            <div class="offer-card-brand-row">
-              <div class="brand-text-container">
-                <span class="brand-text">{{ product.brand?.name }}</span>
-              </div>
-              <button class="compare-btn" type="button"
-                      [class.selected]="isCompared(product.id)"
-                      (click)="onCompareClick($event, product)">
-                {{ isCompared(product.id) ? 'В сравнение' : 'Сравни' }}
-              </button>
-            </div>
-            <div class="offer-card-specs">
-              <ng-container *ngFor="let spec of product.specs">
-                <div class="spec" *ngIf="spec?.value">
-                  <div class="spec-icon" [ngClass]="spec.icon">
-                    <span class="material-icons">{{ spec.icon }}</span>
+              <div class="offer-card-title">{{ product.name }}</div>
+              <div class="offer-card-prices">
+                <div class="price-container">
+                  <div class="current-prices">
+                    <span class="current-price">{{ product.price | number:'1.2-2' }} лв.</span>
+                    <span class="current-price-eur">/ {{ product.priceEur | number:'1.2-2' }} €</span>
                   </div>
-                  <div class="spec-details">
-                    <div class="spec-label">{{ spec.label }}</div>
-                    <div class="spec-value">{{ spec.value }}</div>
+                  <div class="old-prices" *ngIf="product.oldPrice">
+                    <span class="old-price">{{ product.oldPrice | number:'1.2-2' }} лв.</span>
+                    <span class="old-price-eur" *ngIf="product.oldPriceEur">/ {{ product.oldPriceEur | number:'1.2-2' }} €</span>
                   </div>
                 </div>
-              </ng-container>
+              </div>
+              <div class="offer-card-brand-row">
+                <div class="brand-text-container">
+                  <span class="brand-text">{{ product.brand?.name }}</span>
+                </div>
+                <button class="compare-btn" type="button"
+                        [class.selected]="isCompared(product.id)"
+                        (click)="onCompareClick($event, product)">
+                  {{ isCompared(product.id) ? 'В сравнение' : 'Сравни' }}
+                </button>
+              </div>
+              <div class="offer-card-specs">
+                <ng-container *ngFor="let spec of product.specs">
+                  <div class="spec" *ngIf="spec?.value">
+                    <div class="spec-icon" [ngClass]="spec.icon">
+                      <span class="material-icons">{{ spec.icon }}</span>
+                    </div>
+                    <div class="spec-details">
+                      <div class="spec-label">{{ spec.label }}</div>
+                      <div class="spec-value">{{ spec.value }}</div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
             </div>
-          </div>
-        </a>
-      </ng-container>
-      <ng-template #noProducts>
-        <p>Няма намерени продукти в тази категория.</p>
-      </ng-template>
+          </a>
+        </ng-container>
+        <ng-template #noProducts>
+          <p class="no-products-message">Няма намерени продукти в тази категория.</p>
+        </ng-template>
+      </div>
+      
+      <div class="pagination-container" *ngIf="filteredProducts.length > 0">
+        <mat-paginator 
+          [length]="totalItems"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          [pageIndex]="currentPage - 1"
+          (page)="onPageChange($event)"
+          aria-label="Изберете страница">
+        </mat-paginator>
+      </div>
     </div>
   </div>
 </div>
-
-<!-- Mobile Filters Dialog duplicate removed -->
