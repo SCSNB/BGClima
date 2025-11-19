@@ -6,8 +6,6 @@ using BGClima.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
 
 namespace BGClima.API.Controllers
 {
@@ -112,14 +110,37 @@ namespace BGClima.API.Controllers
                     );
                 }
 
-                // Брой на всички продукти след филтрирането
                 var totalCount = await query.CountAsync();
 
-                // Прилагане на пагинация
-                var products = await query
+                query = query
                     .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
+                    .Take(pageSize);
+
+                var products = await query
+                     .Where(p => p.IsActive)
+                     .Select(p => new ProductBrief
+                     {
+                         Id = p.Id,
+                         Name = p.Name,
+                         Price = p.Price,
+                         OldPrice = p.OldPrice,
+                         Brand = new BrandDto { Name = p.Brand.Name },
+                         BTU = new BTUInfoDto { Value = p.BTU.Value },
+                         EnergyClass = new EnergyClassDto { Class = p.EnergyClass.Class },
+                         ImageUrl = p.ImageUrl,
+                         IsNew = p.IsNew,
+                         IsOnSale = p.IsOnSale,
+                         Attributes = p.Attributes
+                             .Where(a => a.AttributeKey.Contains("мощност")
+                                      || a.AttributeKey.Contains("Енергиен")
+                                      || a.AttributeKey.Contains("Wi-Fi"))
+                             .Select(a => new ProductAttributeDto
+                             {
+                                 Id = a.Id,
+                                 AttributeKey = a.AttributeKey,
+                                 AttributeValue = a.AttributeValue
+                             }).ToList()
+                     }).ToListAsync();
 
                 // Връщаме заедно с метаданни за пагинацията
                 var result = new
@@ -128,7 +149,7 @@ namespace BGClima.API.Controllers
                     PageSize = pageSize,
                     CurrentPage = page,
                     TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
-                    Items = _mapper.Map<List<ProductDto>>(products)
+                    Items = products
                 };
 
                 return Ok(result);
@@ -156,7 +177,7 @@ namespace BGClima.API.Controllers
                     .OrderBy(p => p.Name)
                     .ToListAsync();
 
-               var productDTOs = _mapper.Map<List<ProductDto>>(products);
+                var productDTOs = _mapper.Map<List<ProductDto>>(products);
 
                 return Ok(productDTOs);
             }
