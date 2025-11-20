@@ -233,7 +233,7 @@ export class PromoProductsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadPromoProducts();
+   
   }
 
   onFiltersChanged(filters: any) {

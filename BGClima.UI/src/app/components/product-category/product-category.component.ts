@@ -107,7 +107,6 @@ export class ProductCategoryComponent implements OnInit {
 
   // Method to handle filter changes from the filter component
   onFiltersChanged(filters: any) {
-    this.currentFilters = filters;
     this.applyFilters(filters);
   }
 
@@ -160,15 +159,8 @@ export class ProductCategoryComponent implements OnInit {
       if (category) {
         this.currentCategory = category;
         this.setCategoryTitle(category);
-        this.loadProducts();
       }
     });
-  }
-
-  private computeMaxPrice(products: ProductCard[]): number {
-    const prices = products.map(p => Number(p.price ?? 0)).filter(n => !isNaN(n));
-    if (!prices.length) return 0;
-    return Math.max(...prices);
   }
 
   private toEur(bgn?: number | null): number | null {
@@ -197,16 +189,6 @@ export class ProductCategoryComponent implements OnInit {
      
       this.allProducts = items;
       this.filteredProducts = [...items];
-
-      // Update current filters with the hardcoded price range
-      this.currentFilters = {
-        brands: [],
-        price: { lower: 0, upper: 20000 },
-        energyClasses: [],
-        btus: [],
-        roomSizeRanges: [],
-        powerKws: [],
-      };
     });
   }
 
@@ -296,6 +278,7 @@ export class ProductCategoryComponent implements OnInit {
       }
     });
   }
+ 
 
   private transformProductResponse(response: any): { items: ProductCard[], totalCount: number } {
     const totalCount = response.totalCount || 0;
