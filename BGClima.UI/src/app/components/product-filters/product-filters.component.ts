@@ -302,8 +302,8 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
           this.filters.btus = (this.filters.btus || []).filter(id => allowedBtuIds.has(Number(id)));
         }
         this.clampPrices();
-        this.filtersChanged.emit(this.filters);
       }
+        this.filtersChanged.emit(this.filters);
     }
     if (changes['preset'] && this.preset) {
       // При подаден preset, приложи стойностите към вътрешните филтри
