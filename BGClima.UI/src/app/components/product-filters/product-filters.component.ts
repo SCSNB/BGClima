@@ -98,12 +98,6 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     return this.btuOptions;
   }
 
-  // // Форматира етикета за BTU без дублиране на "BTU"
-  // formatBtuLabel(opt: BTUDto): string {
-  //   const raw = String(opt?.value ?? '').trim();
-  //   if (!raw) return '';
-  //   return raw.endsWith('BTU') || raw.endsWith('btu') ? raw : `${raw} BTU`;
-  // }
 
   // Термопомпи: опции за Мощност (kW) – визуално като чеклист
   powerKwOptions: string[] = [
