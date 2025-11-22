@@ -211,7 +211,6 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   }
 
   onFiltersChanged() {
-    debugger;
     this.clampPrices();
     this.filtersChanged.emit(this.filters);
   }
@@ -259,7 +258,6 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   }
 
   ngOnInit(): void {
-    debugger;
     this.updateIsMobile();
     // Зареждане на всички марки от базата
     this.productService.getBrands().subscribe({
