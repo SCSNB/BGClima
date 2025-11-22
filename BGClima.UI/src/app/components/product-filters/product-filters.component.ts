@@ -1,18 +1,19 @@
-import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ProductService, BrandDto, BTUDto, EnergyClassDto } from '../../services/product.service';
 
 @Component({
   selector: 'app-product-filters',
   templateUrl: './product-filters.component.html',
-  styleUrls: ['./product-filters.component.scss']
+  styleUrls: ['./product-filters.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductFiltersComponent implements OnChanges, OnInit {
   @Output() filtersChanged = new EventEmitter<any>();
   @Output() sortChanged = new EventEmitter<string>();
   @Input() currentCategory: string = '';
-  @Input() minPrice: number = 100;
-  @Input() maxPrice: number = 79900;
+  @Input() minPrice: number = 0;
+  @Input() maxPrice: number = 20000;
   // Списък с позволени марки (например само тези, които имат промо продукти)
   @Input() allowedBrands: string[] = [];
   // Показва/скрива секцията с бързи връзки (категории)
@@ -45,7 +46,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
 
   filters = {
     brands: [] as number[],
-    price: { lower: 230, upper: 79900 },
+    price: { lower: 0, upper: 20000 },
     energyClasses: [] as number[],
     btus: [] as number[], // Changed from string[] to number[] to store BTU IDs
     roomSizeRanges: [] as string[],
@@ -97,12 +98,6 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     return this.btuOptions;
   }
 
-  // // Форматира етикета за BTU без дублиране на "BTU"
-  // formatBtuLabel(opt: BTUDto): string {
-  //   const raw = String(opt?.value ?? '').trim();
-  //   if (!raw) return '';
-  //   return raw.endsWith('BTU') || raw.endsWith('btu') ? raw : `${raw} BTU`;
-  // }
 
   // Термопомпи: опции за Мощност (kW) – визуално като чеклист
   powerKwOptions: string[] = [
@@ -292,6 +287,8 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['currentCategory']) {
       // При смяна на категория – ако сме в топлообменници, остави само Марка, Цена и BTU
+      this.filters.price.lower = this.minPrice;
+      this.filters.price.upper = this.maxPrice;
       if (this.isHeatPumpCategory()) {
         this.filters.energyClasses = [];
         this.filters.powerKws = [];
@@ -302,8 +299,9 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
           this.filters.btus = (this.filters.btus || []).filter(id => allowedBtuIds.has(Number(id)));
         }
         this.clampPrices();
+
+        // this.filtersChanged.emit(this.filters);
       }
-        this.filtersChanged.emit(this.filters);
     }
     if (changes['preset'] && this.preset) {
       // При подаден preset, приложи стойностите към вътрешните филтри
@@ -320,15 +318,16 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
       };
       this.clampPrices();
       // Емитни, за да синхронизираме списъка с продукти с възстановените стойности
-      this.filtersChanged.emit(this.filters);
+      // this.filtersChanged.emit(this.filters);
     }
     if (changes['minPrice'] || changes['maxPrice']) {
+      
       // При промяна на входните граници инициализирай диапазона към [min, max]
       this.filters.price.lower = this.minPrice;
       this.filters.price.upper = this.maxPrice;
       this.clampPrices();
       // емитни веднъж, за да синхронизираме списъка
-      this.filtersChanged.emit(this.filters);
+      // this.filtersChanged.emit(this.filters);
     }
     if (changes['allowedBrands']) {
       this.applyAllowedBrandsFilter();
