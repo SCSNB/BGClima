@@ -51,15 +51,21 @@
           <div class="selected-bars-stripes"></div>
         </div>
         <div class="slider-overlay">
-          <mat-slider [min]="minPrice" [max]="maxPrice" [step]="1">
+          <mat-slider [min]="minPrice" 
+                      [max]="maxPrice"
+                      [step]="1">
+
             <input matSliderStartThumb type="range"
-                   [(ngModel)]="filters.price.lower" name="priceLowerThumb"
-                   (ngModelChange)="onFiltersChanged()">
+                  [ngModel]="filters.price.lower"
+                  (ngModelChange)="filters.price.lower = $event"
+                  (change)="onFiltersChanged()">
+
             <input matSliderEndThumb type="range"
-                   [(ngModel)]="filters.price.upper" name="priceUpperThumb"
-                   (ngModelChange)="onFiltersChanged()">
+                  [ngModel]="filters.price.upper"
+                  (ngModelChange)="filters.price.upper = $event"
+                  (change)="onFiltersChanged()">
           </mat-slider>
-        </div>
+                  </div>
       </div>
       <div class="price-range-display">
         <span class="value">{{ filters.price.lower | number:'1.0-0' }} – <strong>{{ filters.price.upper | number:'1.0-0' }}</strong> <small>лв.</small></span>

@@ -160,6 +160,8 @@ export class ProductCategoryComponent implements OnInit {
         this.currentCategory = category;
         this.setCategoryTitle(category);
       }
+
+      this.loadProducts();
     });
   }
 

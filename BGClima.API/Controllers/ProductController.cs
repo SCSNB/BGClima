@@ -217,10 +217,23 @@ namespace BGClima.API.Controllers
 
                 var totalCount = await query.CountAsync();
 
+
+                query = query
+                  .Skip((page - 1) * pageSize)
+                  .Take(pageSize);
+
                 var products = await query
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
+                     .Where(p => p.IsActive)
+                     .Select(p => new ProductBrief
+                     {
+                         Id = p.Id,
+                         Name = p.Name,
+                         Price = p.Price,
+                         OldPrice = p.OldPrice,
+                         Brand = new BrandDto { Name = p.Brand.Name },
+                         BTU = new BTUInfoDto { Value = p.BTU.Value },
+                         EnergyClass = new EnergyClassDto { Class = p.EnergyClass.Class },
+                     }).ToListAsync();
 
                 var result = new
                 {
@@ -228,7 +241,7 @@ namespace BGClima.API.Controllers
                     PageSize = pageSize,
                     CurrentPage = page,
                     TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
-                    Items = _mapper.Map<List<ProductDto>>(products)
+                    Items = products
                 };
 
                 return Ok(result);
@@ -489,24 +502,12 @@ namespace BGClima.API.Controllers
             try
             {
                 var totalProducts = await _context.Products.CountAsync();
-                var activeProducts = await _context.Products.CountAsync(p => p.IsActive);
-                var featuredProducts = await _context.Products.CountAsync(p => p.IsFeatured);
-                var onSaleProducts = await _context.Products.CountAsync(p => p.IsOnSale);
-                var newProducts = await _context.Products.CountAsync(p => p.IsNew);
-                var lowStockProducts = await _context.Products.CountAsync(p => p.StockQuantity <= 5 && p.StockQuantity > 0);
-                var outOfStockProducts = await _context.Products.CountAsync(p => p.StockQuantity == 0);
+
 
                 var stats = new
                 {
                     totalProducts,
-                    activeProducts,
-                    featuredProducts,
-                    onSaleProducts,
-                    newProducts,
-                    lowStockProducts,
-                    outOfStockProducts,
                     totalBrands = await _context.Brands.CountAsync(),
-                    totalProductTypes = await _context.ProductTypes.CountAsync()
                 };
 
                 return Ok(stats);

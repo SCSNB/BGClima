@@ -53,8 +53,6 @@
     <aside class="filters-sidebar" *ngIf="!isMobile">
       <app-product-filters 
         [currentCategory]="currentCategory" 
-        [minPrice]="minPrice" 
-        [maxPrice]="maxPrice"
         [preset]="currentFilters"
         (filtersChanged)="onFiltersChanged($event)">
       </app-product-filters>

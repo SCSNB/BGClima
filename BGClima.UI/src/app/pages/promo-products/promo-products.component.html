@@ -16,10 +16,7 @@
   <aside class="sidebar desktop-only">
     <app-product-filters
       [currentCategory]="currentCategory"
-      [minPrice]="minPrice"
-      [maxPrice]="maxPrice"
       [preset]="filters"
-      [allowedBrands]="allowedBrandNames"
       [showCategoriesNav]="false"
       (filtersChanged)="onFiltersChanged($event)"
       (sortChanged)="onSortChanged($event)">
