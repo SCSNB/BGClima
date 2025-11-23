@@ -1,11 +1,10 @@
 import { Component, OnInit, ViewChild, TemplateRef, HostListener, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router  } from '@angular/router';
 import { ProductDto, ProductService } from 'src/app/services/product.service';
-import { FilterDialogComponent } from 'src/app/shared/components/filter-dialog/filter-dialog.component';
 import { CompareService } from 'src/app/services/compare.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorIntl } from '@angular/material/paginator';
 import { Subject } from 'rxjs';
 
 // Custom paginator for Bulgarian language
@@ -58,7 +57,7 @@ export class ProductCategoryComponent implements OnInit {
   minPrice: number = 0;
   maxPrice: number = 20000;
   isMobile: boolean = false;
-  currentFilters: any;
+  currentFilters: any = {};
   currentSort: string | null = null; // Track current sort order
   productTypeId?: number; // Add productTypeId property
   
@@ -73,6 +72,7 @@ export class ProductCategoryComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute, 
+    private router: Router,    
     private productService: ProductService,
     public dialog: MatDialog,
     private compareService: CompareService,
@@ -152,17 +152,39 @@ export class ProductCategoryComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.parseFiltersFromUrl(params);
+    });
+
     this.route.paramMap.subscribe(params => {
-      const category = params.get('category');
+      const category = params.get('category') || '';
       this.productTypeId = Number(category);
       
-      if (category) {
+      if (category !== this.currentCategory) {
         this.currentCategory = category;
         this.setCategoryTitle(category);
+        this.applyFilters(this.currentFilters);
       }
-
-      this.loadProducts();
     });
+
+  }
+
+    private parseFiltersFromUrl(params: any) {
+    this.currentFilters = {
+      brands: params['brands'] ? params['brands'].split(',').map(Number) : [],
+      price: {
+        lower: params['lower'] ? Number(params['lower']) : this.minPrice,
+        upper: params['upper'] ? Number(params['upper']) : this.maxPrice
+      },
+      energyClasses: params['energyClasses'] ? params['energyClasses'].split(',') : [],
+      btus: params['btus'] ? params['btus'].split(',') : [],
+      powerKws: params['powerKws'] ? params['powerKws'].split(',') : [],
+      roomSizeRanges: params['roomSize'] ? [params['roomSize']] : []
+    };
+
+    this.currentPage = params['page'] ? Number(params['page']) : 1;
+    this.pageSize = params['pageSize'] ? Number(params['pageSize']) : 18;
+    this.currentSort = params['sort'] || null;
   }
 
   private toEur(bgn?: number | null): number | null {
@@ -214,6 +236,9 @@ export class ProductCategoryComponent implements OnInit {
 
   public applyFilters(filters: any): void {
     this.currentFilters = filters;
+
+    this.updateUrlFromFilters(filters);
+
     this.loading = true;
     
     // Prepare filter parameters for the API call
@@ -264,8 +289,7 @@ export class ProductCategoryComponent implements OnInit {
       filterParams.sortBy = sortBy;
       filterParams.sortOrder = sortOrder as 'asc' | 'desc';
     }
-
-    // Call the product service to get filtered products
+    
     this.productService.getProducts(filterParams).subscribe({
       next: (response) => {
         const { items, totalCount } = this.transformProductResponse(response);
@@ -280,7 +304,25 @@ export class ProductCategoryComponent implements OnInit {
       }
     });
   }
- 
+  
+  private updateUrlFromFilters(filters: any) {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        brands: filters.brands?.join(',') || null,
+        lower: filters.price?.lower,
+        upper: filters.price?.upper,
+        energyClasses: filters.energyClasses?.join(',') || null,
+        btus: filters.btus?.join(',') || null,
+        powerKws: filters.powerKws?.join(',') || null,
+        roomSize: filters.roomSizeRanges?.[0] || null,
+        sort: this.currentSort || null,
+        page: this.currentPage,
+        pageSize: this.pageSize
+      },
+      queryParamsHandling: 'merge'
+    });
+  }
 
   private transformProductResponse(response: any): { items: ProductCard[], totalCount: number } {
     const totalCount = response.totalCount || 0;

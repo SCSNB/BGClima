@@ -303,18 +303,17 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
         // this.filtersChanged.emit(this.filters);
       }
     }
-    if (changes['preset'] && this.preset) {
-      // При подаден preset, приложи стойностите към вътрешните филтри
+    if (changes['preset'] && this._preset) {
       this.filters = {
-        brands: [...(this.preset.brands || [])].map(brand => Number(brand)),
+        brands: [...(this._preset.brands || [])].map(brand => Number(brand)),
         price: {
-          lower: Number(this.preset.price?.lower ?? this.minPrice),
-          upper: Number(this.preset.price?.upper ?? this.maxPrice)
+          lower: Number(this._preset.price?.lower ?? this.minPrice),
+          upper: Number(this._preset.price?.upper ?? this.maxPrice)
         },
-        energyClasses: [...(this.preset.energyClasses?.map(id => Number(id)) || [])],
-        btus: [...(this.preset.btus || [])].map(btu => Number(btu)),
-        roomSizeRanges: [...(this.preset.roomSizeRanges || [])],
-        powerKws: [...((this.preset as any).powerKws || [])]
+        energyClasses: [...(this._preset.energyClasses?.map(id => Number(id)) || [])],
+        btus: [...(this._preset.btus || [])].map(btu => Number(btu)),
+        roomSizeRanges: [...(this._preset.roomSizeRanges || [])],
+        powerKws: [...((this._preset as any).powerKws || [])]
       };
       this.clampPrices();
       // Емитни, за да синхронизираме списъка с продукти с възстановените стойности
