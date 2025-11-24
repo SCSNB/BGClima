@@ -245,7 +245,6 @@ export class ProductCategoryComponent implements OnInit {
     }
 
     this.updateUrlFromFilters(filters); 
-
     this.loading = true;
     
     // Prepare filter parameters for the API call
@@ -297,7 +296,6 @@ export class ProductCategoryComponent implements OnInit {
       filterParams.sortOrder = sortOrder as 'asc' | 'desc';
     }
     
-    // Call the product service to get filtered products
     this.productService.getProducts(filterParams).subscribe({
       next: (response) => {
         const { items, totalCount } = this.transformProductResponse(response);
