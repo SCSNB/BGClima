@@ -84,8 +84,31 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   ];
   // Пълен списък за локално филтриране по allowedBrands
   private allBrands: BrandDto[] = [...this.brands];
-  // Списък с BTU стойности от бекенда
-  btuOptions: BTUDto[] = [];
+  btuOptions: BTUDto[] = [
+  { id: 1, value: "7000 BTU" },
+  { id: 2, value: "9000 BTU" },
+  { id: 3, value: "10000 BTU" },
+  { id: 4, value: "12000 BTU" },
+  { id: 5, value: "13000 BTU" },
+  { id: 6, value: "14000 BTU" },
+  { id: 7, value: "16000 BTU" },
+  { id: 8, value: "18000 BTU" },
+  { id: 9, value: "20000 BTU" },
+  { id: 10, value: "22000 BTU" },
+  { id: 11, value: "24000 BTU" },
+  { id: 12, value: "30000 BTU" },
+  { id: 13, value: "36000 BTU" },
+  { id: 14, value: "42000 BTU" },
+  { id: 15, value: "45000 BTU" },
+  { id: 16, value: "48000 BTU" },
+  { id: 17, value: "50000 BTU" },
+  { id: 18, value: "54000 BTU" },
+  { id: 19, value: "55000 BTU" },
+  { id: 20, value: "60000 BTU" },
+  { id: 21, value: "66000 BTU" },
+  { id: 22, value: "72000 BTU" },
+  { id: 23, value: "90000 BTU" }
+];
 
   // Специален набор BTU за "БГКЛИМА тръбни топлообменници"
   private topHeatExchangerBtuIds = [12, 13, 15, 20, 22]; // IDs for 24000, 36000, 48000, 60000, 72000 BTU
@@ -97,7 +120,6 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     }
     return this.btuOptions;
   }
-
 
   // Термопомпи: опции за Мощност (kW) – визуално като чеклист
   powerKwOptions: string[] = [
@@ -210,10 +232,13 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     return this.isHeatPumpSection ? this.heatPumpCategories : this.acCategories;
   }
 
-  onFiltersChanged() {
-    this.clampPrices();
-    this.filtersChanged.emit(this.filters);
-  }
+ onFiltersChanged(): void {
+  this.clampPrices();
+  this.filtersChanged.emit({
+    ...this.filters,
+    resetPagination: true 
+  });
+}
 
   toggleFilter(array: any[], value: any): void {
     const index = array.indexOf(value);
@@ -257,31 +282,12 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     return array.some(item => String(item) === String(value));
   }
 
+  isBTUSelected(brandId: number): boolean {
+    return this.filters.btus.includes(brandId);
+  }
+
   ngOnInit(): void {
     this.updateIsMobile();
-    // Зареждане на всички марки от базата
-    this.productService.getBrands().subscribe({
-      next: (brands) => {
-        this.allBrands = brands ?? [];
-        this.applyAllowedBrandsFilter();
-      },
-      error: (err) => {
-        console.error('Грешка при зареждане на марки:', err);
-        this.allBrands = [];
-        this.applyAllowedBrandsFilter();
-      }
-    });
-
-    // Зареждане на всички BTU стойности от базата
-    this.productService.getBTU().subscribe({
-      next: (btus) => {
-        this.btuOptions = btus ?? [];
-      },
-      error: (err) => {
-        console.error('Грешка при зареждане на BTU стойности:', err);
-        this.btuOptions = [];
-      }
-    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -299,8 +305,6 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
           this.filters.btus = (this.filters.btus || []).filter(id => allowedBtuIds.has(Number(id)));
         }
         this.clampPrices();
-
-        // this.filtersChanged.emit(this.filters);
       }
     }
     if (changes['preset'] && this._preset) {
@@ -311,13 +315,11 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
           upper: Number(this._preset.price?.upper ?? this.maxPrice)
         },
         energyClasses: [...(this._preset.energyClasses?.map(id => Number(id)) || [])],
-        btus: [...(this._preset.btus || [])].map(btu => Number(btu)),
+        btus: [...this._preset.btus],
         roomSizeRanges: [...(this._preset.roomSizeRanges || [])],
         powerKws: [...((this._preset as any).powerKws || [])]
       };
       this.clampPrices();
-      // Емитни, за да синхронизираме списъка с продукти с възстановените стойности
-      // this.filtersChanged.emit(this.filters);
     }
     if (changes['minPrice'] || changes['maxPrice']) {
       
@@ -325,8 +327,6 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
       this.filters.price.lower = this.minPrice;
       this.filters.price.upper = this.maxPrice;
       this.clampPrices();
-      // емитни веднъж, за да синхронизираме списъка
-      // this.filtersChanged.emit(this.filters);
     }
     if (changes['allowedBrands']) {
       this.applyAllowedBrandsFilter();

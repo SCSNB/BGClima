@@ -235,10 +235,16 @@ export class ProductCategoryComponent implements OnInit {
   }
 
   public applyFilters(filters: any): void {
-    this.currentFilters = filters;
+    if (filters.resetPagination) {
+      this.currentPage = 1;
+      // Remove the flag from filters
+      const { resetPagination, ...cleanFilters } = filters;
+      this.currentFilters = cleanFilters;
+    } else {
+      this.currentFilters = filters;
+    }
 
-    this.updateUrlFromFilters(filters);
-
+    this.updateUrlFromFilters(filters); 
     this.loading = true;
     
     // Prepare filter parameters for the API call
