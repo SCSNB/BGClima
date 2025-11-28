@@ -29,11 +29,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
 // Get connection string from environment variable (for Fly.io) or fall back to appsettings.json
-var connectionString = builder.Configuration.GetValue<string>("DATABASE_URL") ??
-                     Environment.GetEnvironmentVariable("DATABASE_URL") ??
-                     builder.Configuration["DATABASE_URL"] ??
-                     builder.Configuration.GetConnectionString("DefaultConnection") ??
-                     "Host=localhost;Port=5432;Database=bgclima;Username=postgres;Password=admin";
+var connectionString = "Host=51.21.18.29;Port=5432;Username=postgres.puegihlkhohkkxnboavo;Password=PxoI!SDz^!4sNG1@;Database=postgres;Ssl Mode=Require;Trust Server Certificate=true;Timeout=30;Pooling=true;Maximum Pool Size=20;Minimum Pool Size=5;";
 
 // Log which config source is being used
 if (!string.IsNullOrEmpty(builder.Configuration.GetValue<string>("DATABASE_URL")))
@@ -141,7 +137,7 @@ builder.Services.AddCors(options =>
 {
     var origins = builder.Environment.IsDevelopment()
         ? new[] { "http://localhost:4200" }
-        : new[] { "https://bgclima.fly.dev" };
+        : new[] { "https://bgclima.com", "https://www.bgclima.com" };
 
     options.AddDefaultPolicy(policy =>
     {
@@ -186,7 +182,9 @@ app.Use(async (context, next) =>
 
     if (!string.IsNullOrEmpty(origin) &&
         (origin.ToString().StartsWith("http://localhost:") ||
-         origin.ToString().StartsWith("https://bgclima.fly.dev")))
+         origin.ToString().StartsWith("https://www.bgclima.com") ||
+         origin.ToString().StartsWith("https://bgclima.com")
+         )
     {
         context.Response.Headers.Add("Access-Control-Allow-Origin", origin);
         context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
