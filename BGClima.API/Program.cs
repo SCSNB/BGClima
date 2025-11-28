@@ -29,7 +29,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
 // Get connection string from environment variable (for Fly.io) or fall back to appsettings.json
-var connectionString = "Host=51.21.18.29;Port=5432;Username=postgres.puegihlkhohkkxnboavo;Password=PxoI!SDz^!4sNG1@;Database=postgres;Ssl Mode=Require;Trust Server Certificate=true;Timeout=30;Pooling=true;Maximum Pool Size=20;Minimum Pool Size=5;";
+var connectionString = builder.Configuration.GetValue<string>("DATABASE_URL") ??
+                     Environment.GetEnvironmentVariable("DATABASE_URL") ??
+                     builder.Configuration["DATABASE_URL"] ??
+                     builder.Configuration.GetConnectionString("DefaultConnection") ??
+                     "Host=localhost;Port=5432;Database=bgclima;Username=postgres;Password=admin";
 
 // Log which config source is being used
 if (!string.IsNullOrEmpty(builder.Configuration.GetValue<string>("DATABASE_URL")))
