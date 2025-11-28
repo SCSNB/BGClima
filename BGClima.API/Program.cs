@@ -141,7 +141,7 @@ builder.Services.AddCors(options =>
 {
     var origins = builder.Environment.IsDevelopment()
         ? new[] { "http://localhost:4200" }
-        : new[] { "https://bgclima.fly.dev" };
+        : new[] { "https://bgclima.com", "https://www.bgclima.com" };
 
     options.AddDefaultPolicy(policy =>
     {
@@ -186,7 +186,8 @@ app.Use(async (context, next) =>
 
     if (!string.IsNullOrEmpty(origin) &&
         (origin.ToString().StartsWith("http://localhost:") ||
-         origin.ToString().StartsWith("https://bgclima.fly.dev")))
+         origin.ToString().StartsWith("https://www.bgclima.com") ||
+         origin.ToString().StartsWith("https://bgclima.com")))
     {
         context.Response.Headers.Add("Access-Control-Allow-Origin", origin);
         context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
