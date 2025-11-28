@@ -187,8 +187,7 @@ app.Use(async (context, next) =>
     if (!string.IsNullOrEmpty(origin) &&
         (origin.ToString().StartsWith("http://localhost:") ||
          origin.ToString().StartsWith("https://www.bgclima.com") ||
-         origin.ToString().StartsWith("https://bgclima.com")
-         )
+         origin.ToString().StartsWith("https://bgclima.com")))
     {
         context.Response.Headers.Add("Access-Control-Allow-Origin", origin);
         context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
