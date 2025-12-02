@@ -57,7 +57,17 @@ namespace BGClima.API.Controllers
                     query = query.Where(p => brandIds.Contains(p.BrandId));
 
                 if (productTypeId.HasValue)
-                    query = query.Where(p => p.ProductTypeId == productTypeId);
+                {
+                    if (productTypeId.Value == 1)
+                    {
+                        query = query.Where(p => p.ProductTypeId == 1 || p.ProductTypeId == 12);
+                    }
+                    else
+                    {
+                        query = query.Where(p => p.ProductTypeId == productTypeId);
+                    }
+                }
+
 
                 if (isFeatured.HasValue)
                     query = query.Where(p => p.IsFeatured == isFeatured);
@@ -223,7 +233,6 @@ namespace BGClima.API.Controllers
                   .Take(pageSize);
 
                 var products = await query
-                     .Where(p => p.IsActive)
                      .Select(p => new ProductBrief
                      {
                          Id = p.Id,

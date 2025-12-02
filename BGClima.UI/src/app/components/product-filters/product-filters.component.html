@@ -27,7 +27,7 @@
       <mat-checkbox *ngFor="let brand of brands"
                    [checked]="isBrandSelected(brand.id)"
                    (change)="toggleBrand(brand.id)">
-        {{ brand.name }} <span class="text-muted small" *ngIf="brand.country">({{ brand.country }})</span>
+        {{ brand.name }}
       </mat-checkbox>
     </div>
   </mat-expansion-panel>

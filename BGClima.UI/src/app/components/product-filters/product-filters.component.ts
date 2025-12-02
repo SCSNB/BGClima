@@ -69,7 +69,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
   // Списък с марки от бекенда
   brands: BrandDto[] = [
     { id: 1, name: 'Daikin', country: 'Япония' },
-    { id: 2, name: 'Mitsubishi Electric', country: 'Япония' },
+    { id: 2, name: 'Mitsubishi Heavy', country: 'Япония' },
     { id: 3, name: 'Toshiba', country: 'Япония' },
     { id: 4, name: 'Fujitsu', country: 'Япония' },
     { id: 5, name: 'Hitachi', country: 'Япония' },
@@ -80,7 +80,8 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     { id: 10, name: 'Kobe', country: 'Япония' },
     { id: 11, name: 'Sendo', country: 'Китай' },
     { id: 12, name: 'Cooper & Hunter', country: 'САЩ' },
-    { id: 13, name: 'Aqua Systems', country: 'България' }
+    { id: 13, name: 'Aqua Systems', country: 'България' },
+    { id: 14, name: 'Techpoint', country: 'Китай' }
   ];
   // Пълен списък за локално филтриране по allowedBrands
   private allBrands: BrandDto[] = [...this.brands];
