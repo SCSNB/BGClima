@@ -25,8 +25,18 @@ namespace BGClima.Infrastructure.Repositories
             var keyNeedle = "тип на инстала"; // обхваща "Тип на инсталацията"
             var value = categoryName?.Trim().ToLower();
 
-            // приемаме и синонима "Настен" за "Стенен тип"
-            var altValue = value == "стенен тип" ? "настен" : null;
+            var acceptedValues = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                acceptedValues.Add(value);
+
+                if (value == "стенен тип")
+                {
+                    acceptedValues.Add("настен");
+                    acceptedValues.Add("хиперинвертори");
+                }
+            }
 
             return await _dbSet
                 .Include(p => p.Brand)
@@ -35,10 +45,7 @@ namespace BGClima.Infrastructure.Repositories
                 .Where(p => p.Attributes.Any(a =>
                     a.AttributeKey != null && a.AttributeValue != null &&
                     a.AttributeKey.ToLower().Contains(keyNeedle) &&
-                    (
-                        a.AttributeValue.ToLower() == value ||
-                        (altValue != null && a.AttributeValue.ToLower() == altValue)
-                    )
+                    acceptedValues.Contains(a.AttributeValue.ToLower())
                 ))
                 .ToListAsync();
         }
