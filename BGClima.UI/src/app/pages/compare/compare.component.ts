@@ -67,7 +67,9 @@ export class CompareComponent implements OnInit {
   // ВЗЕМАНЕ НА АТРИБУТИ ПО КЛЮЧ
   private getAttrExact(p: ProductDto, key: string): string {
     const attrs = p.attributes || [];
-    const found = attrs.find(a => (a.attributeKey || '').trim().toLowerCase() === key.trim().toLowerCase());
+    const found = attrs.find(
+      a => (a.attributeKey || '').trim().toLowerCase() === key.trim().toLowerCase()
+    );
     return (found?.attributeValue || '').trim();
   }
 
@@ -79,25 +81,25 @@ export class CompareComponent implements OnInit {
     return '';
   }
 
-  // Извлича максималната стойност от текст във формат "Мин./Ном./Макс".
-  // Пример: "0.9/2.5/3.2 kW" -> "3.2 kW"
-  private getMaxFromValue(v: string): string {
+  // Извлича номиналната стойност от текст във формат "Мин./Ном./Макс".
+  // Пример: "0.9/2.5/3.2 kW" -> "2.5 kW"
+  private getNominalFromValue(v: string): string {
     if (!v) return '';
     // Нормализиране на разделителите и премахване на излишни интервали
     const parts = v.split('/')
       .map(s => s.trim())
       .filter(Boolean);
     if (parts.length >= 3) {
-      return parts[parts.length - 1];
+      return parts[1]; // Връщаме втората (номинална) стойност
     }
     // Ако не е във вид с "/", връщаме оригинала
     return v.trim();
   }
 
-  private getMaxFromAttr(p: ProductDto, key: string): string {
+  private getNominalFromAttr(p: ProductDto, key: string): string {
     const v = this.getAttrExact(p, key);
-    const max = this.getMaxFromValue(v);
-    return max || '';
+    const nominal = this.getNominalFromValue(v);
+    return nominal || '';
   }
 
   // Стойности за редовете под "Описание"
@@ -118,26 +120,26 @@ export class CompareComponent implements OnInit {
   }
 
   getArea(p: ProductDto): string {
-    return this.getAttrAny(p, ['подходящ за помещения до']) || '-';
+    return this.getAttrExact(p, 'подходящ за помещения до') || '-';
   }
 
   getCoolingCapacity(p: ProductDto): string {
-    const v = this.getMaxFromAttr(p, 'отдавана мощност на охлаждане (мин./ном./макс)');
+    const v = this.getNominalFromAttr(p, 'отдавана мощност на охлаждане (мин./ном./макс)');
     return v || '-';
   }
 
   getHeatingCapacity(p: ProductDto): string {
-    const v = this.getMaxFromAttr(p, 'отдавана мощност на отопление (мин./ном./макс)');
+    const v = this.getNominalFromAttr(p, 'отдавана мощност на отопление (мин./ном./макс)');
     return v || '-';
   }
 
   getConsumptionCooling(p: ProductDto): string {
-    const v = this.getMaxFromAttr(p, 'консумирана мощност на охлаждане (мин./ном./макс)');
+    const v = this.getNominalFromAttr(p, 'консумирана мощност на охлаждане (мин./ном./макс)');
     return v || '-';
   }
 
   getConsumptionHeating(p: ProductDto): string {
-    const v = this.getMaxFromAttr(p, 'консумирана мощност на отопление (мин./ном./макс)');
+    const v = this.getNominalFromAttr(p, 'консумирана мощност на отопление (мин./ном./макс)');
     return v || '-';
   }
 
