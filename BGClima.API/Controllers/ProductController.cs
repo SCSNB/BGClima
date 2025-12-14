@@ -49,7 +49,11 @@ namespace BGClima.API.Controllers
                     .Include(p => p.BTU)
                     .Include(p => p.EnergyClass)
                     .Include(p => p.Brand)
-                    .Include(p => p.Attributes.Where(a => a.AttributeKey.Contains("мощност") || a.AttributeKey.Contains("Енергиен") || a.AttributeKey.Contains("Wi-Fi")))
+                    .Include(p => p.Attributes.Where(a =>
+                        a.AttributeKey.Contains("мощност") ||
+                        a.AttributeKey.Contains("Енергиен") ||
+                        a.AttributeKey.Contains("Wi-Fi") ||
+                        a.AttributeKey.Contains("Подходящ за помещения до")))
                     .AsQueryable();
 
                 // Филтриране
@@ -143,7 +147,8 @@ namespace BGClima.API.Controllers
                          Attributes = p.Attributes
                              .Where(a => a.AttributeKey.Contains("мощност")
                                       || a.AttributeKey.Contains("Енергиен")
-                                      || a.AttributeKey.Contains("Wi-Fi"))
+                                      || a.AttributeKey.Contains("Wi-Fi")
+                                      || a.AttributeKey.Contains("Подходящ за помещения до"))
                              .Select(a => new ProductAttributeDto
                              {
                                  Id = a.Id,
