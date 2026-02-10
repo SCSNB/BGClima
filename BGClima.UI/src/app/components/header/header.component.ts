@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CompareService } from 'src/app/services/compare.service';
+import { GoogleAnalyticsService } from 'src/app/services/google-analytics.service';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -16,7 +17,8 @@ export class HeaderComponent {
   constructor(
     private router: Router,
     private snackBar: MatSnackBar,
-    private compareService: CompareService
+    private compareService: CompareService,
+    private analytics: GoogleAnalyticsService
   ) {
     this.compareCount$ = this.compareService.count$;
   }
@@ -29,6 +31,8 @@ export class HeaderComponent {
     if (!searchTerm || searchTerm.trim() === '') {
       return;
     }
+
+    this.analytics.trackSearch(searchTerm);
     // Navigate to search results page with the search term as a query parameter
     this.router.navigate(['/search'], { queryParams: { q: searchTerm } });
   }
@@ -40,6 +44,8 @@ export class HeaderComponent {
 
   onPhone() {
     // Тук може да стартирате обаждане или да покажете телефонен номер
+    this.analytics.trackPhoneCallClick('042638248');
+    this.analytics.trackAdsPhoneCall();
     window.location.href = 'tel:042638248';
   }
 
