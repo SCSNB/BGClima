@@ -58,17 +58,17 @@
       <!-- Price -->
       <div class="price-section">
         <div class="current-price">
-          <span class="price">{{product.price | number:'1.2-2'}} лв.</span>
-          <span class="price-eur">/ {{(product.price / 1.9558) | number:'1.2-2'}} €</span>
+          <span class="price">{{(product.price / 1.95583) | number:'1.2-2'}} €</span>
+          <span class="price-eur">/ {{product.price | number:'1.2-2'}} лв.</span>
         </div>
         <div class="old-price" *ngIf="product.oldPrice">
-          <span class="price">{{product.oldPrice | number:'1.2-2'}} лв.</span>
-          <span class="price-eur">/ {{(product.oldPrice / 1.9558) | number:'1.2-2'}} €</span>
+          <span class="price">{{(product.oldPrice / 1.95583) | number:'1.2-2'}} €</span>
+          <span class="price-eur">/ {{product.oldPrice | number:'1.2-2'}} лв.</span>
         </div>
       </div>
       
       <div class="price-vat-info">
-        Цените са с включен ДДС. Цените са обозначени в лева и евро по официалния валутен курс на БНБ: 1 EUR = 1.95583 BGN
+        Цените са с включен ДДС. Цените са обозначени в евро и лева по официалния валутен курс на БНБ: 1 EUR = 1.95583 BGN
       </div>
 
       <!-- Product Specifications Icons -->
@@ -211,7 +211,7 @@
         <a [routerLink]="['/product', related.id]">
           <img [src]="related.imageUrl || 'assets/no-image.png'" [alt]="related.name" />
           <h3>{{related.name}}</h3>
-          <div class="price">{{related.price | number:'1.2-2'}} лв.</div>
+          <div class="price">{{(related.price / 1.95583) | number:'1.2-2'}} €</div>
         </a>
       </div>
     </div>

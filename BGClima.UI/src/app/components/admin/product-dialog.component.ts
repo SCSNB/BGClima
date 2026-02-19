@@ -199,8 +199,9 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
     this.form = this.fb.group({
       name: [data.product?.name ?? '', [Validators.required, Validators.maxLength(200)]],
       description: [data.product?.description ?? ''],
-      price: [data.product?.price ?? 0, [Validators.required, Validators.min(0)]],
-      oldPrice: [data.product?.oldPrice ?? null, [Validators.min(0)]],
+      // Конвертиране от лева към евро при зареждане
+      price: [data.product?.price ? this.toEur(data.product.price) : 0, [Validators.required, Validators.min(0)]],
+      oldPrice: [data.product?.oldPrice ? this.toEur(data.product.oldPrice) : null, [Validators.min(0)]],
       stockQuantity: [data.product?.stockQuantity ?? 0, [Validators.required, Validators.min(0)]],
       brandId: [data.product?.brand?.id ?? null, Validators.required],
       productTypeId: [data.product?.productType?.id ?? null, Validators.required],
@@ -319,6 +320,9 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
         isOnSale: !!this.form.value.isOnSale,
         isFeatured: !!this.form.value.isFeatured,
         stockQuantity: this.form.value.stockQuantity || 0,
+        // Конвертиране от евро към лева за съхранение в базата данни
+        price: this.toBgn(this.form.value.price),
+        oldPrice: this.form.value.oldPrice ? this.toBgn(this.form.value.oldPrice) : null,
         images: this.images.map((img, index) => ({
           imageUrl: img.url,
           altText: `Снимка на ${this.form.get('name')?.value || 'продукт'}`,
@@ -495,6 +499,16 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
     this.cleanupObjectUrls();
   }
 
+  private toEur(amountBgn: number): number {
+    const rate = 1.95583;
+    return Math.round((amountBgn / rate) * 100) / 100;
+  }
+
+  private toBgn(amountEur: number): number {
+    const rate = 1.95583;
+    return Math.round((amountEur * rate) * 100) / 100;
+  }
+
   private cleanupObjectUrls(): void {
     // Clean up all object URLs to prevent memory leaks
     this.images.forEach(img => {
@@ -503,4 +517,4 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
       }
     });
   }
-} 
+}
