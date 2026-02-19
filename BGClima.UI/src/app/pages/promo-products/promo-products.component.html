@@ -55,12 +55,12 @@
             <div class="offer-card-prices">
               <div class="price-container">
                 <div class="current-prices">
-                  <span class="current-price">{{ p.price | number:'1.2-2' }} лв.</span>
-                  <span class="current-price-eur" *ngIf="p.priceEur">/ {{ p.priceEur | number:'1.2-2' }} €</span>
+                  <span class="current-price">{{ p.priceEur | number:'1.2-2' }} €</span>
+                  <span class="current-price-eur" *ngIf="p.priceEur">/ {{ p.price | number:'1.2-2' }} лв.</span>
                 </div>
                 <div class="old-prices" *ngIf="p.oldPrice">
-                  <span class="old-price">{{ p.oldPrice | number:'1.2-2' }} лв.</span>
-                  <span class="old-price-eur" *ngIf="p.oldPriceEur">/ {{ p.oldPriceEur | number:'1.2-2' }} €</span>
+                  <span class="old-price">{{ p.oldPriceEur | number:'1.2-2' }} €</span>
+                  <span class="old-price-eur" *ngIf="p.oldPriceEur">/ {{ p.oldPrice | number:'1.2-2' }} лв.</span>
                 </div>
               </div>
             </div>

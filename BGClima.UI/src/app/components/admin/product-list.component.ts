@@ -142,4 +142,9 @@ export class ProductListComponent implements OnInit {
       error: () => this.snack.open('Грешка при изтриване', 'OK', { duration: 3000 })
     });
   }
+
+  toEur(amountBgn: number): number {
+    const rate = 1.95583;
+    return Math.round((amountBgn / rate) * 100) / 100;
+  }
 } 
