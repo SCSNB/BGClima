@@ -78,7 +78,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     { id: 8, name: 'Nippon', country: 'Япония' },
     { id: 9, name: 'Inventor', country: 'Гърция' },
     { id: 10, name: 'Kobe', country: 'Япония' },
-    { id: 11, name: 'Sendo', country: 'Китай' },
+    { id: 11, name: 'Mitsubishi Electric', country: 'Китай' },
     { id: 12, name: 'Cooper & Hunter', country: 'САЩ' },
     { id: 13, name: 'Aqua Systems', country: 'България' },
     { id: 14, name: 'Techpoint', country: 'Китай' }
