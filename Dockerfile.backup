@@ -1,19 +1,3 @@
-# Use Node.js image for building Angular
-FROM node:18 AS angular-build
-WORKDIR /src/ui
-
-# Copy Angular project files
-COPY BGClima.UI/package.json BGClima.UI/package-lock.json ./
-
-# Install Angular dependencies
-RUN npm ci
-
-# Copy Angular source code
-COPY BGClima.UI/ ./
-
-# Build Angular application
-RUN npm run build
-
 # Use the official .NET 8.0 SDK image for building
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
@@ -32,9 +16,6 @@ RUN dotnet restore
 
 # Copy the rest of the source code
 COPY . .
-
-# Copy Angular build output to wwwroot
-COPY --from=angular-build /src/ui/dist/bgclima.ui ./BGClima.API/wwwroot/
 
 # Build the application
 WORKDIR /src/BGClima.API

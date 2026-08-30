@@ -66,7 +66,7 @@ export class ProductFiltersComponent implements OnChanges, OnInit {
     { value: '65-75', label: '65-75 кв.м' }
   ];
 
-  // Списък с марки от бекенда
+ 
   brands: BrandDto[] = [
     { id: 1, name: 'Daikin', country: 'Япония' },
     { id: 2, name: 'Mitsubishi Heavy', country: 'Япония' },
