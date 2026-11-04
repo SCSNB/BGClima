@@ -441,3 +441,10 @@ html, body {
     margin-left: 4px !important;
   }
 }
+
+/* Скриване на цените в лева от всички карти с продукти */
+.price-eur,
+.current-price-eur,
+.old-price-eur {
+  display: none !important;
+}
